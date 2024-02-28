@@ -1,0 +1,121 @@
+body{
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(to right, #e9dfc4 0%, #e9dfc4 1%, #ede3c8 2%, #ede3c8 24%, #ebddc3 25%, #e9dfc4 48%, #ebddc3 49%, #e6d8bd 52%, #e6d8bd 53%, #e9dbc0 54%, #e6d8bd 55%, #e6d8bd 56%, #e9dbc0 57%, #e6d8bd 58%, #e6d8bd 73%, #e9dbc0 74%, #e9dbc0 98%, #ebddc3 100%);
+    background-size: 120px;
+    background-repeat: repeat;
+}
+
+.agent-data-page{
+    padding: 1rem 1rem;
+    height: 100%;
+    width: 100%;
+}
+
+.heading{
+    /* width: 100%; */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+}
+.sort-filter{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+}
+.total-count{
+    margin-top: 2rem;
+}
+
+.dashboard-content{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.background-points{
+    background-color: white;
+    /* width: 3rem; */
+    border-radius: 2rem;
+    margin-right: 3rem;
+    cursor: pointer;
+  }
+
+  .points{
+    color: green;
+    font-family: sans-serif;
+    font-weight: bolder;
+    font-size: 15px;
+    text-align: center;
+    padding: 0.3rem 0.5rem;
+  }
+
+.dashboard{
+    margin-left: 0.3rem;
+}
+.home-icon{
+    margin-bottom: 0.5rem;
+}
+.chevron_right{
+    color: white;
+    font-size: 50px;
+}
+
+.background-total-registration{
+    background-color: red;
+}
+.background-process-completed{
+    background-color: #355E3B;
+}
+.background-pending{
+    background-color:darkcyan;
+}
+.todays-registration{
+    background-color:darkcyan;
+}
+.background-pending{
+    background-color:maroon;
+}
+.align{
+    width: 90%;
+}
+
+.total-registration{
+    border-radius: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: row;
+    width: 95%;
+}
+.registration-text{
+    font-weight: bolder;
+    color:white;
+    font-size: 20px;
+    padding: 1rem 0rem 1rem 1rem;
+    font-family: sans-serif;
+}
+.count{
+    font-weight: bolder;
+    color:white;
+    font-size: 18px;
+    padding: 0rem 1rem 1rem 1rem;
+    font-family: sans-serif;
+
+}
+
+a{
+    text-decoration: none;
+}
+
+.dropdowns{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
