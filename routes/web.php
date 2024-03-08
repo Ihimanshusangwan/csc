@@ -29,6 +29,7 @@ Route::get('/admin/logout', [AdminLoginController::class, 'logout'])->name('admi
 Route::get('/agents/{id}', [AdminLoginController::class, 'agentView'])->name('agent.show');
 Route::get('/admin/filter', [AdminLoginController::class, 'filter'])->name('admin.filter');
 Route::get('/admin/recharge-history', [AdminLoginController::class, 'rechargeHistory'])->name('admin.recharge-history');
+Route::get('/admin/appointment-history', [AdminLoginController::class, 'appointments'])->name('admin.appointment-history');
 
 
 //service groups routes
@@ -42,6 +43,8 @@ Route::put('/service-groups/{id}/update', [ServiceGroupController::class, 'updat
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
 Route::get('services/{id}/delete', [ServiceController::class, 'destroy'])->name('services.delete');
+Route::post('/update-visibility/{serviceId}', [ServiceController::class, 'updateVisibility'])->name('update-visibility');
+
 
 // location routes
 
@@ -55,6 +58,9 @@ use App\Http\Controllers\PriceController;
 Route::get('/prices/{serviceId}', [PriceController::class, 'index'])->name('prices.index');
 Route::post('/prices/{serviceId}/store', [PriceController::class, 'store'])->name('prices.store');
 Route::post('/prices/update', [PriceController::class, 'update'])->name('prices.update');
+Route::put('/services/{serviceId}/update-appointment-price', [PriceController::class, 'updateAppointmentPrice'])
+    ->name('services.update-appointment-price');
+
 
 //plans routes
 
@@ -93,6 +99,12 @@ Route::post('/submit-form/{id}', [ApplyServiceController::class, 'submitForm'])-
 //application routes
 use App\Http\Controllers\ApplicationController;
 Route::post('/update-application', [ApplicationController::class, 'update'])->name('application.update');
+
+//appointment routes
+
+use App\Http\Controllers\AppointmentController;
+Route::get('/appointment', [AppointmentController::class, 'index'])->name('appointment');
+Route::post('/appointments/store', [AppointmentController::class, 'store'])->name('appointments.store');
 
 
 

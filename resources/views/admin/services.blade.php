@@ -12,55 +12,71 @@
 
     <div class="container mt-5">
         <h1>Services</h1>
-        <a href="{{route('admin.dashboard')}}" class="btn btn-secondary m-3">Home</a>
+        <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary m-3">Home</a>
         <!-- Add New Service Button -->
         <button type="button" class="btn btn-primary m-3" data-toggle="modal" data-target="#addServiceModal">
             Add New Service
         </button>
         <!-- Success Message -->
-        @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
         @endif
 
         <!-- Error Message -->
-        @if(session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
+        @if (session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
         @endif
         <div class="row">
 
             <!-- Display Services as Cards -->
-            @foreach($services as $service)
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $service->name }}</h5>
-                        <p><strong>Service Group:</strong> {{ $service->service_group_name }}</p>
-                        <p><strong>Document Requirements:</strong></p>
-                        <ol class="list-group list-group-numbered">
-                            @php
-                            $requirements = explode(',', $service->requirements);
-                            @endphp
+            @foreach ($services as $service)
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $service->name }}</h5>
+                            <p><strong>Service Group:</strong> {{ $service->service_group_name }}</p>
+                            <p><strong>Document Requirements:</strong></p>
+                            <ol class="list-group list-group-numbered">
+                                @php
+                                    $requirements = explode(',', $service->requirements);
+                                @endphp
 
-                            @foreach ($requirements as $requirement)
-                            <li class="list-group-item">{{ trim($requirement) }}</li>
-                            @endforeach
-                        </ol>
+                                @foreach ($requirements as $requirement)
+                                    <li class="list-group-item">{{ trim($requirement) }}</li>
+                                @endforeach
+                            </ol>
 
-                        <!-- Button to Preview Form -->
-                        <button type="button" class="btn btn-warning m-1"
-                            onclick="previewServiceForm('{{ addslashes($service->form) }}')">Preview Form</button>
-                        <a href="{{ route('services.delete', $service->id) }}" class="btn btn-danger m-1"
-                            onclick="return confirm('Are you sure you want to delete this service?')">Delete Service</a>
-                        <a href="{{ route('prices.index', $service->id) }}" class="btn btn-info m-1">Manage Prices</a>
-
-
+                            <!-- Button to Preview Form -->
+                            <button type="button" class="btn btn-warning m-1"
+                                onclick="previewServiceForm('{{ addslashes($service->form) }}')">Preview Form</button>
+                            <a href="{{ route('services.delete', $service->id) }}" class="btn btn-danger m-1"
+                                onclick="return confirm('Are you sure you want to delete this service?')">Delete
+                                Service</a>
+                            <a href="{{ route('prices.index', $service->id) }}" class="btn btn-info m-1">Manage
+                                Prices</a>
+                            <h6>Visibility</h6>
+                            <div class="btn-group" role="group" aria-label="Basic example"
+                                id="btn-group-{{ $service->id }}">
+                                <button type="button"
+                                    class="btn btn-sm btn-secondary {{ $service->visibility == 1 ? 'active' : '' }}"
+                                    data-route="{{ route('update-visibility', ['serviceId' => $service->id]) }}"
+                                    onclick="handleVisibility(this, {{ $service->id }}, 1)">Appointments</button>
+                                <button type="button"
+                                    class="btn btn-sm btn-secondary {{ $service->visibility == 2 ? 'active' : '' }}"
+                                    data-route="{{ route('update-visibility', ['serviceId' => $service->id]) }}"
+                                    onclick="handleVisibility(this, {{ $service->id }}, 2)">Agents</button>
+                                <button type="button"
+                                    class="btn btn-sm btn-secondary {{ $service->visibility == 3 ? 'active' : '' }}"
+                                    data-route="{{ route('update-visibility', ['serviceId' => $service->id]) }}"
+                                    onclick="handleVisibility(this, {{ $service->id }}, 3)">Both</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
             @endforeach
 
         </div>
@@ -90,8 +106,8 @@
                             <div class="form-group">
                                 <label for="serviceGroup">Service Group</label>
                                 <select class="form-control" id="serviceGroup" name="service_group_id" required>
-                                    @foreach($serviceGroups as $serviceGroup)
-                                    <option value="{{ $serviceGroup->id }}">{{ $serviceGroup->name }}</option>
+                                    @foreach ($serviceGroups as $serviceGroup)
+                                        <option value="{{ $serviceGroup->id }}">{{ $serviceGroup->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -100,8 +116,7 @@
                             <div class="form-group">
                                 <label for="serviceRequirements">Document Requirements (enter comma-separated
                                     values)</label>
-                                <textarea class="form-control" id="serviceRequirements" name="requirements" rows="3"
-                                    required></textarea>
+                                <textarea class="form-control" id="serviceRequirements" name="requirements" rows="3" required></textarea>
                             </div>
 
                             <!-- Dynamic Form Construction -->
@@ -147,8 +162,72 @@
 
 
     </div>
+
+    <script src="{{ asset('js/sweetAlert.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        function handleVisibility(button, serviceId, visibilityId) {
+            // Get the button group element
+            const buttonGroup = button.parentElement;
+
+            // Get the route URL from the button's data attribute
+            const routeUrl = button.dataset.route;
+
+            // Send a fetch request to update visibility
+            fetch(`${routeUrl}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        serviceId,
+                        visibilityId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response
+                    const buttons = buttonGroup.querySelectorAll('button');
+                    buttons.forEach(btn => {
+                        if (btn === button) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+
+                    // Visibility names mapping
+                    const visibilityNames = {
+                        1: 'Appointments',
+                        2: 'Agents',
+                        3: 'Both'
+                    };
+
+                    // Get the visibility name from the mapping
+                    const visibilityName = visibilityNames[visibilityId];
+
+                    // Show SweetAlert alert
+                    Swal.fire({
+                        title: 'Visibility Changed',
+                        text: `You chose to update visibility to "${visibilityName}" `,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Handle errors
+                });
+        }
+
+
+
+
+
+        document.addEventListener("DOMContentLoaded", function() {
             let formFieldsCount = 0;
             const formFieldsContainer = document.getElementById("formFields");
             const formDataInput = document.getElementById("form_data");
@@ -184,38 +263,42 @@
             }
 
             function updateFormData() {
-    const formData = [];
-    for (let i = 1; i <= formFieldsCount; i++) {
-        const inputType = document.getElementById(`inputType${i}`).value;
-        const inputLabel = document.getElementById(`inputLabel${i}`).value.trim(); // Trim to remove leading/trailing spaces
-        if (inputLabel !== '') { // Check if label is not empty
-            const optionsGroup = document.getElementById(`optionsGroup${i}`);
-            const inputOptions = optionsGroup.style.display === "none" ? [] : document.getElementById(`inputOptions${i}`).value.split(',');
-    
-            formData.push({
-                type: inputType,
-                label: inputLabel,
-                options: inputOptions,
-            });
-        }
-    }
-    
-    formDataInput.value = JSON.stringify(formData);
-    console.log(JSON.stringify(formData));
-}
+                const formData = [];
+                for (let i = 1; i <= formFieldsCount; i++) {
+                    const inputType = document.getElementById(`inputType${i}`).value;
+                    const inputLabel = document.getElementById(`inputLabel${i}`).value
+                        .trim(); // Trim to remove leading/trailing spaces
+                    if (inputLabel !== '') { // Check if label is not empty
+                        const optionsGroup = document.getElementById(`optionsGroup${i}`);
+                        const inputOptions = optionsGroup.style.display === "none" ? [] : document.getElementById(
+                            `inputOptions${i}`).value.split(',');
+
+                        formData.push({
+                            type: inputType,
+                            label: inputLabel,
+                            options: inputOptions,
+                        });
+                    }
+                }
+
+                formDataInput.value = JSON.stringify(formData);
+                console.log(JSON.stringify(formData));
+            }
 
 
-            formFieldsContainer.addEventListener("change", function (event) {
+            formFieldsContainer.addEventListener("change", function(event) {
                 const target = event.target;
                 if (target && target.tagName === "SELECT" && target.id.startsWith("inputType")) {
                     const optionsGroup = document.getElementById(`optionsGroup${target.id.slice(-1)}`);
-                    optionsGroup.style.display = ["checkbox", "radio", "selectbox"].includes(target.value) ? "block" : "none";
+                    optionsGroup.style.display = ["checkbox", "radio", "selectbox"].includes(target.value) ?
+                        "block" : "none";
                     updateFormData();
                 }
             });
 
             document.getElementById("addInputButton").addEventListener("click", addFormField);
             document.getElementById("previewButton").addEventListener("click", previewForm);
+
             function previewForm() {
                 $('#addServiceModal').modal('hide');
                 updateFormData();
@@ -238,8 +321,10 @@
                     } else if (["checkbox", "radio"].includes(field.type)) {
                         field.options.forEach(option => {
                             formPreviewHTML += '<div class="form-check">';
-                            formPreviewHTML += `<input type="${field.type}" class="form-check-input" id="${option}">`;
-                            formPreviewHTML += `<label class="form-check-label" for="${option}">${option}</label>`;
+                            formPreviewHTML +=
+                                `<input type="${field.type}" class="form-check-input" id="${option}">`;
+                            formPreviewHTML +=
+                                `<label class="form-check-label" for="${option}">${option}</label>`;
                             formPreviewHTML += '</div>';
                         });
                     }
@@ -255,10 +340,12 @@
 
 
         });
+
         function closePreviewModal() {
             $('#formPreviewModal').modal('hide');
             $('#addServiceModal').modal('show');
         }
+
         function previewServiceForm(formInputJson) {
             const formPreviewContainer = document.getElementById("formPreview");
 
@@ -282,8 +369,10 @@
                 } else if (["checkbox", "radio"].includes(field.type)) {
                     field.options.forEach(option => {
                         formPreviewHTML += '<div class="form-check">';
-                        formPreviewHTML += `<input type="${field.type}" class="form-check-input" id="${option}">`;
-                        formPreviewHTML += `<label class="form-check-label" for="${option}">${option}</label>`;
+                        formPreviewHTML +=
+                            `<input type="${field.type}" class="form-check-input" id="${option}">`;
+                        formPreviewHTML +=
+                            `<label class="form-check-label" for="${option}">${option}</label>`;
                         formPreviewHTML += '</div>';
                     });
                 }
@@ -298,13 +387,7 @@
             // Show the modal
             $("#formPreviewModal").modal("show");
         }
-
-
     </script>
-
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 
 </body>

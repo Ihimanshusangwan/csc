@@ -26,6 +26,33 @@
         </div>
         @endif
         <a href="{{route('services.index')}}" class="btn btn-secondary m-3">Back</a>
+        <div class="container my-2">
+            <form action="{{ route('services.update-appointment-price', ['serviceId' => $serviceId]) }}" method="POST">
+                @csrf
+                @method('PUT')
+              <div class="form-group">
+                <label for="appointmentPrice"><strong>Appointment Price:</strong></label>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text">₹</span>
+                            </div>
+                            <input type="number" class="form-control" id="appointmentPrice" placeholder="Appointment Price" aria-label="Appointment Price" aria-describedby="basic-addon1" value="{{ isset($appointmentPrice) ? $appointmentPrice : '' }}" name="appointment_price"> 
+
+                          </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary ">Update</button>
+                    </div>
+                    
+
+                </div>
+                
+              </div>
+             
+            </form>
+          </div>
         <table class="table">
             <thead>
                 <tr>

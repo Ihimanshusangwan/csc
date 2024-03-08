@@ -47,6 +47,10 @@
                 <a href="index.html"
                     class="block md:inline-block px-4 py-3 no-underline text-grey-darkest hover:text-grey-darker text-white">Home</a>
             </li>
+            <li class="border-t md:border-none">
+                <a href="{{route('appointment');}}"
+                    class="block md:inline-block px-4 py-3 no-underline text-grey-darkest hover:text-grey-darker text-white">Book an appointment</a>
+            </li>
 
             <li class="border-t md:border-none dropdown inline-block relative">
                 <a class="block md:inline-block px-4 py-3 no-underline text-grey-darkest hover:text-grey-darker"><span

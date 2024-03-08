@@ -28,7 +28,9 @@ class PlanController extends Controller
 
         $serviceGroups = DB::table('service_groups')->get();
         $services = DB::table('services')
-        ->where("is_active",1)->get();
+        ->where("is_active",1)
+        ->where("visibility", 2)
+        ->orwhere("visibility", 3)->get();
 
         return view('admin.plans', compact('groupedPlans', 'serviceGroups', 'services'));
     }

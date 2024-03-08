@@ -62,6 +62,9 @@
                 <li class="nav-item m-2">
                         <a class="btn btn-secondary" href="{{ route('admin.recharge-history') }}">Recharge Histroy </a>
                 </li>
+                <li class="nav-item m-2">
+                        <a class="btn btn-secondary" href="{{ route('admin.appointment-history') }}">Appointments</a>
+                </li>
             </ul>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">

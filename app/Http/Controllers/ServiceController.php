@@ -49,5 +49,17 @@ class ServiceController extends Controller
 
         return redirect()->route('services.index')->with('success', 'Service status updated successfully.');
     }
+    public function updateVisibility(Request $request, $serviceId)
+    {
+        $visibilityId = $request->input('visibilityId');
+
+        // Update visibility in the database
+        DB::table('services')
+            ->where('id', $serviceId)
+            ->update(['visibility' => $visibilityId]);
+
+        // Return response
+        return response()->json(['message' => 'Visibility updated successfully'], 200);
+    }
 
 }

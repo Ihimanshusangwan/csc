@@ -23,7 +23,8 @@ class PriceController extends Controller
             ->orderBy('locations.district', 'asc')
             ->distinct()
             ->get();
-        return view('admin.prices', ['locations' => $locations, 'serviceId' => $serviceId]);
+        $appointmentPrice = DB::table('services')->select('appointment_price')->where('id','=',$serviceId)->first()->appointment_price;
+        return view('admin.prices', ['locations' => $locations, 'serviceId' => $serviceId, 'appointmentPrice'=>$appointmentPrice]);
     }
 
     public function store(Request $request, $serviceId)
@@ -79,6 +80,17 @@ class PriceController extends Controller
             ]);
 
         return redirect()->back()->with('success', 'Price successfully updated.');
+    }
+
+    public function updateAppointmentPrice(Request $request, $serviceId)
+    {
+        $newPrice = $request->input('appointment_price');
+
+        DB::table('services')
+            ->where('id', $serviceId)
+            ->update(['appointment_price' => $newPrice]);
+
+        return redirect()->back()->with('success', 'Appointment price updated successfully.');
     }
 
 

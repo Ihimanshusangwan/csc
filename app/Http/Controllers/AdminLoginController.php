@@ -256,4 +256,23 @@ class AdminLoginController extends Controller
         return view("admin.rechargeHistory", compact('recharges', 'earnings'));
 
     }
+    public function appointments(Request $request)
+    {
+
+        $query = DB::table('appointments')
+            ->join('locations', 'appointments.city_id', '=', 'locations.id')
+            ->join('services', 'appointments.service_id', '=', 'services.id')
+            ->select(
+                'appointments.*',
+                'locations.*',
+                'services.name as service',
+            )
+            ->orderby('appointments.id', 'desc');
+
+        // Fetch paginated applications
+        $appointments = $query->paginate(15);
+
+        return view("admin.appointments", compact('appointments'));
+
+    }
 }
