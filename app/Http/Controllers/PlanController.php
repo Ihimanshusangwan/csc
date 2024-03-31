@@ -26,7 +26,7 @@ class PlanController extends Controller
 
         $groupedPlans = $plans->groupBy('plan_id');
 
-        $serviceGroups = DB::table('service_groups')->get();
+        $serviceGroups = DB::table('service_groups')->where('visibility',1)->where('availability', 0)->get();
         $services = DB::table('services')
         ->where("is_active",1)
         ->where("visibility", 2)

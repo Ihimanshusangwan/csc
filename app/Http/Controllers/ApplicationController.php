@@ -20,6 +20,10 @@ class ApplicationController extends Controller
         if ($request->has('delivery_date')) {
             $updateData['delivery_date'] = $request->input('delivery_date');
         }
+        // Update the status if provided
+        if ($request->has('status')) {
+            $updateData['status'] = $request->input('status');
+        }
     
         // Update the document if provided
         if ($request->hasFile('document')) {

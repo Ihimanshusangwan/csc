@@ -30,6 +30,11 @@ Route::get('/agents/{id}', [AdminLoginController::class, 'agentView'])->name('ag
 Route::get('/admin/filter', [AdminLoginController::class, 'filter'])->name('admin.filter');
 Route::get('/admin/recharge-history', [AdminLoginController::class, 'rechargeHistory'])->name('admin.recharge-history');
 Route::get('/admin/appointment-history', [AdminLoginController::class, 'appointments'])->name('admin.appointment-history');
+Route::get('/admin/visited-appointments', [AdminLoginController::class, 'visitedAppointments'])->name('admin.appointment-visited');
+Route::get('/admin/rejected-appointment', [AdminLoginController::class, 'rejectedAppointments'])->name('admin.appointment-rejected');
+Route::post('/admin/delete-data', [AdminLoginController::class, 'deleteData'])->name('admin.delete-data');
+Route::get('/admin/delete-data', [AdminLoginController::class, 'showDeleteForm'])->name('admin.delete-form');
+Route::get('admin/registered-staff', [AdminLoginController::class, 'showStaffDetails'])->name('admin.registered-staff');
 
 
 //service groups routes
@@ -37,6 +42,8 @@ Route::get('/service-groups', [ServiceGroupController::class, 'index'])->name('s
 Route::post('/service-groups', [ServiceGroupController::class, 'store'])->name('service-groups.store');
 Route::get('/service-groups/{id}/edit', [ServiceGroupController::class, 'edit'])->name('service-groups.edit');
 Route::put('/service-groups/{id}/update', [ServiceGroupController::class, 'update'])->name('service-groups.update');
+Route::post('/service-groups/{groupId}/update-visibility', [ServiceGroupController::class, 'updateVisibility'])->name('service-groups.update-visibility');
+Route::post('/service-groups/{groupId}/update-availability', [ServiceGroupController::class, 'updateAvailability'])->name('service-groups.update-availability');
 
 //service routes
 
@@ -44,6 +51,7 @@ Route::get('/services', [ServiceController::class, 'index'])->name('services.ind
 Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
 Route::get('services/{id}/delete', [ServiceController::class, 'destroy'])->name('services.delete');
 Route::post('/update-visibility/{serviceId}', [ServiceController::class, 'updateVisibility'])->name('update-visibility');
+Route::post('/update-availability/{serviceId}', [ServiceController::class, 'updateAvailability'])->name('update-availability');
 
 
 // location routes
@@ -105,7 +113,24 @@ Route::post('/update-application', [ApplicationController::class, 'update'])->na
 use App\Http\Controllers\AppointmentController;
 Route::get('/appointment', [AppointmentController::class, 'index'])->name('appointment');
 Route::post('/appointments/store', [AppointmentController::class, 'store'])->name('appointments.store');
+Route::post('/appointments/visited', [AppointmentController::class, 'markVisited'])->name('appointments.visited');
+Route::post('/appointments/reject', [AppointmentController::class, 'rejectAppointment'])->name('appointments.reject');
 
+//staff routes
+use App\Http\Controllers\StaffController;
+Route::get('/register-staff',[StaffController::class,'create'])->name("staffs.create");
+Route::post('/register/staff', [StaffController::class, 'register'])->name('staff.register');
+Route::get('/staff/logout', [StaffController::class, 'logout'])->name('staff.logout');
+Route::get('/staff/login', [StaffController::class, 'showLoginForm'])->name('staff.login');
+Route::post('/staff/login', [StaffController::class, 'login'])->name('staff.login.submit');
+Route::get('/staff/dashboard', [StaffController::class, 'index'])->name('staff.dashboard');
+
+//statuses routes
+use App\Http\Controllers\StatusController;
+
+Route::get('statuses/{service_id}', [StatusController::class, 'index'])->name('statuses.index');
+Route::post('statuses/{id}', [StatusController::class, 'update'])->name('statuses.update');
+Route::post('statuses', [StatusController::class, 'store'])->name('statuses.store');
 
 
 

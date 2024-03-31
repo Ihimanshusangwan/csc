@@ -225,25 +225,29 @@
         </td>
 
         <td>
-        @php 
-    $applyDate = strtotime($application->apply_date);
-    $deliveryDate = strtotime($application->delivery_date);
-
-    if ($deliveryDate === false) { // Check if delivery date is null
-        $deliveryDate = strtotime('+15 days', strtotime('today')); // Set delivery date as 15 days from today
-    }
-
-    $today = strtotime('today');
-    if ($deliveryDate <= $today) {
-        echo '<span class="text-success font-weight-bold">completed</span><br>
-        Document: <a href="' . asset($application->delivery) . '" target="_blank" style="color: blue;">View Document</a>';
-    }
-    elseif ($applyDate == $today) {
-        echo '<span class="text-info font-weight-bold">initiated</span>';
-    }  else {
-        echo '<span class="text-warning font-weight-bold">in progress</span>';
-    }
-@endphp
+          @php 
+          if ($application->status == 2) {
+              echo '<span class="text-success font-weight-bold">Completed</span><br>
+              Document: <a href="' . asset($application->delivery) . '" target="_blank" style="color: blue;">View Document</a>';
+          }
+          elseif ($application->status == 0) {
+              echo '<span class="text-info font-weight-bold">Initiated</span>';
+          }  
+          elseif($application->status == 1) {
+              echo '<span class="text-warning font-weight-bold">In Progress</span>';
+          }
+          else {
+              $statusesArray = explode(',', $application->statuses);
+              foreach($statusesArray as $status) {
+                  [$id, $statusName] = explode(':', $status);
+                  if ($application->status == $id) {
+                      echo '<span class="font-weight-bold">' . ucfirst($statusName) . '</span>';
+                      break;
+                  }
+              }
+          }
+          @endphp
+          
 
         </td>
         <td>{{ $application->service_name}}</td>

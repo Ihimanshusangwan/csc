@@ -58,6 +58,8 @@
                                 Service</a>
                             <a href="{{ route('prices.index', $service->id) }}" class="btn btn-info m-1">Manage
                                 Prices</a>
+                            <a href="{{ route('statuses.index', $service->id) }}" class="btn btn-info m-1">Manage
+                                Statuses</a>
                             <h6>Visibility</h6>
                             <div class="btn-group" role="group" aria-label="Basic example"
                                 id="btn-group-{{ $service->id }}">
@@ -74,6 +76,19 @@
                                     data-route="{{ route('update-visibility', ['serviceId' => $service->id]) }}"
                                     onclick="handleVisibility(this, {{ $service->id }}, 3)">Both</button>
                             </div>
+                            <h6>Availability</h6>
+                            <div class="btn-group" role="group" aria-label="Basic example"
+                            id="availability-btn-group-{{ $service->id }}">
+                            <button type="button"
+                                class="btn btn-sm btn-secondary {{ $service->availability == 1 ? 'active' : '' }}"
+                                data-route="{{ route('update-availability', ['serviceId' => $service->id]) }}"
+                                onclick="handleAvailability(this, {{ $service->id }}, 1)">Subscription only</button>
+                            <button type="button"
+                                class="btn btn-sm btn-secondary {{ $service->availability == 2 ? 'active' : '' }}"
+                                data-route="{{ route('update-availability', ['serviceId' => $service->id]) }}"
+                                onclick="handleAvailability(this, {{ $service->id }}, 2)">With and Without Subscription</button>
+                            
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -163,7 +178,6 @@
 
     </div>
 
-    <script src="{{ asset('js/sweetAlert.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
@@ -213,6 +227,59 @@
                     Swal.fire({
                         title: 'Visibility Changed',
                         text: `You chose to update visibility to "${visibilityName}" `,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Handle errors
+                });
+        }
+        function handleAvailability(button, serviceId, availabilityId) {
+            // Get the button group element
+            const buttonGroup = button.parentElement;
+
+            // Get the route URL from the button's data attribute
+            const routeUrl = button.dataset.route;
+
+            // Send a fetch request to update visibility
+            fetch(`${routeUrl}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        serviceId,
+                        availabilityId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response
+                    const buttons = buttonGroup.querySelectorAll('button');
+                    buttons.forEach(btn => {
+                        if (btn === button) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+
+                    //  names mapping
+                    const availabilityNames = {
+                        1: 'Subscription Only',
+                        2: 'With and Without Subscription'
+                    };
+
+                    // Get the availabilityName  from the mapping
+                    const availabilityName = availabilityNames[availabilityId];
+
+                    // Show SweetAlert alert
+                    Swal.fire({
+                        title: 'Availability Changed',
+                        text: `You chose to update availability to "${availabilityName}" `,
                         icon: 'success',
                         confirmButtonText: 'OK'
                     });

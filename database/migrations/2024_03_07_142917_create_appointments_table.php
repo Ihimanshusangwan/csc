@@ -10,8 +10,8 @@ class CreateAppointmentsTable extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_id')->constrained('services');
-            $table->foreignId('city_id')->constrained('locations');
+            $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
+            $table->foreignId('city_id')->constrained('locations')->onDelete('cascade');
             $table->string('name');
             $table->string('email');
             $table->string('phone');
@@ -21,6 +21,7 @@ class CreateAppointmentsTable extends Migration
             $table->decimal('service_price', 10, 2);
             $table->timestamps();
         });
+        
     }
 
     public function down()

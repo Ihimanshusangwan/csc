@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('services', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('service_group_id')->constrained('service_groups'); // Foreign key reference
+            $table->foreignId('service_group_id')->constrained('service_groups')->onDelete('cascade'); // Foreign key reference
             $table->text('requirements')->nullable();
             $table->longText('form')->nullable();
             $table->boolean('is_active')->default(true);

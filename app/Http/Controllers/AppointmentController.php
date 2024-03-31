@@ -20,7 +20,7 @@ class AppointmentController extends Controller
             ->orderBy('district', 'asc')
             ->get();
 
-        return view('appointment', compact('serviceGroups', 'services','locations'));
+        return view('appointment', compact('serviceGroups', 'services', 'locations'));
     }
     public function store(Request $request)
     {
@@ -33,11 +33,11 @@ class AppointmentController extends Controller
         $phone = $data['phone'];
         $address = $data['address'];
         $cityId = $data['city'];
-         // Convert selectedDate to the correct format
-    $selectedDate = date('Y-m-d', strtotime($data['selectedDate']));
+        // Convert selectedDate to the correct format
+        $selectedDate = date('Y-m-d', strtotime($data['selectedDate']));
         $selectedTimeSlot = $data['selectedTimeSlot'];
         $servicePrice = $data['servicePrice'];
-        $serviceId = $data['selectedTileId']; 
+        $serviceId = $data['selectedTileId'];
 
         // Insert data into the appointments table 
         DB::table('appointments')->insert([
@@ -55,5 +55,37 @@ class AppointmentController extends Controller
         ]);
 
         return response()->json(['message' => 'Appointment created successfully'], 200);
+    }
+    public function markVisited(Request $request)
+    {
+        $appointmentId = $request->input('appointment_id');
+
+        // Perform update using query builder
+        DB::table('appointments')->where('id', $appointmentId)->update(['status' => 1]);
+
+        // Redirect back to the previous page
+        return redirect()->back();
+    }
+
+    public function rejectAppointment(Request $request)
+    {
+        $appointmentId = $request->input('appointment_id');
+
+        // Get reason for rejection
+        $reason = $request->input('reason');
+
+        // Perform update using query builder
+        DB::table('appointments')->where('id', $appointmentId)->update(['status' => 2]);
+
+        // Save reason for rejection in appointment_deletion_reasons table
+        DB::table('appointment_deletion_reasons')->insert([
+            'appointment_id' => $appointmentId,
+            'reason' => $reason,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        // Redirect back to the previous page
+        return redirect()->back();
     }
 }

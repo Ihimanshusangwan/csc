@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Appointments</title>
+    <title>Deleted Appointments</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
@@ -121,14 +121,12 @@
         <div class="heading">
             <div class="dashboard-content">
                 <span class="material-icons home-icon"> home </span>
-                <h3 class="dashboard"> In Progress Appointments</h3>
+                <h3 class="dashboard"> Rejected Appointments</h3>
             </div>
 
         </div>
     </div>
-    <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary m-2">Home</a>
-    <a href="{{ route('admin.appointment-visited') }}" class="btn btn-secondary m-2">Visited Appointments</a>
-    <a href="{{ route('admin.appointment-rejected') }}" class="btn btn-secondary m-2">Rejected Appointments</a>
+    <a href="{{ route('admin.appointment-history') }}" class="btn btn-secondary m-2">Back</a>
 
     <table class="table table-striped mt-4">
         <thead>
@@ -143,7 +141,7 @@
                 <th scope="col">City</th>
                 <th scope="col">Address</th>
                 <th scope="col">Amount(&#8377;)</th>
-                <th scope="col">Actions(&#8377;)</th>
+                <th scope="col">Reason</th>
             </tr>
         </thead>
         <tbody>
@@ -159,21 +157,7 @@
                     <td>{{ $appointment->district }}</td>
                     <td>{{ $appointment->address }}</td>
                     <td class="text-success"> &#8377;{{ $appointment->service_price }}</td>
-                    <td>
-                      <div class="btn-group" role="group" aria-label="Appointment Actions">
-                          <form action="{{ route('appointments.visited') }}" method="post">
-                              @csrf
-                              <input type="hidden" name="appointment_id" value="{{ $appointment->appointment_id }}">
-                              <button type="submit" class="btn btn-success btn-sm">Visited</button>
-                          </form>
-                          <form action="{{ route('appointments.reject') }}" method="post" id="rejectForm">
-                              @csrf
-                              <input type="hidden" name="appointment_id" value="{{ $appointment->appointment_id }}">
-                              <input type="hidden" name="reason" id="reasonInput">
-                              <button type="button" class="btn btn-danger btn-sm" onclick="promptReason()">Reject</button>
-                          </form>
-                      </div>
-                  </td>
+                    <td >{{ $appointment->reason }}</td>
                   
                 </tr>
             @endforeach
@@ -182,17 +166,6 @@
     <div>
         {{ $appointments->links('pagination::bootstrap-5') }}
     </div>
-    <script>
-      function promptReason() {
-          var reason = prompt("Please enter the reason for rejection:");
-          if (reason !== null) { // If the user clicked OK in the prompt
-              // Set the reason value to a hidden input field in the form
-              document.getElementById("reasonInput").value = reason;
-              // Submit the form
-              document.getElementById("rejectForm").submit();
-          }
-      }
-  </script>
   
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>

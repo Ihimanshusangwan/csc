@@ -96,7 +96,6 @@ class AgentController extends Controller
             'expiration_date' => $expirationDate
         ]);
         return redirect()->route('admin.dashboard')->with(['success' => 'Registration successful']);
-
     }
     public function showAgentDetails(Request $request)
     {
@@ -234,7 +233,6 @@ class AgentController extends Controller
             ]);
 
         return redirect()->route('admin.requested-agents')->with(['success' => 'successfully approved']);
-
     }
     // reject agent
     public function reject(Request $request)
@@ -245,7 +243,6 @@ class AgentController extends Controller
             ->where('id', $agent_id)
             ->delete();
         return redirect()->route('admin.requested-agents')->with(['success' => 'successfully deleted']);
-
     }
     //hold agent
     public function hold(Request $request)
@@ -265,7 +262,6 @@ class AgentController extends Controller
         ]);
 
         return redirect()->route('admin.requested-agents')->with(['success' => 'successfully put on Hold']);
-
     }
     //unhold agent
     public function unhold(Request $request)
@@ -335,15 +331,25 @@ class AgentController extends Controller
             $encryptedAgentId = Cookie::get('Agent_Session');
             $agentId = Crypt::decrypt($encryptedAgentId);
             // Find the corresponding agent by their Id
+            $plan = DB::table("agents")->select('plan_id', 'expiration_date')->where("id", "=", $agentId)->first();
+            $currentDate = date('Y-m-d'); // Get the current date in the format YYYY-MM-DD
 
-            $plan = DB::table("agents")->select("plan_id")->where("id", "=", $agentId)->first();
-            $services = DB::table("plan_services")
+            if ($plan->expiration_date >= $currentDate) {
+                $services = DB::table("plan_services")
                 ->where("plan_services.plan_id", "=", $plan->plan_id)
                 ->join("services", "plan_services.service_id", "=", "services.id")
                 ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
                 ->select("services.*", "service_groups.name as group_name", "service_groups.photo as group_photo")
                 ->get()
                 ->groupBy('service_group_id');
+            } else {
+                $services = DB::table("services")
+                ->where("services.availability",2)
+                ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
+                ->select("services.*", "service_groups.name as group_name", "service_groups.photo as group_photo")
+                ->get()
+                ->groupBy('service_group_id');
+            }
 
             // Format the services data for the view
             $serviceGroups = [];
@@ -366,7 +372,6 @@ class AgentController extends Controller
 
             // Pass data to the view using compact, including the decrypted agent ID
             return view('agent.dashboard', compact('serviceGroups', 'sumOfPrices', 'balance'));
-
         } else {
 
             return view('agent.login');
@@ -386,7 +391,6 @@ class AgentController extends Controller
     {
         $services = DB::table('services')->where("service_group_id", "=", $serviceGroupId)->get();
         return view('agent.serviceGroup', compact('services'));
-
     }
 
     public function applications(Request $request)
@@ -395,14 +399,17 @@ class AgentController extends Controller
             // Retrieve and decrypt the agent's ID from the cookie
             $encryptedAgentId = Cookie::get('Agent_Session');
             $agentId = Crypt::decrypt($encryptedAgentId);
+
             $query = DB::table('applications')
                 ->where('applications.agent_id', $agentId)
                 ->join('customers', 'applications.customer_id', '=', 'customers.id')
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->select(
+                    
                     'applications.*',
                     'services.name as service_name',
                     'customers.name as customer_name',
+                    DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
 
@@ -436,13 +443,9 @@ class AgentController extends Controller
             $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
 
             return view("agent.applications", compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount'));
-
-
         } else {
             return view('agent.login');
         }
-
-
     }
     public function recharge(Request $request, $id)
     {
@@ -461,7 +464,7 @@ class AgentController extends Controller
             'agent_id' => $id,
             'amount' => $amount,
             'balance_before' => $currentBalance,
-            
+
         ]);
 
         // Update the balance in the database
@@ -480,28 +483,22 @@ class AgentController extends Controller
             // Retrieve and decrypt the agent's ID from the cookie
             $encryptedAgentId = Cookie::get('Agent_Session');
             $agentId = Crypt::decrypt($encryptedAgentId);
-           
+
             $query = DB::table('recharges')
-            ->where('agent_id', $agentId)
-            ->orderBy("id", "desc");
+                ->where('agent_id', $agentId)
+                ->orderBy("id", "desc");
 
-        // Fetch paginated applications
-        $recharges = $query->paginate(15);
+            // Fetch paginated applications
+            $recharges = $query->paginate(15);
 
-        // Get sum of all spendings
-        $spendings = DB::table('recharges')
-        ->where('agent_id', $agentId)
-            ->sum('amount');
+            // Get sum of all spendings
+            $spendings = DB::table('recharges')
+                ->where('agent_id', $agentId)
+                ->sum('amount');
 
-        return view("agent.rechargeHistory", compact('recharges', 'spendings'));
-
-
+            return view("agent.rechargeHistory", compact('recharges', 'spendings'));
         } else {
             return view('agent.login');
         }
-
-
     }
-
 }
-

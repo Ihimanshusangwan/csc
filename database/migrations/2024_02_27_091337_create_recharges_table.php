@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('recharges', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('agent_id');
-            $table->foreign('agent_id')->references('id')->on('agents');
+            $table->foreign('agent_id')->references('id')->on('agents')->onDelete('cascade');
             $table->decimal('amount', 10, 2); 
             $table->decimal('balance_before', 10, 2); 
             $table->timestamps();

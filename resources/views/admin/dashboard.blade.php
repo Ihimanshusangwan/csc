@@ -13,64 +13,64 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <!-- <span class="navbar-brand"><strong>Admin Dashboard</strong></span> -->
+        <!-- Brand -->
+        <a class="navbar-brand" href="#">Dokument Guru</a>
+    
+        <!-- Toggler/collapsible Button -->
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+    
+        <!-- Navbar links -->
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item m-2">
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
-                        data-bs-target="#agentRegistrationModal">
-                        Register Agent
-                    </button>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.requested-agents')}}">Agents Request</a>
                 </li>
-                <li class="nav-item m-2">
-                    <a class="btn btn-secondary" href="{{ route('admin.requested-agents')}}">Agents Request</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.registered-agents')}}">Registered Agents</a>
                 </li>
-                <li class="nav-item m-2">
-                    <a class="btn btn-secondary" href="{{ route('admin.registered-agents')}}">Registered Agents</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.registered-staff')}}">Registered Staffs</a>
                 </li>
-                <!-- <li class="nav-item m-2">
-                    <a class="btn btn-secondary" href="#">Registered Customer</a>
-                </li> -->
-                <!-- <li class="nav-item m-2">
-                        <a class="btn btn-secondary" href="#">Agent Inquiry</a>
-                </li> -->
-                <!-- <li class="nav-item m-2">
-                        <a class="btn btn-secondary" href="#">Customer Enquiry</a>
-                </li> -->
-                <!-- <li class="nav-item m-2">
-                        <a class="btn btn-secondary" href="#">Subscribed Agents</a>
-                </li> -->
-                <li class="nav-item m-2">
-                        <a class="btn btn-secondary" href="{{ route('service-groups.index') }}">Manage Service Groups</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('service-groups.index') }}">Manage Service Groups</a>
                 </li>
-                <li class="nav-item m-2">
-                        <a class="btn btn-secondary" href="{{ route('services.index') }}">Manage Services </a>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('services.index') }}">Manage Services</a>
                 </li>
-                <li class="nav-item m-2">
-                        <a class="btn btn-secondary" href="{{ route('locations.index') }}">Manage Locations </a>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('locations.index') }}">Manage Locations</a>
                 </li>
-                <li class="nav-item m-2">
-                        <a class="btn btn-secondary" href="{{ route('plans.index') }}">Manage Plans </a>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('plans.index') }}">Manage Plans</a>
                 </li>
-                <li class="nav-item m-2">
-                        <a class="btn btn-secondary" href="{{ route('admin.filter') }}">Filter </a>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.filter') }}">Filter</a>
                 </li>
-                <li class="nav-item m-2">
-                        <a class="btn btn-secondary" href="{{ route('admin.recharge-history') }}">Recharge Histroy </a>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.recharge-history') }}">Recharge History</a>
                 </li>
-                <li class="nav-item m-2">
-                        <a class="btn btn-secondary" href="{{ route('admin.appointment-history') }}">Appointments</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.appointment-history') }}">Appointments</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('staffs.create') }}">Register Staff</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.delete-form') }}">Clear Database</a>
                 </li>
             </ul>
         </div>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ route('admin.logout') }}" class="btn btn-danger">Logout</a>
+    
+        <!-- Logout Button -->
+        <div class="navbar-nav">
+            <a href="{{ route('admin.logout') }}" class="nav-link text-danger">Logout</a>
         </div>
     </nav>
+    
+    
     @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
@@ -195,6 +195,7 @@
         <th scope="col">Status</th>
         <th scope="col">Applied For</th>
         <th scope="col">Preview</th>
+        <th scope="col">Reporting Staff</th>
         <th scope="col">Ruppes(&#8377;)</th>
         <th scope="col">Upload Document</th>
         <th scope="col">Action</th>
@@ -212,27 +213,26 @@
             <form action="{{route('application.update')}}" method="post" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="application_id" value="{{$application->id}}"/>
-        <input type="date" class="form-control" id="delivery_date" name="delivery_date" value="{{ $application->delivery_date ? $application->delivery_date : '' }}">
+        <input type="date" class="form-control-sm" id="delivery_date" name="delivery_date" value="{{ $application->delivery_date ? $application->delivery_date : '' }}">
         </td>
 
         <td>
-        @php 
-          $applyDate = strtotime($application->apply_date);
-          $deliveryDate = strtotime($application->delivery_date);
-
-          if ($deliveryDate === false) { // Check if delivery date is null
-              $deliveryDate = strtotime('+15 days', strtotime('today')); // Set delivery date as 15 days from today
-          }
-
-            $today = strtotime('today');
-            if ($applyDate == $today) {
-                echo '<span class="text-info font-weight-bold">initiated</span>';
-            } elseif ($deliveryDate <= $today) {
-                echo '<span class="text-success font-weight-bold">completed</span>';
-            } else {
-                echo '<span class="text-warning font-weight-bold">in progress</span>';
-            }
-          @endphp
+            <select class="form-control-sm" id="status" name="status">
+                <option value="0" {{ $application->status == 0 ? 'selected' : '' }} class="text-info">Initiated</option>
+                <option value="1" {{ $application->status == 1 ? 'selected' : '' }} class="text-warning">In Progress</option>
+                <option value="2" {{ $application->status == 2 ? 'selected' : '' }} class="text-success">Completed</option>
+                
+                {{-- Explode statuses and create options --}}
+                @php
+                    $statusesArray = explode(',', $application->statuses);
+                @endphp
+                @foreach($statusesArray as $status)
+                    @php
+                        [$id, $statusName] = explode(':', $status);
+                    @endphp
+                    <option value="{{ $id }}" {{ $application->status == $id ? 'selected' : '' }}>{{ $statusName }}</option>
+                @endforeach
+            </select>
         </td>
         <td>{{ $application->service_name}}</td>
         <td>
@@ -241,6 +241,7 @@
             preview
           </span>
         </td>
+        <td>{{$application->staffName}}</td>
         <td class="text-success"> &#8377;{{ $application->price}}</td>
         <td>
         @if($application->delivery_date)
@@ -250,7 +251,7 @@
     </div>
 @endif
  <div class="form-group">
-        <input type="file" class="form-control" id="document" name="document" placeholder="upload Document">
+        <input type="file" class="form-control-sm" id="document" name="document" placeholder="upload Document">
     </div>
         </td>
         <td>

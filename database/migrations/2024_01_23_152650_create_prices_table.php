@@ -12,8 +12,8 @@ return new class extends Migration {
     {
         Schema::create('prices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_id')->constrained('services'); 
-            $table->foreignId('location_id')->constrained('locations');
+            $table->foreignId('service_id')->constrained('services')->onDelete('cascade'); 
+            $table->foreignId('location_id')->constrained('locations')->onDelete('cascade');
             $table->decimal('default_govt_price', 10, 2)->nullable()->default(NULL);
             $table->decimal('default_commission_price', 10, 2)->nullable()->default(NULL);
             $table->decimal('default_tax_percentage', 5, 2)->nullable()->default(NULL);

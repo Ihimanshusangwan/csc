@@ -19,16 +19,27 @@ class ApplyServiceController extends Controller
             // Retrieve location_id and balance in a single query
             $agentData = DB::table('agents')
                 ->where('id', $agentId)
-                ->select('location_id', 'balance')
+                ->select('location_id', 'balance', 'expiration_date')
                 ->first();
 
             $locationId = $agentData->location_id ?? null;
-            $balance = $agentData->balance ?? null;
-
+            $balance = $agentData->balance ?? 0;
+            $currentDate = date('Y-m-d');
             $prices = DB::table('prices')->where('location_id', $locationId)->where('service_id', $id)->get();
-            $service = DB::table('services')->where('id', $id)->get();
-            return view("agent.directApply", compact('service', 'prices', 'balance'));
+            if ($agentData->expiration_date >= $currentDate) {
 
+                $defaultPrice = $prices[0]->subscribed_default_govt_price + $prices[0]->subscribed_default_commission_price + ($prices[0]->subscribed_default_govt_price * $prices[0]->subscribed_default_tax_percentage / 100);
+
+                $tatkalPrice = $prices[0]->subscribed_tatkal_govt_price + $prices[0]->subscribed_tatkal_commission_price + ($prices[0]->subscribed_tatkal_govt_price * $prices[0]->subscribed_tatkal_tax_percentage / 100);
+            } else {
+
+                $defaultPrice = $prices[0]->default_govt_price + $prices[0]->default_commission_price + ($prices[0]->default_govt_price * $prices[0]->default_tax_percentage / 100);
+
+                $tatkalPrice = $prices[0]->tatkal_govt_price + $prices[0]->tatkal_commission_price + ($prices[0]->tatkal_govt_price * $prices[0]->tatkal_tax_percentage / 100);
+            }
+
+            $service = DB::table('services')->where('id', $id)->get();
+            return view("agent.directApply", compact('service', 'defaultPrice', 'balance', 'tatkalPrice'));
         } else {
             return view('agent.login');
         }
@@ -41,8 +52,40 @@ class ApplyServiceController extends Controller
             // Retrieve and decrypt the agent's ID from the cookie
             $encryptedAgentId = Cookie::get('Agent_Session');
             $agentId = Crypt::decrypt($encryptedAgentId);
-            $locationId = DB::table('agents')->where('id', $agentId)->value('location_id');
+            $data = DB::table("agents")->select('location_id', 'expiration_date')->where("id", "=", $agentId)->first();
+            $currentDate = date('Y-m-d');
+            $locationId = $data->location_id;
+            $serviceGroup = DB::table("services")->select('service_group_id')->where("id", "=", $id)->first();
+            $serviceGroupId = $serviceGroup->service_group_id;
             $prices = DB::table('prices')->where('location_id', $locationId)->where('service_id', $id)->get();
+            $latestStaffId = DB::table('applications')
+                ->where('service_group_id', $serviceGroupId)
+                ->where('location_id', $locationId)
+                ->latest()
+                ->value('staff_id');
+
+            // Retrieve all staff IDs
+            $staffIds = DB::table('staff')
+                ->where('location_id', $locationId)
+                ->where('service_group_id', $serviceGroupId)
+                ->pluck('id')
+                ->toArray();
+
+            // Check if the staff IDs array is empty
+            if (count($staffIds) > 0) {
+                // Find the index of the last staff ID in the array
+                $lastStaffIdIndex = array_search($latestStaffId, $staffIds);
+
+                // Calculate the index of the next staff ID
+                $nextStaffIdIndex = ($lastStaffIdIndex + 1) % count($staffIds);
+
+                // Get the next staff ID
+                $nextStaffId = $staffIds[$nextStaffIdIndex];
+            } else {
+                // If the array is empty, set the next staff ID to null
+                $nextStaffId = null;
+            }
+
 
             try {
                 // Start a transaction
@@ -56,15 +99,26 @@ class ApplyServiceController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+
                 // Retrieve the selected price type
                 $priceType = $request->input('price_type');
 
-                // Calculate the total price based on the selected price type
-                if ($priceType === 'default') {
-                    $totalPrice = $prices[0]->default_govt_price + $prices[0]->default_commission_price + ($prices[0]->default_govt_price * $prices[0]->default_tax_percentage / 100);
+                if ($data->expiration_date >= $currentDate) {
+                    if ($priceType === 'default') {
+                        $totalPrice = $prices[0]->subscribed_default_govt_price + $prices[0]->subscribed_default_commission_price + ($prices[0]->subscribed_default_govt_price * $prices[0]->subscribed_default_tax_percentage / 100);
+                    } else {
+                        $totalPrice = $prices[0]->subscribed_tatkal_govt_price + $prices[0]->subscribed_tatkal_commission_price + ($prices[0]->subscribed_tatkal_govt_price * $prices[0]->subscribed_tatkal_tax_percentage / 100);
+                    }
                 } else {
-                    $totalPrice = $prices[0]->tatkal_govt_price + $prices[0]->tatkal_commission_price + ($prices[0]->tatkal_govt_price * $prices[0]->tatkal_tax_percentage / 100);
+                    // Calculate the total price based on the selected price type
+                    if ($priceType === 'default') {
+                        $totalPrice = $prices[0]->default_govt_price + $prices[0]->default_commission_price + ($prices[0]->default_govt_price * $prices[0]->default_tax_percentage / 100);
+                    } else {
+                        $totalPrice = $prices[0]->tatkal_govt_price + $prices[0]->tatkal_commission_price + ($prices[0]->tatkal_govt_price * $prices[0]->tatkal_tax_percentage / 100);
+                    }
                 }
+
+
 
 
                 // Get all form input data excluding specific fields
@@ -118,6 +172,9 @@ class ApplyServiceController extends Controller
                     'service_id' => $id,
                     'form_data' => $formDataJson,
                     'price' => $totalPrice,
+                    'location_id' => $locationId,
+                    'service_group_id' => $serviceGroupId,
+                    'staff_id' => $nextStaffId,
                     'apply_date' => now(),
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -126,7 +183,6 @@ class ApplyServiceController extends Controller
                 // Commit the transaction
                 DB::commit();
                 return redirect()->route('agent.dashboard')->with('success', 'Application submitted successfully!');
-
             } catch (\Exception $e) {
                 // If an exception occurs, rollback the transaction
                 DB::rollback();

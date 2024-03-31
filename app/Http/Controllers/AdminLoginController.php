@@ -22,11 +22,14 @@ class AdminLoginController extends Controller
                 ->join('customers', 'applications.customer_id', '=', 'customers.id')
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->join('agents', 'applications.agent_id', '=', 'agents.id')
+                ->leftJoin('staff', 'applications.staff_id', '=', 'staff.id')
                 ->select(
+                    'staff.name as staffName',
                     'applications.*',
                     'services.name as service_name',
                     'customers.name as customer_name',
                     'agents.full_name as agent_name',
+                    DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
 
@@ -48,7 +51,7 @@ class AdminLoginController extends Controller
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')
-                ->whereDate('delivery_date', '<=', now()->toDateString())
+                ->where('status', 2)
                 ->count();
 
             // Calculate pending applications count
@@ -60,6 +63,34 @@ class AdminLoginController extends Controller
             return view('admin.login');
         }
     }
+    public function showStaffDetails(Request $request)
+    {
+        // Check if the custom cookie exists
+        if (Cookie::has('Admin_Session')) {
+            // The cookie exists, proceed to the admin dashboard
+
+
+            $query = DB::table('staff')
+                ->leftJoin('locations', 'staff.location_id', '=', 'locations.id')
+                ->leftJoin('service_groups', 'staff.service_group_id', '=', 'service_groups.id')
+                ->select(
+                    'staff.*',
+                    'locations.district as city',
+                    'service_groups.name as service_group_name'
+                )
+                ->orderBy("staff.id", "desc");
+
+            // Fetch paginated applications
+            $staffs = $query->paginate(15);
+
+            // Pass data to the view using compact
+            return view('admin.registeredStaff', compact('staffs'));
+        } else {
+
+            return view('admin.login');
+        }
+    }
+
     // Display the login form
     public function showLoginForm()
     {
@@ -99,7 +130,6 @@ class AdminLoginController extends Controller
             // Authentication failed for admin guard
             return back()->withErrors(['email' => 'Invalid credentials'])->withInput($request->only('email'));
         }
-
     }
     public function logout(Request $request)
     {
@@ -123,11 +153,14 @@ class AdminLoginController extends Controller
                 ->join('customers', 'applications.customer_id', '=', 'customers.id')
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->join('agents', 'applications.agent_id', '=', 'agents.id')
+                ->leftJoin('staff', 'applications.staff_id', '=', 'staff.id')
                 ->select(
+                    'staff.name as staffName',
                     'applications.*',
                     'services.name as service_name',
                     'customers.name as customer_name',
                     'agents.full_name as agent_name',
+                    DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
 
@@ -152,8 +185,7 @@ class AdminLoginController extends Controller
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')
-                ->where('agent_id', $id)
-                ->whereDate('delivery_date', '<=', now()->toDateString())
+                ->where('agent_id', $id)->where('status', 2)
                 ->count();
 
             // Calculate pending applications count
@@ -254,15 +286,38 @@ class AdminLoginController extends Controller
             ->sum('amount');
 
         return view("admin.rechargeHistory", compact('recharges', 'earnings'));
-
     }
     public function appointments(Request $request)
     {
 
         $query = DB::table('appointments')
+            ->where('appointments.status', "=", 0)
             ->join('locations', 'appointments.city_id', '=', 'locations.id')
             ->join('services', 'appointments.service_id', '=', 'services.id')
             ->select(
+                'appointments.id as appointment_id',
+                'appointments.*',
+                'locations.*',
+                'services.name as service',
+            )
+            ->orderby('appointments.selected_date', 'asc');
+
+        // Fetch paginated applications
+        $appointments = $query->paginate(15);
+        // dd($appointments);
+
+        return view("admin.appointments", compact('appointments'));
+    }
+    public function visitedAppointments(Request $request)
+    {
+
+        $query = DB::table('appointments')
+            ->where('appointments.status', 1)
+            ->join('locations', 'appointments.city_id', '=', 'locations.id')
+            ->join('services', 'appointments.service_id', '=', 'services.id')
+            ->select(
+
+                'appointments.id as appointment_id',
                 'appointments.*',
                 'locations.*',
                 'services.name as service',
@@ -272,7 +327,62 @@ class AdminLoginController extends Controller
         // Fetch paginated applications
         $appointments = $query->paginate(15);
 
-        return view("admin.appointments", compact('appointments'));
+        return view("admin.visitedAppointments", compact('appointments'));
+    }
+    public function rejectedAppointments(Request $request)
+    {
 
+        $query = DB::table('appointments')
+            ->where('appointments.status', 2)
+            ->join('locations', 'appointments.city_id', '=', 'locations.id')
+            ->join('appointment_deletion_reasons', 'appointment_deletion_reasons.appointment_id', '=', 'appointments.id')
+            ->join('services', 'appointments.service_id', '=', 'services.id')
+            ->select(
+
+                'appointments.id as appointment_id',
+                'appointment_deletion_reasons.reason',
+                'appointments.*',
+                'locations.*',
+                'services.name as service',
+            )
+            ->orderby('appointments.id', 'desc');
+
+        // Fetch paginated applications
+        $appointments = $query->paginate(15);
+
+        return view("admin.deletedAppointments", compact('appointments'));
+    }
+    public function deleteData(Request $request)
+    {
+        $password = $request->input('password');
+
+        // Hardcoded password for demonstration purposes
+        if ($password === 'Webifly@123') {
+            // Tables to preserve
+            $tablesToPreserve = ['admins'];
+
+            // Get all table names from the database
+            $tables = collect(DB::select('SHOW TABLES'))->pluck('Tables_in_' . env('DB_DATABASE'));
+
+            // Remove tables to preserve from the list
+            $tablesToDelete = $tables->reject(function ($table) use ($tablesToPreserve) {
+                return in_array($table, $tablesToPreserve);
+            });
+
+            // Delete data from each table
+            $tablesToDelete->each(function ($table) {
+                DB::table($table)->delete();
+            });
+
+            return redirect()->back()->with('success', 'Data cleared successfully.');
+        }
+
+        return redirect()->back()->with('error', 'Incorrect password.');
+    }
+
+
+    public function showDeleteForm()
+    {
+        return view('admin.deleteData');
     }
 }

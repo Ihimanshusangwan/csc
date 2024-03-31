@@ -61,5 +61,17 @@ class ServiceController extends Controller
         // Return response
         return response()->json(['message' => 'Visibility updated successfully'], 200);
     }
+    public function updateAvailability(Request $request, $serviceId)
+    {
+        $availabilityId = $request->input('availabilityId');
+
+        // Update visibility in the database
+        DB::table('services')
+            ->where('id', $serviceId)
+            ->update(['availability' => $availabilityId]);
+
+        // Return response
+        return response()->json(['message' => 'Availability updated successfully'], 200);
+    }
 
 }

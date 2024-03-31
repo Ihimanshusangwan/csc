@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin</title>
+    <title>Staff</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
@@ -12,6 +12,18 @@
     <link rel="stylesheet" href="{{ asset('css/adminDashboard.css') }}">
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg ">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            
+        </div>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ route('staff.logout') }}" class="btn btn-danger">Logout</a>
+        </div>
+    </nav>
     @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
@@ -32,14 +44,11 @@
         <div class="heading">
             <div class="dashboard-content">
                 <span class="material-icons home-icon"> home </span>
-                <h3 class="dashboard">Dashboard</h3>
+                <h3 class="dashboard">Staff Dashboard</h3>
             </div>
-            <div class="background-points">
-                <div class="points">Total Earnings: &#8377;{{$sumOfPrices}}</div>
-            </div>
+            
         </div>
 
-        <a href="{{route('admin.dashboard')}}" class="btn btn-secondary m-2">Home</a>
         <div class="row">
         <div class="col-3">
           <div class="total-registration background-total-registration">
@@ -79,9 +88,48 @@
         </div>
       </div>
 
-        <h3 class="mt-4 text-center">Today's Applications</h3>
+        <h3 class="mt-4 text-center">Latest Applications</h3>
         <div class="sort-filter">
-          
+            <div class="dropdowns">
+                <div class="dropdown">
+                    <label><strong>Sort By Status: </strong></label>
+                    <div class="input-group">
+                        <select class="form-select" id="inputGroupSelect01">
+                            <option selected disabled>Choose...</option>
+                            <option value="1">All</option>
+                            <option value="2">Pending</option>
+                            <option value="2">Success</option>
+                            <option value="2">Failed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="dropdown" style="margin-left: 1rem">
+                    <label><strong>Sort By Agent: </strong></label>
+                    <div class="input-group">
+                        <select class="form-select" id="inputGroupSelect02">
+                            <option selected disabled>Choose Agent Name...</option>
+                            <option value="1">All</option>
+                            <option value="1">Lokesh Thakare</option>
+                            <option value="2">Himanshu Sangwan</option>
+                            <option value="2">Sadashiv</option>
+                            <option value="2">Avinash</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="dropdown" style="margin-left: 1rem">
+                    <label><strong>Sort By Requested: </strong></label>
+                    <div class="input-group">
+                        <select class="form-select" id="inputGroupSelect04">
+                            <option selected disabled>Choose...</option>
+                            <option value="1">All</option>
+                            <option value="1">Requested</option>
+                            <option value="2">Approve</option>
+                            <option value="2">Rejected</option>
+                            <option value="2">Hold</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             <div class="total-count">
                 <strong class="text-primary">Total : {{$totalApplicationCount}} </strong>
@@ -92,12 +140,12 @@
       <tr class="table-dark text-center">
         <th scope="col">Sr.No</th>
         <th scope="col">Applicant Name</th>
+        <th scope="col">Agent Name</th>
         <th scope="col">Date of Application</th>
         <th scope="col">Estimated Delivery Date</th>
         <th scope="col">Status</th>
         <th scope="col">Applied For</th>
         <th scope="col">Preview</th>
-        <th scope="col">Reporting Staff</th>
         <th scope="col">Ruppes(&#8377;)</th>
         <th scope="col">Upload Document</th>
         <th scope="col">Action</th>
@@ -110,12 +158,14 @@
       <tr class="text-center">
         <th scope="row">{{ $counter++ }}</th>
         <td>{{ $application->customer_name}}</td>
+        <td>{{ $application->agent_name}}</td>
         <td>{{ $application->apply_date}}</td><td>
             <form action="{{route('application.update')}}" method="post" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="application_id" value="{{$application->id}}"/>
         <input type="date" class="form-control" id="delivery_date" name="delivery_date" value="{{ $application->delivery_date ? $application->delivery_date : '' }}">
         </td>
+
         <td>
           <select class="form-control-sm" id="status" name="status">
               <option value="0" {{ $application->status == 0 ? 'selected' : '' }} class="text-info">Initiated</option>
@@ -141,7 +191,6 @@
             preview
           </span>
         </td>
-        <td> {{$application->staffName}}</td>
         <td class="text-success"> &#8377;{{ $application->price}}</td>
         <td>
         @if($application->delivery_date)
@@ -223,3 +272,26 @@
 </body>
 
 </html>
+
+<!-- PREVIEW DOCUMENTS MODEL -->
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                    Uploaded Documents
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">...</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+

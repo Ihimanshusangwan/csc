@@ -28,7 +28,7 @@ class CreateAgentsTable extends Migration
             $table->string('payment_mode')->nullable();
             $table->decimal('paid_amount', 10, 2)->nullable();
             $table->decimal('unpaid_amount', 10, 2)->nullable(); 
-            $table->decimal('balance', 10, 2)->nullable(); 
+            $table->decimal('balance', 10, 2)->default(0);; 
             $table->date('reg_date')->default(DB::raw('CURRENT_DATE'));
             $table->date('purchase_date')->nullable(); 
             $table->date('expiration_date')->nullable(); 

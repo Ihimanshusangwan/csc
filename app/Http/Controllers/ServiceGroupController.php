@@ -18,6 +18,7 @@ class ServiceGroupController extends Controller
 
         // Group the results by service group ID
         $groupedServiceGroups = collect($serviceGroups)->groupBy('id');
+        // dd($groupedServiceGroups);
 
         return view('admin.serviceGroups', compact('groupedServiceGroups'));
     }
@@ -80,6 +81,40 @@ class ServiceGroupController extends Controller
         }
 
         return view('admin.editServiceGroup', compact('serviceGroup'));
+    }
+    public function updateVisibility(Request $request, $groupId)
+    {
+        $visibility = $request->input('visibility') ? 1 : 0;
+
+        DB::table('service_groups')
+            ->where('id', $groupId)
+            ->update(['visibility' => $visibility]);
+
+        return response()->json(['message' => 'Visibility updated successfully.']);
+    }
+    public function updateAvailability(Request $request, $groupId)
+    {
+        $availability = $request->input('availability') ? 1 : 0;
+        try {
+            DB::beginTransaction();
+        
+            if ($availability) {
+                DB::table('services')->where('service_group_id', $groupId)->update(['availability' => 2]);
+            } else {
+                DB::table('services')->where('service_group_id', $groupId)->update(['availability' => 1]);
+            }
+            DB::table('service_groups')
+            ->where('id', $groupId)
+            ->update(['availability' => $availability]);
+        
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            // Handle exception, log error, or throw further
+        }
+        
+
+        return response()->json(['message' => 'Avalability updated successfully.']);
     }
    
 }

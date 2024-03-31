@@ -66,6 +66,10 @@
                     </li>
                     <li class="">
                         <a class="bg-gray-900 hover:bg-gray-700 py-2 px-4 block whitespace-no-wrap text-white"
+                            href="{{ route('staff.login') }}">Staff Login</a>
+                    </li>
+                    <li class="">
+                        <a class="bg-gray-900 hover:bg-gray-700 py-2 px-4 block whitespace-no-wrap text-white"
                             href="software_d.html">Customer Login</a>
                     </li>
                     <li class="">
