@@ -335,21 +335,32 @@ class AgentController extends Controller
             $currentDate = date('Y-m-d'); // Get the current date in the format YYYY-MM-DD
 
             if ($plan->expiration_date >= $currentDate) {
-                $services = DB::table("plan_services")
-                ->where("plan_services.plan_id", "=", $plan->plan_id)
-                ->join("services", "plan_services.service_id", "=", "services.id")
-                ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
-                ->select("services.*", "service_groups.name as group_name", "service_groups.photo as group_photo")
-                ->get()
-                ->groupBy('service_group_id');
+                $services1 = DB::table("plan_services")
+                    ->where("plan_services.plan_id", "=", $plan->plan_id)
+                    ->join("services", "plan_services.service_id", "=", "services.id")
+                    ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
+                    ->select("services.*", "service_groups.name as group_name", "service_groups.photo as group_photo")
+                    ->get()
+                    ->groupBy('service_group_id');
+                $freeServices = DB::table("services")
+                    ->where("services.availability", 2)
+                    ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
+                    ->select("services.*", "service_groups.name as group_name", "service_groups.photo as group_photo")
+                    ->get()
+                    ->groupBy('service_group_id');
+
+
+                // Combine the results
+                $services = $services1->merge($freeServices);
             } else {
                 $services = DB::table("services")
-                ->where("services.availability",2)
-                ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
-                ->select("services.*", "service_groups.name as group_name", "service_groups.photo as group_photo")
-                ->get()
-                ->groupBy('service_group_id');
+                    ->where("services.availability", 2)
+                    ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
+                    ->select("services.*", "service_groups.name as group_name", "service_groups.photo as group_photo")
+                    ->get()
+                    ->groupBy('service_group_id');
             }
+
 
             // Format the services data for the view
             $serviceGroups = [];
@@ -405,7 +416,7 @@ class AgentController extends Controller
                 ->join('customers', 'applications.customer_id', '=', 'customers.id')
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->select(
-                    
+
                     'applications.*',
                     'services.name as service_name',
                     'customers.name as customer_name',

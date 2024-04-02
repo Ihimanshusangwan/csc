@@ -252,48 +252,108 @@
         <h3 class="text-center">Services</h3>
       </div>
       <div class="col-4">
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search here ..." aria-label="Search" />
-          <button class="btn btn-outline-success" type="submit">
-            Search
-          </button>
-        </form>
+        <div class="row">
+          <div class="col-md-12 mb-4">
+              <input class="form-control me-2" id="searchInput" type="search" placeholder="Search here ..." aria-label="Search" onkeyup="searchServices()">
+              <div class="dropdown-menu" aria-labelledby="servicesDropdown" id="servicesDropdown" style="display: none;">
+                  <!-- Dropdown items will be dynamically added here -->
+              </div>
+          </div>
+      </div>
       </div>
     </div>
 
 
     <div class="container">
       <div class="row">
+        @php
+        // Initialize an empty array to store services with their routes
+        $servicesArray = [];
+    
+        @endphp
+    
         @foreach($serviceGroups as $serviceGroup)
         <div class="col-md-4 mb-4">
-          <div class="card">
-            <img src="{{ asset($serviceGroup['group_photo']) }}" class="card-img-top"
-              alt="{{ $serviceGroup['group_name'] }} Photo">
-            <div class="card-body">
-              <h5 class="card-title">{{ $serviceGroup['group_name'] }}</h5>
-              <div class="sections">
-                <a href="{{ route('service-group.view', ['serviceGroupId' => $serviceGroup['group_id']]) }}"
-                  class="btn btn-success">View</a>
-                <div class="dropdown">
-                  <button class="btn btn-warning" type="button"
-                    id="{{ 'servicesDropdown_' . $serviceGroup['group_id'] }}" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">Services</button>
-                  <div class="dropdown-menu" aria-labelledby="{{ 'servicesDropdown_' . $serviceGroup['group_id'] }}">
-                    @foreach($serviceGroup['services'] as $service)
-                    <a class="dropdown-item" href="{{ route('service.direct-apply', ['id' => $service->id]) }}">
-                      <h6>{{ $service->name }}</h6>
-                    </a>
-                    @endforeach
-                  </div>
+            <div class="card h-100">
+                <img src="{{ asset($serviceGroup['group_photo']) }}" class="card-img-top"
+                    alt="{{ $serviceGroup['group_name'] }} Photo" style="width: 100%; height: 300px;">
+                <div class="card-body" style="height: 100px;"> <!-- Adjust height as needed -->
+                    <h5 class="card-title">{{ $serviceGroup['group_name'] }}</h5>
+                    <div class="sections">
+                        <a href="{{ route('service-group.view', ['serviceGroupId' => $serviceGroup['group_id']]) }}"
+                            class="btn btn-success">View</a>
+                        <div class="dropdown">
+                            <button class="btn btn-warning" type="button"
+                                id="{{ 'servicesDropdown_' . $serviceGroup['group_id'] }}" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">Services</button>
+                            <div class="dropdown-menu"
+                                aria-labelledby="{{ 'servicesDropdown_' . $serviceGroup['group_id'] }}">
+                                @foreach($serviceGroup['services'] as $service)
+                                @php
+                                // Store service details along with its route in the $servicesArray
+                                $servicesArray[] = [
+                                'name' => $service->name,
+                                'route' => route('service.direct-apply', ['id' => $service->id]),
+                                ];
+                                @endphp
+                                <a class="dropdown-item"
+                                    href="{{ route('service.direct-apply', ['id' => $service->id]) }}">
+                                    <h6>{{ $service->name }}</h6>
+                                </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
         @endforeach
-      </div>
+    </div>
+    
+    
     </div>
   </div>
+  <script>
+    // Store services array in a JavaScript variable
+    var servicesArray = {!! json_encode($servicesArray ?? []) !!};
+
+    // Function to perform live search
+    function searchServices() {
+        var input, filter, dropdown, items, a, i, txtValue;
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        dropdown = document.getElementById("servicesDropdown");
+        dropdown.innerHTML = ""; // Clear previous search results
+        items = [];
+
+        // Filter and display matching items
+        for (i = 0; i < servicesArray.length; i++) {
+            txtValue = servicesArray[i].name.toUpperCase();
+            if (txtValue.indexOf(filter) > -1) {
+                var item = document.createElement("a");
+                item.className = "dropdown-item";
+                item.innerHTML = "<h6>" + servicesArray[i].name + "</h6>";
+                // Use a closure to capture the current value of 'route'
+                item.onclick = (function(route) {
+                    return function() {
+                        redirectToService(route);
+                    };
+                })(servicesArray[i].route);
+                dropdown.appendChild(item);
+                items.push(item); // Store reference to the added item
+            }
+        }
+
+        // Show or hide the dropdown based on search results
+        dropdown.style.display = (items.length > 0) ? "block" : "none";
+    }
+
+    // Function to handle click event on dropdown item
+    function redirectToService(route) {
+        window.location.href = route;
+    }
+</script>
+
 
 </body>
 

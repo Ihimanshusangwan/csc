@@ -26,6 +26,12 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
+                    <button type="button" class="nav-link" data-bs-toggle="modal"
+                    data-bs-target="#agentRegistrationModal">
+                    Register Agent
+                </button>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ route('admin.requested-agents')}}">Agents Request</a>
                 </li>
                 <li class="nav-item">
