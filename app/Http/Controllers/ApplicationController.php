@@ -22,7 +22,11 @@ class ApplicationController extends Controller
         }
         // Update the status if provided
         if ($request->has('status')) {
-            $updateData['status'] = $request->input('status');
+            $statusId = $request->input('status');
+            $updateData['status'] = $statusId;
+            if($statusId == -1){
+                $updateData['reason'] = $request->input('reason');
+            }
         }
     
         // Update the document if provided
@@ -39,6 +43,7 @@ class ApplicationController extends Controller
             // Update the document path in the update data array
             $updateData['delivery'] = 'uploads/applications/' . $fileName;
         }
+        // dd($updateData);
         // Update the application using the query builder
         DB::table('applications')
             ->where('id', $applicationId)
@@ -47,5 +52,5 @@ class ApplicationController extends Controller
         // Redirect back or wherever you need after successful update
         return redirect()->back()->with('success', 'Application updated successfully');
     }
-    
+   
 }

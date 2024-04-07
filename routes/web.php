@@ -108,6 +108,7 @@ Route::post('/submit-form/{id}', [ApplyServiceController::class, 'submitForm'])-
 use App\Http\Controllers\ApplicationController;
 Route::post('/update-application', [ApplicationController::class, 'update'])->name('application.update');
 
+
 //appointment routes
 
 use App\Http\Controllers\AppointmentController;

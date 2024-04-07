@@ -117,22 +117,68 @@
         <input type="date" class="form-control" id="delivery_date" name="delivery_date" value="{{ $application->delivery_date ? $application->delivery_date : '' }}">
         </td>
         <td>
-          <select class="form-control-sm" id="status" name="status">
-              <option value="0" {{ $application->status == 0 ? 'selected' : '' }} class="text-info">Initiated</option>
-              <option value="1" {{ $application->status == 1 ? 'selected' : '' }} class="text-warning">In Progress</option>
-              <option value="2" {{ $application->status == 2 ? 'selected' : '' }} class="text-success">Completed</option>
-              
+          <input type="hidden" name="reason" value="NA">
+          <select class="form-control-sm statuses-menu" id="status" name="status">
+              <option value="-1" {{ $application->status == -1 ? 'selected' : '' }}
+                  class="text-danger">Rejected</option>
+              <option value="0" {{ $application->status == 0 ? 'selected' : '' }}
+                  class="text-info">Initiated</option>
+              <option value="1" {{ $application->status == 1 ? 'selected' : '' }}
+                  class="text-warning">In Progress</option>
+              <option value="2" {{ $application->status == 2 ? 'selected' : '' }}
+                  class="text-success">Completed</option>
+
               {{-- Explode statuses and create options --}}
               @php
                   $statusesArray = explode(',', $application->statuses);
               @endphp
-              @foreach($statusesArray as $status)
-                  @php
-                      [$id, $statusName] = explode(':', $status);
-                  @endphp
-                  <option value="{{ $id }}" {{ $application->status == $id ? 'selected' : '' }}>{{ $statusName }}</option>
-              @endforeach
+
+              @if (count($statusesArray) > 0)
+                  @foreach ($statusesArray as $status)
+                      @php
+                          $statusParts = explode(':', $status);
+                          $id = $statusParts[0] ?? null;
+                          $statusName = $statusParts[1] ?? null;
+                      @endphp
+
+                      @if ($id !== null && $statusName !== null)
+                          <option value="{{ $id }}"
+                              {{ $application->status == $id ? 'selected' : '' }}>
+                              {{ $statusName }}</option>
+                      @endif
+                  @endforeach
+              @endif
+
+
           </select>
+          @if ($application->status == -1)
+          <span class="text-danger" style="text-decoration: underline; cursor: pointer;" data-reason="{{ $application->reason }}"
+              data-toggle="modal"
+              data-target="#reasonModal{{ $application->id }}">Reason</span>
+        
+              <!-- Modal -->
+              <div class="modal fade" id="reasonModal{{ $application->id }}" tabindex="-1"
+                  role="dialog" aria-labelledby="reasonModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="reasonModalLabel">Reason</h5>
+                              <button type="button" class="close" data-dismiss="modal"
+                                  aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                              </button>
+                          </div>
+                          <div class="modal-body">
+                              {{ $application->reason }}
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary"
+                                  data-dismiss="modal">Close</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          @endif
       </td>
         <td>{{ $application->service_name}}</td>
         <td>
@@ -219,6 +265,21 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
+        <script>
+          document.querySelectorAll('.statuses-menu').forEach((e) => {
+              const reasonInput = e.previousElementSibling;
+              e.addEventListener('change', (event) => {
+                  let statusId = event.target.value;
+                  if (statusId == -1) {
+                      var reason = prompt("Please enter the reason:");
+                      if (reason !== null) {
+                          reasonInput.value = reason;
+                      }
+                  }
+  
+              });
+          });
+      </script>
     <script src="{{asset('js/adminDashboard.js')}}"></script>
 </body>
 

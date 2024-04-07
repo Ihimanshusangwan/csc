@@ -39,7 +39,8 @@
                 <div class="col-md-4 mb-3">
                     <div class="card">
                         <!-- Display service group details -->
-                        <img src="{{ $group[0]->photo }}" class="card-img-top" alt="{{ $group[0]->name }}">
+                        <img src="{{ asset($group[0]->photo) }}" class="card-img-top" alt="{{ $group[0]->name }}">
+
                         <div class="card-body">
                             <h5 class="card-title">{{ $group[0]->name }}</h5>
                             <h6>Services</h6>
