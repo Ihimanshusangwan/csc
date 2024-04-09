@@ -133,5 +133,11 @@ Route::get('statuses/{service_id}', [StatusController::class, 'index'])->name('s
 Route::post('statuses/{id}', [StatusController::class, 'update'])->name('statuses.update');
 Route::post('statuses', [StatusController::class, 'store'])->name('statuses.store');
 
+//Home page register Agent
+use App\Http\Controllers\HomeController;
+
+Route::get('join-as-agent', [HomeController::class, 'registerAgent'])->name('home.register-agent');
+
+
 
 

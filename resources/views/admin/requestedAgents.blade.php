@@ -150,7 +150,7 @@
                 <th scope="col">Payment Status</th>
                 <th scope="col">Amount Paid (in &#8377;) </th>
                 <th scope="col">Unpaid Amount (in &#8377;) </th>
-                <th scope="col">Purchased Plan</th>
+                <th scope="col"> Plan</th>
                 <th scope="col">Payment Method</th>
                 <th scope="col">Set Status</th>
             </tr>
@@ -232,15 +232,10 @@
                                 <strong>Shop Address:</strong> {{ $agent->shop_address }}<br />
                                 <strong>Username:</strong> {{ $agent->username }}<br />
                                 <strong>Password:</strong> {{ $agent->password }}<br />
-                                <strong>Plan:</strong> {{ $agent->plan_name }}<br />
                                 <strong>Location:</strong>
                                 {{ $agent->district . ' (' . $agent->state . ')' }}<br />
                                 <strong>Payment Status:</strong> {{ $agent->payment_status }}<br />
-                                <strong>Payment Mode:</strong> {{ $agent->payment_mode }}<br />
-                                <strong>Paid Amount (&#8377;):</strong> {{ $agent->paid_amount }}<br />
-                                <strong>Unpaid Amount (&#8377;):</strong> {{ $agent->unpaid_amount }}<br />
                                 <strong>Registration Date:</strong> {{ $agent->reg_date }}<br />
-                                <strong>Purchase Date:</strong> {{ $agent->purchase_date }}<br />
                                 @if ($agent->aadhar_card)
                                     <strong>Aadhar Card:</strong>
                                     <a href="{{ asset($agent->aadhar_card) }}" target="_blank">View Aadhar
@@ -333,7 +328,6 @@
                                 <strong>Shop Address:</strong> {{ $hold->shop_address }}<br />
                                 <strong>Username:</strong> {{ $hold->username }}<br />
                                 <strong>Password:</strong> {{ $hold->password }}<br />
-                                <strong>Plan:</strong> {{ $hold->plan_name }}<br />
                                 <strong>Location:</strong>
                                 {{ $hold->district . ' (' . $hold->state . ')' }}<br />
                                 <strong>Registration Date:</strong> {{ $hold->reg_date }}<br />

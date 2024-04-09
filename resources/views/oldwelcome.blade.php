@@ -10,7 +10,6 @@
             dataLayer.push(arguments);
         }
         gtag("js", new Date());
-
         gtag("config", "G-4K6EYYCJDR");
     </script>
     <meta charset="utf-8" />
@@ -23,7 +22,6 @@
         .dropdown:hover .dropdown-menu {
             display: block;
         }
-
         .gradient {
             background: linear-gradient(90deg, #132247 0%, #b8b2b2 100%);
         }

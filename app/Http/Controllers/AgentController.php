@@ -43,7 +43,7 @@ class AgentController extends Controller
         $shopAddress = $request->input('shop_address');
         $username = $request->input('username');
         $password = $request->input('password');
-        $plan_id = $request->input('plan_id');
+        $plan_id = $request->input('plan_id') ? $request->input('plan_id'): null;
         $location_id = $request->input('location_id');
         $password = $request->input('password');
         // Additional fields for the payment section
@@ -64,12 +64,17 @@ class AgentController extends Controller
         if ($existingUsername) {
             return redirect()->back()->withInput()->withErrors(['error' => 'The username is already taken. Please choose a different one.']);
         }
-
-        $planDuration = DB::table('plans')->where('id', '=', $plan_id)
+        if($plan_id){
+            $planDuration = DB::table('plans')->where('id', '=', $plan_id)
             ->select('duration')
             ->get()[0]->duration;
 
         $expirationDate = now()->addDays($planDuration)->toDateString();
+        }else{
+            $expirationDate = null;
+        }
+
+        
 
         // Save the data to the database using query builder
         $agentId = DB::table('agents')->insertGetId([
@@ -95,7 +100,7 @@ class AgentController extends Controller
             'purchase_date' => $purchaseDate,
             'expiration_date' => $expirationDate
         ]);
-        return redirect()->route('admin.dashboard')->with(['success' => 'Registration successful']);
+        return redirect()->back()->with(['success' => 'Registration successful']);
     }
     public function showAgentDetails(Request $request)
     {
@@ -159,11 +164,9 @@ class AgentController extends Controller
         // Fetch all agents with associated plans and locations
 
         $query = DB::table('agents')
-            ->join('plans', 'agents.plan_id', '=', 'plans.id')
             ->join('locations', 'agents.location_id', '=', 'locations.id')
             ->select(
                 'agents.*',
-                'plans.name as plan_name',
                 'locations.district',
                 'locations.state'
             )
@@ -180,12 +183,10 @@ class AgentController extends Controller
 
         $query2 = DB::table('hold_agents')
             ->join('agents', 'hold_agents.agent_id', '=', 'agents.id')
-            ->join('plans', 'agents.plan_id', '=', 'plans.id')
             ->join('locations', 'agents.location_id', '=', 'locations.id')
             ->select(
                 'agents.*',
                 'hold_agents.*',
-                'plans.name as plan_name',
                 'locations.district',
                 'locations.state'
             )

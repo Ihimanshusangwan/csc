@@ -74,7 +74,12 @@
               <li><a href="{{ route('staff.login') }}">Staff Login</a></li>
             </ul>
           </li>
-          <li><a href="#footer">Contact Us</a></li>
+          <li class="drop-down"><a href="">Register</a>
+            <ul>
+              <li><a href="{{ route('home.register-agent') }}">Register as Agent</a></li>
+            </ul>
+          </li>
+          {{-- <li><a href="#footer">Contact Us</a></li> --}}
         </ul>
       </nav><!-- .main-nav -->
       
