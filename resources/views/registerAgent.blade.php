@@ -39,7 +39,7 @@
             @csrf
             <div class="card">
                 <div class="card-header">
-                    <h1 class="card-title fs-5">Register Agent</h1>
+                    <h1 class="card-title fs-5">Register As Agent</h1>
                 </div>
                 <div class="card-body">
                     <input type="hidden" name="type" value="Request">

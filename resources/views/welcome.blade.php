@@ -74,11 +74,9 @@
               <li><a href="{{ route('staff.login') }}">Staff Login</a></li>
             </ul>
           </li>
-          <li class="drop-down"><a href="">Register</a>
-            <ul>
-              <li><a href="{{ route('home.register-agent') }}">Register as Agent</a></li>
-            </ul>
-          </li>
+          
+          <li><a  href="{{ route('home.register-agent') }}">Register</a></li>
+         
           {{-- <li><a href="#footer">Contact Us</a></li> --}}
         </ul>
       </nav><!-- .main-nav -->
@@ -783,7 +781,7 @@
                   <li class="list-group-item" style="font-weight: 900;">Unlimited Service Access</li>
                   <li class="list-group-item" style="font-weight: 900;">24/7 Customer Support </li>
                 </ul>
-                <!-- <a href="#" class="btn">Choose Plan</a> -->
+                 {{-- <a href="#" class="btn">Choose Plan</a>  --}}
               </div>
             </div>
           </div>
