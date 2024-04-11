@@ -290,11 +290,6 @@
                     // Handle errors
                 });
         }
-
-
-
-
-
         document.addEventListener("DOMContentLoaded", function() {
             let formFieldsCount = 0;
             const formFieldsContainer = document.getElementById("formFields");

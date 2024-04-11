@@ -19,25 +19,26 @@ class ApplyServiceController extends Controller
             // Retrieve location_id and balance in a single query
             $agentData = DB::table('agents')
                 ->where('id', $agentId)
-                ->select('location_id', 'balance', 'expiration_date')
+                ->select('location_id', 'balance', 'expiration_date', 'plan_id')
                 ->first();
 
             $locationId = $agentData->location_id ?? null;
             $balance = $agentData->balance ?? 0;
             $currentDate = date('Y-m-d');
-            $prices = DB::table('prices')->where('location_id', $locationId)->where('service_id', $id)->get();
-            if ($agentData->expiration_date >= $currentDate) {
+            $plan_id = $agentData->plan_id;
+            if ($plan_id && $agentData->expiration_date >= $currentDate) {
+                //active plan
+                $prices = DB::table('prices')->where('location_id', $locationId)->where('service_id', $id)->where('plan_id', $plan_id)->first();
+                $defaultPrice = $prices->subscribed_default_govt_price + $prices->subscribed_default_commission_price + ($prices->subscribed_default_govt_price * $prices->subscribed_default_tax_percentage / 100);
 
-                $defaultPrice = $prices[0]->subscribed_default_govt_price + $prices[0]->subscribed_default_commission_price + ($prices[0]->subscribed_default_govt_price * $prices[0]->subscribed_default_tax_percentage / 100);
-
-                $tatkalPrice = $prices[0]->subscribed_tatkal_govt_price + $prices[0]->subscribed_tatkal_commission_price + ($prices[0]->subscribed_tatkal_govt_price * $prices[0]->subscribed_tatkal_tax_percentage / 100);
+                $tatkalPrice = $prices->subscribed_tatkal_govt_price + $prices->subscribed_tatkal_commission_price + ($prices->subscribed_tatkal_govt_price * $prices->subscribed_tatkal_tax_percentage / 100);
             } else {
+                //expired or free plan
+                $prices = DB::table('prices')->where('location_id', $locationId)->where('service_id', $id)->where('plan_id', null)->first();
+                $defaultPrice = $prices->default_govt_price + $prices->default_commission_price + ($prices->default_govt_price * $prices->default_tax_percentage / 100);
 
-                $defaultPrice = $prices[0]->default_govt_price + $prices[0]->default_commission_price + ($prices[0]->default_govt_price * $prices[0]->default_tax_percentage / 100);
-
-                $tatkalPrice = $prices[0]->tatkal_govt_price + $prices[0]->tatkal_commission_price + ($prices[0]->tatkal_govt_price * $prices[0]->tatkal_tax_percentage / 100);
+                $tatkalPrice = $prices->tatkal_govt_price + $prices->tatkal_commission_price + ($prices->tatkal_govt_price * $prices->tatkal_tax_percentage / 100);
             }
-
             $service = DB::table('services')->where('id', $id)->get();
             return view("agent.directApply", compact('service', 'defaultPrice', 'balance', 'tatkalPrice'));
         } else {
@@ -52,12 +53,26 @@ class ApplyServiceController extends Controller
             // Retrieve and decrypt the agent's ID from the cookie
             $encryptedAgentId = Cookie::get('Agent_Session');
             $agentId = Crypt::decrypt($encryptedAgentId);
-            $data = DB::table("agents")->select('location_id', 'expiration_date')->where("id", "=", $agentId)->first();
+            $data = DB::table("agents")->select('location_id', 'expiration_date', 'plan_id')->where("id", "=", $agentId)->first();
             $currentDate = date('Y-m-d');
             $locationId = $data->location_id;
             $serviceGroup = DB::table("services")->select('service_group_id')->where("id", "=", $id)->first();
             $serviceGroupId = $serviceGroup->service_group_id;
-            $prices = DB::table('prices')->where('location_id', $locationId)->where('service_id', $id)->get();
+            $defaultPrice = 0;
+            $tatkalPrice = 0;
+            if ($data->plan_id && $data->expiration_date >= $currentDate) {
+                // active plan check
+                $prices = DB::table('prices')->where('location_id', $locationId)->where('service_id', $id)->where('plan_id', $data->plan_id)->first();
+                $defaultPrice = $prices->subscribed_default_govt_price + $prices->subscribed_default_commission_price + ($prices->subscribed_default_govt_price * $prices->subscribed_default_tax_percentage / 100);
+
+                $tatkalPrice = $prices->subscribed_tatkal_govt_price + $prices->subscribed_tatkal_commission_price + ($prices->subscribed_tatkal_govt_price * $prices->subscribed_tatkal_tax_percentage / 100);
+            } else {
+                //free plan
+                $prices = DB::table('prices')->where('location_id', $locationId)->where('service_id', $id)->where('plan_id', null)->first();
+                $defaultPrice = $prices->default_govt_price + $prices->default_commission_price + ($prices->default_govt_price * $prices->default_tax_percentage / 100);
+
+                $tatkalPrice = $prices->tatkal_govt_price + $prices->tatkal_commission_price + ($prices->tatkal_govt_price * $prices->tatkal_tax_percentage / 100);
+            }
             $latestStaffId = DB::table('applications')
                 ->where('service_group_id', $serviceGroupId)
                 ->where('location_id', $locationId)
@@ -102,25 +117,7 @@ class ApplyServiceController extends Controller
 
                 // Retrieve the selected price type
                 $priceType = $request->input('price_type');
-
-                if ($data->expiration_date >= $currentDate) {
-                    if ($priceType === 'default') {
-                        $totalPrice = $prices[0]->subscribed_default_govt_price + $prices[0]->subscribed_default_commission_price + ($prices[0]->subscribed_default_govt_price * $prices[0]->subscribed_default_tax_percentage / 100);
-                    } else {
-                        $totalPrice = $prices[0]->subscribed_tatkal_govt_price + $prices[0]->subscribed_tatkal_commission_price + ($prices[0]->subscribed_tatkal_govt_price * $prices[0]->subscribed_tatkal_tax_percentage / 100);
-                    }
-                } else {
-                    // Calculate the total price based on the selected price type
-                    if ($priceType === 'default') {
-                        $totalPrice = $prices[0]->default_govt_price + $prices[0]->default_commission_price + ($prices[0]->default_govt_price * $prices[0]->default_tax_percentage / 100);
-                    } else {
-                        $totalPrice = $prices[0]->tatkal_govt_price + $prices[0]->tatkal_commission_price + ($prices[0]->tatkal_govt_price * $prices[0]->tatkal_tax_percentage / 100);
-                    }
-                }
-
-
-
-
+                $totalPrice = ($priceType === 'default') ? $defaultPrice : $tatkalPrice;
                 // Get all form input data excluding specific fields
                 $formData = $request->except('_token', 'customerName', 'mobileNumber');
 

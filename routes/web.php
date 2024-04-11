@@ -64,7 +64,8 @@ Route::resource('locations', LocationController::class);
 
 use App\Http\Controllers\PriceController;
 Route::get('/prices/{serviceId}', [PriceController::class, 'index'])->name('prices.index');
-Route::post('/prices/{serviceId}/store', [PriceController::class, 'store'])->name('prices.store');
+Route::get('/plan-based-prices/{serviceId}/{locationId}', [PriceController::class, 'planBasedPrices'])->name('prices.plan-based-prices');
+Route::post('/prices/{serviceId}/{locationId}/store', [PriceController::class, 'store'])->name('prices.store');
 Route::post('/prices/update', [PriceController::class, 'update'])->name('prices.update');
 Route::put('/services/{serviceId}/update-appointment-price', [PriceController::class, 'updateAppointmentPrice'])
     ->name('services.update-appointment-price');

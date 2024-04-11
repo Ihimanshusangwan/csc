@@ -93,7 +93,7 @@
         <div class="col-md-6 intro-info order-md-first order-last">
           <h2>All Legal Documents<br>for Your <span>Corporate Business!</span></h2>
           <div>
-            <a href="#about" class="btn-get-started scrollto">Get Started</a>
+            <a href="{{ route('home.register-agent') }}" class="btn-get-started scrollto">Get Started</a>
           </div>
         </div>
   
@@ -720,7 +720,7 @@
                   <li class="list-group-item" style="font-weight: 900;">Limited Service Access</li>
                   <li class="list-group-item" style="font-weight: 900;">Office Timing Support </li>
                 </ul>
-                <!-- <a href="#" class="btn">Choose Plan</a> -->
+                 <a href="{{ route('home.register-agent') }}" class="btn">Choose Plan</a> 
               </div>
             </div>
           </div>
@@ -741,7 +741,7 @@
                   <li class="list-group-item" style="font-weight: 900;">Limited Service Access</li>
                   <li class="list-group-item" style="font-weight: 900;">24/7 Customer Support </li>
                 </ul>
-                <!-- <a href="#" class="btn">Choose Plan</a> -->
+                <a href="{{ route('home.register-agent') }}" class="btn">Choose Plan</a> 
               </div>
             </div>
           </div>
@@ -762,7 +762,7 @@
                   <li class="list-group-item" style="font-weight: 900;">Unlimited Service Access</li>
                   <li class="list-group-item" style="font-weight: 900;">24/7 Customer Support </li>
                 </ul>
-                <!-- <a href="#" class="btn">Choose Plan</a> -->
+                <a href="{{ route('home.register-agent') }}" class="btn">Choose Plan</a> 
               </div>
             </div>
           </div>
@@ -781,7 +781,7 @@
                   <li class="list-group-item" style="font-weight: 900;">Unlimited Service Access</li>
                   <li class="list-group-item" style="font-weight: 900;">24/7 Customer Support </li>
                 </ul>
-                 {{-- <a href="#" class="btn">Choose Plan</a>  --}}
+                <a href="{{ route('home.register-agent') }}" class="btn">Choose Plan</a> 
               </div>
             </div>
           </div>

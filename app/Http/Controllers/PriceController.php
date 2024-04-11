@@ -9,30 +9,37 @@ class PriceController extends Controller
 {
     public function index($serviceId)
     {
-        $locations = DB::table('locations')
-            ->select(
-                'locations.id AS location_id_1',
-                'locations.*',
-                'prices.id AS price_id',
-                'prices.*'
-            )
-            ->leftJoin('prices', function ($join) use ($serviceId) {
-                $join->on('locations.id', '=', 'prices.location_id')
-                    ->where('prices.service_id', '=', $serviceId);
+        $locations = DB::table('locations')->get();
+        $appointmentPrice = DB::table('services')->select('appointment_price')->where('id','=',$serviceId)->first()->appointment_price;
+        return view('admin.prices', ['locations' => $locations, 'serviceId' => $serviceId ,'appointmentPrice'=>$appointmentPrice]);
+        
+    }
+    public function planBasedPrices($serviceId,$locationId)
+    {
+        $locations = DB::table('plans')
+            ->leftJoin('prices', function ($join) use ($serviceId,$locationId) {
+                $join->on('plans.id', '=', 'prices.plan_id')
+                    ->where('prices.service_id', '=', $serviceId)
+                    ->where('prices.location_id', '=', $locationId)
+                    ->where('prices.plan_id', "!=", null);
             })
-            ->orderBy('locations.district', 'asc')
+           
+            ->select('prices.*','plans.name as planName','plans.id as main_plan_id')
+            ->orderBy('plans.id', 'desc')
             ->distinct()
             ->get();
-        $appointmentPrice = DB::table('services')->select('appointment_price')->where('id','=',$serviceId)->first()->appointment_price;
-        return view('admin.prices', ['locations' => $locations, 'serviceId' => $serviceId, 'appointmentPrice'=>$appointmentPrice]);
+
+        $pricesWithoutSubscription = DB::table('prices')->where('service_id', $serviceId)->where('location_id',$locationId)->where('plan_id', null)->select('*')->first();
+        return view('admin.planBasedPrices', ['locations' => $locations,'pricesWithoutSubscription' => $pricesWithoutSubscription, 'serviceId' => $serviceId,'locationId'=>$locationId]); 
     }
 
-    public function store(Request $request, $serviceId)
+    public function store(Request $request, $serviceId, $locationId)
     {
-        $locationId = $request->input('location_id');
+        $planId = $request->input('plan_id');
         DB::table('prices')->insert([
             'service_id' => $serviceId,
             'location_id' => $locationId,
+            'plan_id' => $planId,
             'default_govt_price' => $request->input('default_govt_price'),
             'default_commission_price' => $request->input('default_commission_price'),
             'default_tax_percentage' => $request->input('default_tax_percentage'),
@@ -46,7 +53,7 @@ class PriceController extends Controller
             'subscribed_tatkal_commission_price' => $request->input('subscribed_tatkal_commission_price'),
             'subscribed_tatkal_tax_percentage' => $request->input('subscribed_tatkal_tax_percentage'),
         ]);
-        return redirect()->route('prices.index', ['serviceId' => $serviceId])
+        return redirect()->back()
             ->with('success', 'Prices successfully stored.');
     }
     public function update(Request $request)
