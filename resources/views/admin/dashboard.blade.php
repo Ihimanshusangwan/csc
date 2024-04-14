@@ -213,7 +213,7 @@
 
 
                 @php   $counter = 1; @endphp @foreach ($applications as $application)
-                    <tr class="text-center">
+                    <tr class="text-center" >
                         <th scope="row">{{ $counter++ }}</th>
                         <td>{{ $application->customer_name }}</td>
                         <td>{{ $application->agent_name }}</td>
@@ -251,10 +251,11 @@
                                             $statusParts = explode(':', $status);
                                             $id = $statusParts[0] ?? null;
                                             $statusName = $statusParts[1] ?? null;
+                                            $statuscolor = $statusParts[2] ?? null;
                                         @endphp
 
                                         @if ($id !== null && $statusName !== null)
-                                            <option value="{{ $id }}"
+                                            <option value="{{ $id }}"  style="color: {{ $statuscolor }};"
                                                 {{ $application->status == $id ? 'selected' : '' }}>
                                                 {{ $statusName }}</option>
                                         @endif

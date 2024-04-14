@@ -49,7 +49,6 @@ class ApplyServiceController extends Controller
     {
 
         if (Cookie::has('Agent_Session')) {
-            // The cookie exists, proceed to the admin dashboard
             // Retrieve and decrypt the agent's ID from the cookie
             $encryptedAgentId = Cookie::get('Agent_Session');
             $agentId = Crypt::decrypt($encryptedAgentId);
@@ -62,9 +61,10 @@ class ApplyServiceController extends Controller
             $govtPrice = 0;
             $commission = 0;
             $tax = 0;
-
+            $is_agent_subscribed = false;
             $priceType = $request->input('price_type');
             if ($data->plan_id && $data->expiration_date >= $currentDate) {
+                $is_agent_subscribed = true;
                 // active plan check
                 $prices = DB::table('prices')->where('location_id', $locationId)->where('service_id', $id)->where('plan_id', $data->plan_id)->first();
                 if ($priceType === 'default') {
@@ -190,6 +190,7 @@ class ApplyServiceController extends Controller
                     'price_type' => $priceType,
                     'govt_price' => $govtPrice,
                     'commission' => $commission,
+                    'is_agent_subscribed' => $is_agent_subscribed,
                     'tax' => $tax,
                     'apply_date' => now(),
                     'created_at' => now(),

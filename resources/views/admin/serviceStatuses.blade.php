@@ -30,17 +30,19 @@
         @endif
         <table class="table mt-3">
             <thead>
-                <tr>
+                <tr >
                     <th>Sr. No</th>
                     <th>Status</th>
+                    <th>Color code</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($statuses as $key => $status)
-                <tr>
+                <tr style = "background-color: {{$status->color}};">
                     <td>{{ $key + 1 }}</td>
                     <td>{{ $status->status_name }}</td>
+                    <td>{{ $status->color }}</td>
                     <td>
                         <button class="btn btn-warning" data-toggle="modal"
                             data-target="#editstatusModal-{{ $status->id }}">Edit</button>
@@ -67,6 +69,11 @@
                                         <label for="editstatus_name-{{ $status->id }}">Status:</label>
                                         <input type="text" class="form-control" id="editstatus_name-{{ $status->id }}"
                                             name="status_name" value="{{ $status->status_name }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editstatus_name-{{ $status->id }}">Color Hex code:</label>
+                                        <input type="text" class="form-control" id="editstatus_name-{{ $status->id }}"
+                                            name="color" value="{{ $status->color }}" required>
                                     </div>
                                     
                                     <button type="submit" class="btn btn-primary">Update status</button>
@@ -98,6 +105,10 @@
                         <div class="form-group">
                             <label for="addstatus_name">Status Name:</label>
                             <input type="text" class="form-control" id="addstatus_name" name="status_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="addstatus_name">Status Color Hex Code:</label>
+                            <input type="text" class="form-control" id="addstatus_name" name="color" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Add status</button>
                     </form>

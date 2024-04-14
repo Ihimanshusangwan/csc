@@ -171,69 +171,70 @@
                         </td>
 
                         <td>
-                          <input type="hidden" name="reason" value="NA">
-                          <select class="form-control-sm statuses-menu" id="status" name="status">
-                              <option value="-1" {{ $application->status == -1 ? 'selected' : '' }}
-                                  class="text-danger">Rejected</option>
-                              <option value="0" {{ $application->status == 0 ? 'selected' : '' }}
-                                  class="text-info">Initiated</option>
-                              <option value="1" {{ $application->status == 1 ? 'selected' : '' }}
-                                  class="text-warning">In Progress</option>
-                              <option value="2" {{ $application->status == 2 ? 'selected' : '' }}
-                                  class="text-success">Completed</option>
+                            <input type="hidden" name="reason" value="NA">
+                            <select class="form-control-sm statuses-menu" id="status" name="status">
+                                <option value="-1" {{ $application->status == -1 ? 'selected' : '' }}
+                                    class="text-danger">Rejected</option>
+                                <option value="0" {{ $application->status == 0 ? 'selected' : '' }}
+                                    class="text-info">Initiated</option>
+                                <option value="1" {{ $application->status == 1 ? 'selected' : '' }}
+                                    class="text-warning">In Progress</option>
+                                <option value="2" {{ $application->status == 2 ? 'selected' : '' }}
+                                    class="text-success">Completed</option>
 
-                              {{-- Explode statuses and create options --}}
-                              @php
-                                  $statusesArray = explode(',', $application->statuses);
-                              @endphp
+                                {{-- Explode statuses and create options --}}
+                                @php
+                                    $statusesArray = explode(',', $application->statuses);
+                                @endphp
 
-                              @if (count($statusesArray) > 0)
-                                  @foreach ($statusesArray as $status)
-                                      @php
-                                          $statusParts = explode(':', $status);
-                                          $id = $statusParts[0] ?? null;
-                                          $statusName = $statusParts[1] ?? null;
-                                      @endphp
+                                @if (count($statusesArray) > 0)
+                                    @foreach ($statusesArray as $status)
+                                        @php
+                                            $statusParts = explode(':', $status);
+                                            $id = $statusParts[0] ?? null;
+                                            $statusName = $statusParts[1] ?? null;
+                                            $statuscolor = $statusParts[2] ?? null;
+                                        @endphp
 
-                                      @if ($id !== null && $statusName !== null)
-                                          <option value="{{ $id }}"
-                                              {{ $application->status == $id ? 'selected' : '' }}>
-                                              {{ $statusName }}</option>
-                                      @endif
-                                  @endforeach
-                              @endif
+                                        @if ($id !== null && $statusName !== null)
+                                            <option value="{{ $id }}" style="color: {{ $statuscolor }};"
+                                                {{ $application->status == $id ? 'selected' : '' }}>
+                                                {{ $statusName }}</option>
+                                        @endif
+                                    @endforeach
+                                @endif
 
 
-                          </select>
-                          @if ($application->status == -1)
-                          <span class="text-danger" style="text-decoration: underline; cursor: pointer;" data-reason="{{ $application->reason }}"
-                              data-toggle="modal"
-                              data-target="#reasonModal{{ $application->id }}">Reason</span>
-                        
-                              <!-- Modal -->
-                              <div class="modal fade" id="reasonModal{{ $application->id }}" tabindex="-1"
-                                  role="dialog" aria-labelledby="reasonModalLabel" aria-hidden="true">
-                                  <div class="modal-dialog" role="document">
-                                      <div class="modal-content">
-                                          <div class="modal-header">
-                                              <h5 class="modal-title" id="reasonModalLabel">Reason</h5>
-                                              <button type="button" class="close" data-dismiss="modal"
-                                                  aria-label="Close">
-                                                  <span aria-hidden="true">&times;</span>
-                                              </button>
-                                          </div>
-                                          <div class="modal-body">
-                                              {{ $application->reason }}
-                                          </div>
-                                          <div class="modal-footer">
-                                              <button type="button" class="btn btn-secondary"
-                                                  data-dismiss="modal">Close</button>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          @endif
-                      </td>
+                            </select>
+                            @if ($application->status == -1)
+                                <span class="text-danger" style="text-decoration: underline; cursor: pointer;"
+                                    data-reason="{{ $application->reason }}" data-toggle="modal"
+                                    data-target="#reasonModal{{ $application->id }}">Reason</span>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="reasonModal{{ $application->id }}" tabindex="-1"
+                                    role="dialog" aria-labelledby="reasonModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="reasonModalLabel">Reason</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {{ $application->reason }}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                        </td>
                         <td>{{ $application->service_name }}</td>
                         <td>
                             <span style="cursor: pointer" class="material-icons" data-toggle="modal"
@@ -278,7 +279,12 @@
                                         @foreach ($formData as $category => $fields)
                                             @if (strtolower($category) !== 'service_id' && strtolower($category) !== 'filepaths')
                                                 @foreach ($fields as $key => $value)
-                                                    @php if ($i == 1) { $i++; continue; }  @endphp 
+                                                    @php
+                                                        if ($i == 1) {
+                                                            $i++;
+                                                            continue;
+                                                        }
+                                                    @endphp
                                                     @if (!empty($value))
                                                         @if (is_array($value))
                                                             <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong>

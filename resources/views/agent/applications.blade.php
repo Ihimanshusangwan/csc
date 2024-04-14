@@ -267,16 +267,17 @@
                             @elseif ($application->status == 1)
                                 <span class="text-warning font-weight-bold">In Progress</span>
                             @else
-                                @php
-                                    $statusesArray = explode(',', $application->statuses);
-                                    foreach ($statusesArray as $status) {
-                                        [$id, $statusName] = explode(':', $status);
-                                        if ($application->status == $id) {
-                                            echo '<span class="font-weight-bold">' . ucfirst($statusName) . '</span>';
-                                            break;
-                                        }
-                                    }
-                                @endphp
+                            @php
+                            $statusesArray = explode(',', $application->statuses);
+                            foreach ($statusesArray as $status) {
+                                [$id, $statusName, $statusColor] = explode(':', $status);
+                                if ($application->status == $id) {
+                                    echo '<span class="font-weight-bold" style="color: ' . $statusColor . '">' . ucfirst($statusName) . '</span>';
+                                    break;
+                                }
+                            }
+                            @endphp
+                            
                             @endif
 
 

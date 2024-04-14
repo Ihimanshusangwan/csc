@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
+
 
 class AdminLoginController extends Controller
 {
@@ -29,13 +31,13 @@ class AdminLoginController extends Controller
                     'services.name as service_name',
                     'customers.name as customer_name',
                     'agents.full_name as agent_name',
-                    DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
+                    DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
 
             // Fetch paginated applications
             $applications = $query->paginate(15);
-
+                    // dd($applications);
             // Get sum of all price column
             $sumOfPrices = DB::table('applications')
                 ->sum('price');
@@ -64,52 +66,52 @@ class AdminLoginController extends Controller
         }
     }
     public function customerData()
-    {           
-            $plans = DB::table('plans')->where("is_active", 1)->get();
-            $locations = DB::table('locations')->get();
+    {
+        $plans = DB::table('plans')->where("is_active", 1)->get();
+        $locations = DB::table('locations')->get();
 
-            $query = DB::table('applications')
-                ->join('customers', 'applications.customer_id', '=', 'customers.id')
-                ->join('services', 'applications.service_id', '=', 'services.id')
-                ->join('agents', 'applications.agent_id', '=', 'agents.id')
-                ->leftJoin('staff', 'applications.staff_id', '=', 'staff.id')
-                ->select(
-                    'staff.name as staffName',
-                    'applications.*',
-                    'services.name as service_name',
-                    'customers.name as customer_name',
-                    'agents.full_name as agent_name',
-                    DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
-                )
-                ->orderBy("applications.id", "desc");
+        $query = DB::table('applications')
+            ->join('customers', 'applications.customer_id', '=', 'customers.id')
+            ->join('services', 'applications.service_id', '=', 'services.id')
+            ->join('agents', 'applications.agent_id', '=', 'agents.id')
+            ->leftJoin('staff', 'applications.staff_id', '=', 'staff.id')
+            ->select(
+                'staff.name as staffName',
+                'applications.*',
+                'services.name as service_name',
+                'customers.name as customer_name',
+                'agents.full_name as agent_name',
+                DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
+            )
+            ->orderBy("applications.id", "desc");
 
-            // Fetch paginated applications
-            $applications = $query->get();
-            // dd($applications);
+        // Fetch paginated applications
+        $applications = $query->get();
+        // dd($applications);
 
-            // // Get sum of all price column
-            // $sumOfPrices = DB::table('applications')
-            //     ->sum('price');
+        // // Get sum of all price column
+        // $sumOfPrices = DB::table('applications')
+        //     ->sum('price');
 
-            // // Get count of today's applications
-            // $countOfTodaysApplications = DB::table('applications')
-            //     ->whereDate('apply_date', now()->toDateString())
-            //     ->count();
+        // // Get count of today's applications
+        // $countOfTodaysApplications = DB::table('applications')
+        //     ->whereDate('apply_date', now()->toDateString())
+        //     ->count();
 
-            // // Get total application count
-            // $totalApplicationCount = DB::table('applications')
-            //     ->count();
+        // // Get total application count
+        // $totalApplicationCount = DB::table('applications')
+        //     ->count();
 
-            // // Get completed applications count which have delivery date less than today
-            // $completedApplicationsCount = DB::table('applications')
-            //     ->where('status', 2)
-            //     ->count();
+        // // Get completed applications count which have delivery date less than today
+        // $completedApplicationsCount = DB::table('applications')
+        //     ->where('status', 2)
+        //     ->count();
 
-            // // Calculate pending applications count
-            // $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
-            // Pass data to the view using compact
-            // return view('admin.dashboard', compact('plans', 'locations', 'applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount'));
-       return $applications->toJson();
+        // // Calculate pending applications count
+        // $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
+        // Pass data to the view using compact
+        // return view('admin.dashboard', compact('plans', 'locations', 'applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount'));
+        return $applications->toJson();
     }
     public function showStaffDetails(Request $request)
     {
@@ -252,6 +254,7 @@ class AdminLoginController extends Controller
             // The cookie exists, proceed to the admin dashboard
             $services = DB::table('services')->where("is_active", 1)->get();
             $agents = DB::table('agents')->get();
+            $statuses = DB::table('service_statuses')->select('id', 'status_name')->get();
 
             // Retrieve form data
             $dateFrom = $request->input('dateFrom');
@@ -260,19 +263,25 @@ class AdminLoginController extends Controller
             $status = $request->input('status');
             $applicantName = $request->input('applicantName');
             $service = $request->input('services');
+            $price_type = $request->input('price_type');
+            $agent_type = $request->input('agent_type');
 
             // Start with a base query
             $query = DB::table('applications')
                 ->join('customers', 'applications.customer_id', '=', 'customers.id')
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->join('agents', 'applications.agent_id', '=', 'agents.id')
+                ->join('service_groups', 'services.service_group_id', '=', 'service_groups.id')
                 ->select(
                     'applications.*',
+                    'service_groups.name as service_group_name',
                     'services.name as service_name',
                     'customers.name as customer_name',
                     'agents.full_name as agent_name',
+                    DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
+
 
             // Apply filters conditionally based on input values
             if ($dateFrom) {
@@ -290,26 +299,75 @@ class AdminLoginController extends Controller
             if ($applicantName) {
                 $query->where('customers.name', 'like', '%' . $applicantName . '%');
             }
-            if ($status) {
-                $today = strtotime('today');
-                if ($status == "completed") {
-                    $query->where('applications.delivery_date', ">=", $today);
-                } elseif ($status == "initiated") {
-                    $query->where('applications.apply_date', "=", $today);
-                } else {
-                    $query->where('applications.delivery_date', "<", $today);
+            if ($status !== null && $status !== '') {
+                $query->where('applications.status', '=', $status);
+            }
+            if ($price_type) {
+                $query->where('price_type', '=', $price_type);
+            }
+            if ($agent_type !== null && $agent_type !== '') {
+                $query->where('is_agent_subscribed', '=', $agent_type);
+            }
+            $applications = $query->get();
+            $originalCollection = Collection::make($applications);
+            $groupedByServiceGroup = $originalCollection->groupBy('service_group_id');
+            $structuredData = [];
+
+            foreach ($groupedByServiceGroup as $serviceGroupId => $collection) {
+                $collection = new Collection($collection);
+                $totalPrice = 0;
+                $totalGovtPrice = 0;
+                $totalCommission = 0;
+                $totalTax = 0;
+
+                foreach ($collection as $item) {
+                    if (is_object($item)) {
+                        // Calculate totals
+                        $totalPrice += (float) ($item->price ?? 0);
+                        $totalGovtPrice += (float) ($item->govt_price ?? 0);
+                        $totalCommission += (float) ($item->commission ?? 0);
+                        $totalTax += (float) ($item->tax ?? 0);
+                    }
+                }
+
+                $servicesData = $collection->groupBy('service_name')->map(function ($serviceCollection) {
+                    $serviceTotalPrice = $serviceCollection->sum('price');
+                    $serviceTotalGovtPrice = $serviceCollection->sum('govt_price');
+                    $serviceTotalCommission = $serviceCollection->sum('commission');
+                    $serviceTotalTax = $serviceCollection->sum('tax');
+
+                    return [
+                        'total_price' => $serviceTotalPrice,
+                        'total_govt_price' => $serviceTotalGovtPrice,
+                        'total_commission' => $serviceTotalCommission,
+                        'total_tax' => $serviceTotalTax,
+                    ];
+                });
+
+                if (!empty($collection->first()->service_group_name)) {
+                    $structuredData[] = [
+                        'service_group_name' => $collection->first()->service_group_name,
+                        'total_price' => $totalPrice,
+                        'total_govt_price' => $totalGovtPrice,
+                        'total_commission' => $totalCommission,
+                        'total_tax' => $totalTax,
+                        'services' => $servicesData,
+                    ];
                 }
             }
-            // Fetch paginated applications
-            $applications = $query->paginate(15);
-
             // Get sum of all price column
             $sumOfPrices = $query
                 ->sum('price');
-
+            //total govt. price 
+            $sumOfGovtPrice = $query
+                ->sum('govt_price');
+            //total commission
+            $sumOfCommission = $query->sum('commission');
+            //total tax
+            $sumOfTax = $query->sum('tax');
 
             // Pass data to the view using compact
-            return view('admin.filter', compact('applications', 'sumOfPrices', 'services', 'agents'));
+            return view('admin.filter', compact('applications', 'sumOfPrices', 'services', 'agents', 'statuses', 'sumOfGovtPrice', 'sumOfCommission', 'sumOfTax','structuredData'));
         } else {
 
             return view('admin.login');

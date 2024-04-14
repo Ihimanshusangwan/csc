@@ -24,12 +24,14 @@ class StatusController extends Controller
         // Validate the incoming request data
         $validatedData = $request->validate([
             'status_name' => 'required|string|max:255',
+            'color' => 'required|string|max:255',
             'service_id' => 'required',
         ]);
     
         // Insert the new status into the database
         DB::table('service_statuses')->insert([
             'status_name' => $validatedData['status_name'],
+            'color' => $validatedData['color'],
             'service_id' => $validatedData['service_id'],
         ]);
     
@@ -41,6 +43,7 @@ class StatusController extends Controller
         // Validate the incoming request data
         $validatedData = $request->validate([
             'status_name' => 'required|string|max:255',
+            'color' => 'required|string|max:255',
         ]);
     
         // Update the status record in the database
@@ -48,6 +51,7 @@ class StatusController extends Controller
             ->where('id', $id)
             ->update([
                 'status_name' => $validatedData['status_name'],
+                'color' => $validatedData['color'],
             ]);
     
         // Redirect back with success message
