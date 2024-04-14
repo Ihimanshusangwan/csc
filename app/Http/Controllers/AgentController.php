@@ -43,7 +43,7 @@ class AgentController extends Controller
         $shopAddress = $request->input('shop_address');
         $username = $request->input('username');
         $password = $request->input('password');
-        $plan_id = $request->input('plan_id') ? $request->input('plan_id'): null;
+        $plan_id = $request->input('plan_id') ? $request->input('plan_id') : null;
         $location_id = $request->input('location_id');
         $password = $request->input('password');
         // Additional fields for the payment section
@@ -64,17 +64,17 @@ class AgentController extends Controller
         if ($existingUsername) {
             return redirect()->back()->withInput()->withErrors(['error' => 'The username is already taken. Please choose a different one.']);
         }
-        if($plan_id){
+        if ($plan_id) {
             $planDuration = DB::table('plans')->where('id', '=', $plan_id)
-            ->select('duration')
-            ->get()[0]->duration;
+                ->select('duration')
+                ->get()[0]->duration;
 
-        $expirationDate = now()->addDays($planDuration)->toDateString();
-        }else{
+            $expirationDate = now()->addDays($planDuration)->toDateString();
+        } else {
             $expirationDate = null;
         }
 
-        
+
 
         // Save the data to the database using query builder
         $agentId = DB::table('agents')->insertGetId([
@@ -505,6 +505,23 @@ class AgentController extends Controller
 
             return view("agent.rechargeHistory", compact('recharges', 'spendings'));
         } else {
+            return view('agent.login');
+        }
+    }
+
+    public function profile()
+    {
+        // Check if the custom cookie exists
+        if (Cookie::has('Agent_Session')) {
+            // The cookie exists, proceed to the admin dashboard
+            // Retrieve and decrypt the agent's ID from the cookie
+            $encryptedAgentId = Cookie::get('Agent_Session');
+            $agentId = Crypt::decrypt($encryptedAgentId);
+            $agentData = DB::table('agents')->where('id', $agentId)->first();
+
+            return view('agent.profile', compact('agentData'));
+        } else {
+
             return view('agent.login');
         }
     }

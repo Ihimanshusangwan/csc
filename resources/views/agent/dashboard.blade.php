@@ -210,7 +210,7 @@
       </li>
 
       <li class="border-t md:border-none">
-        <a href="about.html"
+        <a href="{{ route('agent.profile');}}"
           class="block md:inline-block px-4 py-3 no-underline text-grey-darkest hover:text-grey-darker">My Profile</a>
       </li>
 

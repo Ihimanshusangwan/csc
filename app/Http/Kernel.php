@@ -22,6 +22,8 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         // 'auth.admin' => \App\Http\Middleware\AuthenticateAdmin::class,
+        \App\Http\Middleware\EnableCors::class,
+
     ];
 
     /**

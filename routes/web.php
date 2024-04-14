@@ -36,6 +36,10 @@ Route::post('/admin/delete-data', [AdminLoginController::class, 'deleteData'])->
 Route::get('/admin/delete-data', [AdminLoginController::class, 'showDeleteForm'])->name('admin.delete-form');
 Route::get('admin/registered-staff', [AdminLoginController::class, 'showStaffDetails'])->name('admin.registered-staff');
 
+Route::get('/admin/customer-data', [AdminLoginController::class, 'customerData'])
+    ->withoutMiddleware(\App\Http\Middleware\EnableCors::class);
+
+
 
 //service groups routes
 Route::get('/service-groups', [ServiceGroupController::class, 'index'])->name('service-groups.index');
@@ -95,6 +99,7 @@ Route::get('/agent/recharge-history', [AgentController::class, 'rechargeHistory'
 Route::get('/agent/login', [AgentController::class, 'showLoginForm'])->name('agent.login');
 Route::post('/agent/login', [AgentController::class, 'login'])->name('agent.login.submit');
 Route::get('/agent/dashboard', [AgentController::class, 'index'])->name('agent.dashboard');
+Route::get('/agent/profile', [AgentController::class, 'profile'])->name('agent.profile');
 Route::get('/agent/applications', [AgentController::class, 'applications'])->name('agent.applications');
 Route::get('/agent/logout', [AgentController::class, 'logout'])->name('agent.logout');
 Route::get('/servicegroup/view/{serviceGroupId}', [AgentController::class, 'view'])->name('service-group.view');

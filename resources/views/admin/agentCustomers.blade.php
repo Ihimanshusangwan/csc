@@ -190,7 +190,7 @@
         <td> {{$application->staffName}}</td>
         <td class="text-success"> &#8377;{{ $application->price}}</td>
         <td>
-        @if($application->delivery_date)
+        @if($application->delivery_date && $application->delivery)
     <!-- If delivery date exists, display a link to open the document in another tab -->
     <div class="form-group">
         Uploaded Document:<a href="{{ asset($application->delivery) }}" target="_blank"  style="color: blue;">View Document</a>

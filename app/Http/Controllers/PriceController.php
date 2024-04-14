@@ -23,7 +23,6 @@ class PriceController extends Controller
                     ->where('prices.location_id', '=', $locationId)
                     ->where('prices.plan_id', "!=", null);
             })
-           
             ->select('prices.*','plans.name as planName','plans.id as main_plan_id')
             ->orderBy('plans.id', 'desc')
             ->distinct()

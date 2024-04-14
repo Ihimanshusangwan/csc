@@ -26,7 +26,7 @@
         <div class="card mt-3">
             <div class="card-header">
                 <h4>{{ $groupedPlan->first()->plan_name }}</h4>
-                <p>Price: ${{ $groupedPlan->first()->price }}</p>
+                <p>Price: Rs. {{ $groupedPlan->first()->price }}</p>
                 <p>Duration: {{ $groupedPlan->first()->duration }} days</p>
                 <!-- Delete button -->
                 <form action="{{ route('plans.destroy', $groupedPlan->first()->plan_id) }}" method="post"

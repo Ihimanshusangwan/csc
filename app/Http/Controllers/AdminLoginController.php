@@ -63,6 +63,54 @@ class AdminLoginController extends Controller
             return view('admin.login');
         }
     }
+    public function customerData()
+    {           
+            $plans = DB::table('plans')->where("is_active", 1)->get();
+            $locations = DB::table('locations')->get();
+
+            $query = DB::table('applications')
+                ->join('customers', 'applications.customer_id', '=', 'customers.id')
+                ->join('services', 'applications.service_id', '=', 'services.id')
+                ->join('agents', 'applications.agent_id', '=', 'agents.id')
+                ->leftJoin('staff', 'applications.staff_id', '=', 'staff.id')
+                ->select(
+                    'staff.name as staffName',
+                    'applications.*',
+                    'services.name as service_name',
+                    'customers.name as customer_name',
+                    'agents.full_name as agent_name',
+                    DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
+                )
+                ->orderBy("applications.id", "desc");
+
+            // Fetch paginated applications
+            $applications = $query->get();
+            // dd($applications);
+
+            // // Get sum of all price column
+            // $sumOfPrices = DB::table('applications')
+            //     ->sum('price');
+
+            // // Get count of today's applications
+            // $countOfTodaysApplications = DB::table('applications')
+            //     ->whereDate('apply_date', now()->toDateString())
+            //     ->count();
+
+            // // Get total application count
+            // $totalApplicationCount = DB::table('applications')
+            //     ->count();
+
+            // // Get completed applications count which have delivery date less than today
+            // $completedApplicationsCount = DB::table('applications')
+            //     ->where('status', 2)
+            //     ->count();
+
+            // // Calculate pending applications count
+            // $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
+            // Pass data to the view using compact
+            // return view('admin.dashboard', compact('plans', 'locations', 'applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount'));
+       return $applications->toJson();
+    }
     public function showStaffDetails(Request $request)
     {
         // Check if the custom cookie exists
