@@ -243,7 +243,7 @@
         <td class="text-success"> &#8377;{{ $agent->paid_amount}}</td>
         <td class="text-danger"> &#8377;{{ $agent->unpaid_amount}}</td>
         <td class="text-success"> &#8377;{{ $agent->balance}}</td>
-        <td><a href="{{ route('agent.show', ['id' => $agent->id]) }}" class="btn btn-info">View</a></td>
+        <td><a href="{{ route('agent.show', ['id' => $agent->id , 'category' => 'today']) }}" class="btn btn-info">View</a></td>
         <td>
           <button style="cursor: pointer" class="btn btn-success" data-toggle="modal"
                             data-target="#agentRechargeModal{{ $agent->id }}">

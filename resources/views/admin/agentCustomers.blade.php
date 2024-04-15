@@ -44,44 +44,45 @@
         <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary m-2">Home</a>
         <div class="row">
             <div class="col-3">
-                <div class="total-registration background-total-registration">
+                <a class="total-registration background-total-registration" href="{{route('agent.show',[ 'category' => 'all' , 'id' => $id])}}">
                     <div class="align">
                         <div class="registration-text">Total Applications</div>
                         <div class="count">{{ $totalApplicationCount }}</div>
                     </div>
                     <div class="material-icons chevron_right">chevron_right</div>
-                </div>
+                </a>
             </div>
             <div class="col-3">
-                <div class="total-registration todays-registration">
+                <a class="total-registration todays-registration" href="{{route('agent.show',[ 'category' => 'today' , 'id' => $id])}}">
                     <div class="align">
                         <div class="registration-text">Today's Applications</div>
                         <div class="count">{{ $countOfTodaysApplications }}</div>
                     </div>
                     <div class="material-icons chevron_right">chevron_right</div>
-                </div>
+                </a>
             </div>
             <div class="col-3">
-                <div class="total-registration background-process-completed">
+                <a class="total-registration background-process-completed" href="{{route('agent.show',[ 'category' => 'completed' , 'id' => $id])}}">
                     <div class="align">
                         <div class="registration-text">Completed Applications</div>
                         <div class="count">{{ $completedApplicationsCount }}</div>
                     </div>
                     <div class="material-icons chevron_right">chevron_right</div>
-                </div>
+                </a>
             </div>
             <div class="col-3">
-                <div class="total-registration background-pending">
+                <a class="total-registration background-pending" href="{{route('agent.show',[ 'category' => 'pending' , 'id' => $id])}}">
                     <div class="align">
                         <div class="registration-text">Pending Applications</div>
                         <div class="count"> {{ $pendingApplicationsCount }}</div>
                     </div>
                     <div class="material-icons chevron_right">chevron_right</div>
-                </div>
+                </a>
             </div>
         </div>
 
-        <h3 class="mt-4 text-center">Today's Applications</h3>
+
+        <h3 class="mt-2 text-center">{{ucfirst($category) . "'s"}} Applications</h3>
         <div class="sort-filter">
 
 

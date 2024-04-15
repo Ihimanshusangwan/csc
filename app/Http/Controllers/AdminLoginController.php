@@ -37,7 +37,7 @@ class AdminLoginController extends Controller
 
             // Fetch paginated applications
             $applications = $query->paginate(15);
-                    // dd($applications);
+            // dd($applications);
             // Get sum of all price column
             $sumOfPrices = DB::table('applications')
                 ->sum('price');
@@ -192,7 +192,7 @@ class AdminLoginController extends Controller
         // Redirect to the login page or any other desired page after logout
         return redirect('/')->withCookie($cookie);
     }
-    public function agentView(Request $request, $id)
+    public function agentView(Request $request, $id, $category)
     {
         // Check if the custom cookie exists
         if (Cookie::has('Admin_Session')) {
@@ -213,18 +213,30 @@ class AdminLoginController extends Controller
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
+                switch ($category) {
+                    case "all":
+                        // No need for any additional filtering
+                        break;
+                    case "today":
+                        $query->whereDate("applications.apply_date", "=", today()->toDateString());
+                        break;
+                    case "completed":
+                        $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
+                        break;
+                    case "pending":
+                        $query->whereDate("applications.delivery_date", ">=", today()->toDateString())->orWhere('applications.status', '!=', 2);
+ 
+                        break;
+                }
 
             // Fetch paginated applications
             $applications = $query->paginate(15);
 
             // Get sum of all price column
-            $sumOfPrices = DB::table('applications')
-                ->where('agent_id', $id)
-                ->sum('price');
+            $sumOfPrices =$query->sum('price');
 
             // Get count of today's applications
-            $countOfTodaysApplications = DB::table('applications')
-                ->where('agent_id', $id)
+            $countOfTodaysApplications =$query
                 ->whereDate('apply_date', now()->toDateString())
                 ->count();
 
@@ -234,14 +246,13 @@ class AdminLoginController extends Controller
                 ->count();
 
             // Get completed applications count which have delivery date less than today
-            $completedApplicationsCount = DB::table('applications')
-                ->where('agent_id', $id)->where('status', 2)
+            $completedApplicationsCount = $query->where('delivery_date','<=', today()->toDateString())
                 ->count();
 
             // Calculate pending applications count
             $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
             // Pass data to the view using compact
-            return view('admin.agentCustomers', compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount'));
+            return view('admin.agentCustomers', compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount','id','category'));
         } else {
 
             return view('admin.login');
@@ -367,7 +378,7 @@ class AdminLoginController extends Controller
             $sumOfTax = $query->sum('tax');
 
             // Pass data to the view using compact
-            return view('admin.filter', compact('applications', 'sumOfPrices', 'services', 'agents', 'statuses', 'sumOfGovtPrice', 'sumOfCommission', 'sumOfTax','structuredData'));
+            return view('admin.filter', compact('applications', 'sumOfPrices', 'services', 'agents', 'statuses', 'sumOfGovtPrice', 'sumOfCommission', 'sumOfTax', 'structuredData'));
         } else {
 
             return view('admin.login');
@@ -490,5 +501,70 @@ class AdminLoginController extends Controller
     public function showDeleteForm()
     {
         return view('admin.deleteData');
+    }
+
+    public function applications($category)
+    {
+        // Check if the custom cookie exists
+        if (Cookie::has('Admin_Session')) {
+            // The cookie exists, proceed to the admin dashboard
+
+            $query = DB::table('applications')
+                ->join('customers', 'applications.customer_id', '=', 'customers.id')
+                ->join('services', 'applications.service_id', '=', 'services.id')
+                ->join('agents', 'applications.agent_id', '=', 'agents.id')
+                ->leftJoin('staff', 'applications.staff_id', '=', 'staff.id')
+                ->select(
+                    'staff.name as staffName',
+                    'applications.*',
+                    'services.name as service_name',
+                    'customers.name as customer_name',
+                    'agents.full_name as agent_name',
+                    DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
+                )
+                ->orderBy("applications.id", "desc");
+                switch ($category) {
+                    case "all":
+                        // No need for any additional filtering
+                        break;
+                    case "today":
+                        $query->whereDate("applications.apply_date", "=", today()->toDateString());
+                        break;
+                    case "completed":
+                        $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
+                        break;
+                    case "pending":
+                        $query->whereDate("applications.delivery_date", ">=", today()->toDateString())->orWhere('applications.status', '!=', 2);
+ 
+                        break;
+                }
+            // Fetch paginated applications
+            $applications = $query->paginate(15);
+
+            // Get sum of all price column
+            $sumOfPrices = $query
+                ->sum('price');
+
+            // Get count of today's applications
+            $countOfTodaysApplications = $query
+                ->whereDate('apply_date', now()->toDateString())
+                ->count();
+
+            // Get total application count
+            $totalApplicationCount = DB::table('applications')
+                ->count();
+
+            // Get completed applications count which have delivery date less than today
+            $completedApplicationsCount = $query->where('delivery_date','<=', today()->toDateString())
+                ->count();
+
+            // Calculate pending applications count
+            $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
+            // Pass data to the view using compact
+            return view('admin.applications', compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount', 'category'));
+        } else {
+
+            return view('admin.login');
+        }
     }
 }
