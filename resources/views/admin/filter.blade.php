@@ -130,11 +130,18 @@
             font-family: sans-serif;
 
         }
+        @media print{
+            .no-print{
+                display: none;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <div class="no-print">
     <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary m-2">Home</a>
+    <button class="btn btn-warning m-2" onclick="window.print()"> Print</button>
     <div class="container mt-5">
         <h2>Filter Options</h2>
         <form method="GET" action="">
@@ -242,6 +249,7 @@
             <button type="submit" class="btn btn-primary m-2">Filter</button>
         </form>
     </div>
+</div>
     <div class="heading">
         <div class="dashboard-content">
 
@@ -260,8 +268,8 @@
         </div>
     </div>
     </div>
-    <h4>View Detailed Earnings</h4>
-    <div class="accordion m-3" id="accordionExample">
+    <h4 class="no-print">View Detailed Earnings</h4>
+    <div class="accordion m-3 no-print" id="accordionExample">
         @foreach($structuredData as $index => $data)
         <div class="accordion-item">
             <h2 class="accordion-header" id="heading{{ $index }}">
@@ -321,7 +329,7 @@
                 <th scope="col">Estimated Delivery Date</th>
                 <th scope="col">Status</th>
                 <th scope="col">Applied For</th>
-                <th scope="col">Preview</th>
+                <th scope="col" class="no-print">Preview</th>
                 <th scope="col">Type</th>
                 <th scope="col">Ruppes(&#8377;)</th>
                 <th scope="col">Commission(&#8377;)</th>
@@ -369,9 +377,9 @@
                                 </div>
                             </div>
                         @elseif ($application->status == 2)
-                            <span class="text-success font-weight-bold">Completed</span><br>
+                            <span class="text-success font-weight-bold">Completed</span><br><span class="no-print">
                             Document: <a href="{{ asset($application->delivery) }}" target="_blank"
-                                style="color: blue;">View Document</a>
+                                style="color: blue;">View Document</a> </span>
                         @elseif ($application->status == 0)
                             <span class="text-info font-weight-bold">Initiated</span>
                         @elseif ($application->status == 1)
@@ -380,9 +388,9 @@
                             @php
                                 $statusesArray = explode(',', $application->statuses);
                                 foreach ($statusesArray as $status) {
-                                    [$id, $statusName] = explode(':', $status);
+                                    [$id, $statusName ,$statusColor] = explode(':', $status);
                                     if ($application->status == $id) {
-                                        echo '<span class="font-weight-bold">' . ucfirst($statusName) . '</span>';
+                                        echo '<span class="font-weight-bold" style="color: ' . $statusColor . '">' . ucfirst($statusName) . '</span>';
                                         break;
                                     }
                                 }
@@ -393,7 +401,7 @@
 
                     </td>
                     <td>{{ $application->service_name }}</td>
-                    <td>
+                    <td class="no-print"> 
                         <span style="cursor: pointer" class="material-icons" data-toggle="modal"
                             data-target="#agentModal{{ $application->id }}">
                             preview
