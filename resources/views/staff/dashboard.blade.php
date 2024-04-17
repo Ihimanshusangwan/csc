@@ -70,13 +70,13 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="total-registration background-process-completed" href="{{route('staff.dashboard',[ 'category' => 'completed'])}}">
+                <div class="total-registration background-process-completed" >
                     <div class="align">
                         <div class="registration-text">Completed Applications</div>
                         <div class="count">{{ $completedApplicationsCount }}</div>
                     </div>
-                    <div class="material-icons chevron_right">chevron_right</div>
-                </a>
+                    {{-- <div class="material-icons chevron_right">chevron_right</div> --}}
+                </div>
             </div>
             <div class="col-3">
                 <a class="total-registration background-pending" href="{{route('staff.dashboard',[ 'category' => 'pending'])}}">

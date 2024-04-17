@@ -67,6 +67,9 @@
                     <a class="nav-link" href="{{ route('staffs.create') }}">Register Staff</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.troubleshoot') }}">Run Troubleshooter</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ route('admin.delete-form') }}">Clear Database</a>
                 </li>
             </ul>

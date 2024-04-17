@@ -69,11 +69,11 @@ class StaffController extends Controller
             // Retrieve and decrypt the agent's ID from the cookie
             $encryptedStaffId = Cookie::get('Staff_Session');
             $staffId = Crypt::decrypt($encryptedStaffId);
-
-
-
             $query = DB::table('applications')
-                ->where('applications.staff_id', $staffId)
+                ->where('applications.staff_id', $staffId)->where(function ($query) {
+                    $query->whereDate("applications.delivery_date", ">=", today()->toDateString())
+                        ->orWhereNull("applications.delivery_date");
+                })
                 ->join('customers', 'applications.customer_id', '=', 'customers.id')
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->join('agents', 'applications.agent_id', '=', 'agents.id')
@@ -92,11 +92,7 @@ class StaffController extends Controller
                 case "today":
                     $query->whereDate("applications.apply_date", "=", today()->toDateString());
                     break;
-                case "completed":
-                    $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
-                    break;
                 case "pending":
-                    $query->whereDate("applications.delivery_date", ">=", today()->toDateString())->orWhere('applications.status', '!=', 2);
                     break;
             }
 
@@ -105,7 +101,8 @@ class StaffController extends Controller
 
 
             // Get count of today's applications
-            $countOfTodaysApplications = $query
+            $countOfTodaysApplications = DB::table('applications')
+                ->where('applications.staff_id', $staffId)
                 ->whereDate('apply_date', now()->toDateString())
                 ->count();
 
@@ -115,14 +112,15 @@ class StaffController extends Controller
                 ->count();
 
             // Get completed applications count which have delivery date less than today
-            $completedApplicationsCount = $query
-                ->where('status', 2)
+            $completedApplicationsCount = DB::table('applications')
+                ->where('applications.staff_id', $staffId)
+                ->whereDate('delivery_date', '<=', today()->toDateString())
                 ->count();
 
             // Calculate pending applications count
             $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
             // Pass data to the view using compact
-            return view('staff.dashboard', compact('applications', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount','category'));
+            return view('staff.dashboard', compact('applications', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount', 'category'));
         } else {
 
             return view('staff.login');

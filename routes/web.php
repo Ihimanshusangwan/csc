@@ -36,6 +36,7 @@ Route::post('/admin/delete-data', [AdminLoginController::class, 'deleteData'])->
 Route::get('/admin/delete-data', [AdminLoginController::class, 'showDeleteForm'])->name('admin.delete-form');
 Route::get('admin/registered-staff', [AdminLoginController::class, 'showStaffDetails'])->name('admin.registered-staff');
 Route::get('admin/applications/{category}', [AdminLoginController::class, 'applications'])->name('admin.applications');
+Route::get('admin/troubleshooter', [AdminLoginController::class, 'troubleshoot'])->name('admin.troubleshoot');
 
 Route::get('/admin/customer-data', [AdminLoginController::class, 'customerData'])
     ->withoutMiddleware(\App\Http\Middleware\EnableCors::class);

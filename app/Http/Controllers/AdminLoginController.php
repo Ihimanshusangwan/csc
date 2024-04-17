@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+use App\DatabaseTroubleshooter;
 
 
 class AdminLoginController extends Controller
@@ -60,6 +61,20 @@ class AdminLoginController extends Controller
             $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
             // Pass data to the view using compact
             return view('admin.dashboard', compact('plans', 'locations', 'applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount'));
+        } else {
+
+            return view('admin.login');
+        }
+    }
+    public function troubleshoot()
+    {
+        // Check if the custom cookie exists
+        if (Cookie::has('Admin_Session')) {
+            $troubleshooter = new DatabaseTroubleshooter();
+            $issues= $troubleshooter->checkPricesAndFormData();
+            // dd($issues);
+            return view('admin.troubleshooter', compact('issues'));
+          
         } else {
 
             return view('admin.login');
@@ -213,30 +228,31 @@ class AdminLoginController extends Controller
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
-                switch ($category) {
-                    case "all":
-                        // No need for any additional filtering
-                        break;
-                    case "today":
-                        $query->whereDate("applications.apply_date", "=", today()->toDateString());
-                        break;
-                    case "completed":
-                        $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
-                        break;
-                    case "pending":
-                        $query->whereDate("applications.delivery_date", ">=", today()->toDateString())->orWhere('applications.status', '!=', 2);
- 
-                        break;
-                }
+            switch ($category) {
+                case "all":
+                    // No need for any additional filtering
+                    break;
+                case "today":
+                    $query->whereDate("applications.apply_date", "=", today()->toDateString());
+                    break;
+                case "completed":
+                    $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
+                    break;
+                case "pending":
+                    $query->whereDate("applications.delivery_date", ">=", today()->toDateString())->orWhere('applications.status', '!=', 2);
+
+                    break;
+            }
 
             // Fetch paginated applications
             $applications = $query->paginate(15);
 
             // Get sum of all price column
-            $sumOfPrices =$query->sum('price');
+            $sumOfPrices = $query->sum('price');
 
             // Get count of today's applications
-            $countOfTodaysApplications =$query
+            $countOfTodaysApplications = DB::table('applications')
+            ->where('applications.agent_id', $id)
                 ->whereDate('apply_date', now()->toDateString())
                 ->count();
 
@@ -246,13 +262,14 @@ class AdminLoginController extends Controller
                 ->count();
 
             // Get completed applications count which have delivery date less than today
-            $completedApplicationsCount = $query->where('delivery_date','<=', today()->toDateString())
+            $completedApplicationsCount = DB::table('applications')
+            ->where('applications.agent_id', $id)->whereDate('delivery_date', '<=', today()->toDateString())
                 ->count();
 
             // Calculate pending applications count
             $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
             // Pass data to the view using compact
-            return view('admin.agentCustomers', compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount','id','category'));
+            return view('admin.agentCustomers', compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount', 'id', 'category'));
         } else {
 
             return view('admin.login');
@@ -523,21 +540,21 @@ class AdminLoginController extends Controller
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
-                switch ($category) {
-                    case "all":
-                        // No need for any additional filtering
-                        break;
-                    case "today":
-                        $query->whereDate("applications.apply_date", "=", today()->toDateString());
-                        break;
-                    case "completed":
-                        $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
-                        break;
-                    case "pending":
-                        $query->whereDate("applications.delivery_date", ">=", today()->toDateString())->orWhere('applications.status', '!=', 2);
- 
-                        break;
-                }
+            switch ($category) {
+                case "all":
+                    // No need for any additional filtering
+                    break;
+                case "today":
+                    $query->whereDate("applications.apply_date", "=", today()->toDateString());
+                    break;
+                case "completed":
+                    $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
+                    break;
+                case "pending":
+                    $query->whereDate("applications.delivery_date", ">=", today()->toDateString())->orWhere('applications.status', '!=', 2);
+
+                    break;
+            }
             // Fetch paginated applications
             $applications = $query->paginate(15);
 
@@ -546,7 +563,7 @@ class AdminLoginController extends Controller
                 ->sum('price');
 
             // Get count of today's applications
-            $countOfTodaysApplications = $query
+            $countOfTodaysApplications = DB::table('applications')
                 ->whereDate('apply_date', now()->toDateString())
                 ->count();
 
@@ -555,7 +572,7 @@ class AdminLoginController extends Controller
                 ->count();
 
             // Get completed applications count which have delivery date less than today
-            $completedApplicationsCount = $query->where('delivery_date','<=', today()->toDateString())
+            $completedApplicationsCount = DB::table('applications')->whereDate('delivery_date', '<=', today()->toDateString())
                 ->count();
 
             // Calculate pending applications count
