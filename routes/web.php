@@ -102,7 +102,7 @@ Route::get('/agent/login', [AgentController::class, 'showLoginForm'])->name('age
 Route::post('/agent/login', [AgentController::class, 'login'])->name('agent.login.submit');
 Route::get('/agent/dashboard', [AgentController::class, 'index'])->name('agent.dashboard');
 Route::get('/agent/profile', [AgentController::class, 'profile'])->name('agent.profile');
-Route::get('/agent/applications', [AgentController::class, 'applications'])->name('agent.applications');
+Route::get('/agent/applications/{category}', [AgentController::class, 'applications'])->name('agent.applications');
 Route::get('/agent/logout', [AgentController::class, 'logout'])->name('agent.logout');
 Route::get('/servicegroup/view/{serviceGroupId}', [AgentController::class, 'view'])->name('service-group.view');
 
