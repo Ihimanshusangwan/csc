@@ -26,7 +26,7 @@ Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name
 Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
 Route::get('/admin/dashboard', [AdminLoginController::class, 'index'])->name('admin.dashboard');
 Route::get('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
-Route::get('/agents/{id}', [AdminLoginController::class, 'agentView'])->name('agent.show');
+Route::get('/agents/{id}/{category}', [AdminLoginController::class, 'agentView'])->name('agent.show');
 Route::get('/admin/filter', [AdminLoginController::class, 'filter'])->name('admin.filter');
 Route::get('/admin/recharge-history', [AdminLoginController::class, 'rechargeHistory'])->name('admin.recharge-history');
 Route::get('/admin/appointment-history', [AdminLoginController::class, 'appointments'])->name('admin.appointment-history');
@@ -35,6 +35,8 @@ Route::get('/admin/rejected-appointment', [AdminLoginController::class, 'rejecte
 Route::post('/admin/delete-data', [AdminLoginController::class, 'deleteData'])->name('admin.delete-data');
 Route::get('/admin/delete-data', [AdminLoginController::class, 'showDeleteForm'])->name('admin.delete-form');
 Route::get('admin/registered-staff', [AdminLoginController::class, 'showStaffDetails'])->name('admin.registered-staff');
+Route::get('admin/applications/{category}', [AdminLoginController::class, 'applications'])->name('admin.applications');
+Route::get('admin/troubleshooter', [AdminLoginController::class, 'troubleshoot'])->name('admin.troubleshoot');
 
 Route::get('/admin/customer-data', [AdminLoginController::class, 'customerData'])
     ->withoutMiddleware(\App\Http\Middleware\EnableCors::class);
@@ -100,7 +102,7 @@ Route::get('/agent/login', [AgentController::class, 'showLoginForm'])->name('age
 Route::post('/agent/login', [AgentController::class, 'login'])->name('agent.login.submit');
 Route::get('/agent/dashboard', [AgentController::class, 'index'])->name('agent.dashboard');
 Route::get('/agent/profile', [AgentController::class, 'profile'])->name('agent.profile');
-Route::get('/agent/applications', [AgentController::class, 'applications'])->name('agent.applications');
+Route::get('/agent/applications/{category}', [AgentController::class, 'applications'])->name('agent.applications');
 Route::get('/agent/logout', [AgentController::class, 'logout'])->name('agent.logout');
 Route::get('/servicegroup/view/{serviceGroupId}', [AgentController::class, 'view'])->name('service-group.view');
 
@@ -130,7 +132,7 @@ Route::post('/register/staff', [StaffController::class, 'register'])->name('staf
 Route::get('/staff/logout', [StaffController::class, 'logout'])->name('staff.logout');
 Route::get('/staff/login', [StaffController::class, 'showLoginForm'])->name('staff.login');
 Route::post('/staff/login', [StaffController::class, 'login'])->name('staff.login.submit');
-Route::get('/staff/dashboard', [StaffController::class, 'index'])->name('staff.dashboard');
+Route::get('/staff/dashboard/{category}', [StaffController::class, 'index'])->name('staff.dashboard');
 
 //statuses routes
 use App\Http\Controllers\StatusController;

@@ -400,7 +400,7 @@ class AgentController extends Controller
         return view('agent.serviceGroup', compact('services'));
     }
 
-    public function applications(Request $request)
+    public function applications(Request $request,$category)
     {
         if (Cookie::has('Agent_Session')) {
             // Retrieve and decrypt the agent's ID from the cookie
@@ -419,14 +419,27 @@ class AgentController extends Controller
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
-
+                switch ($category) {
+                    case "all":
+                        // No need for any additional filtering
+                        break;
+                    case "today":
+                        $query->whereDate("applications.apply_date", "=", today()->toDateString());
+                        break;
+                    case "completed":
+                        $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
+                        break;
+                    case "pending":
+                        $query->whereDate("applications.delivery_date", ">=", today()->toDateString())->orWhere('applications.status', '!=', 2);
+    
+                        break;
+                }
+    
             // Fetch paginated applications
             $applications = $query->paginate(15);
 
             // Get sum of all price column
-            $sumOfPrices = DB::table('applications')
-                ->where('agent_id', $agentId)
-                ->sum('price');
+            $sumOfPrices = $query->sum('price');
 
             // Get count of today's applications
             $countOfTodaysApplications = DB::table('applications')
@@ -441,15 +454,14 @@ class AgentController extends Controller
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')
-                ->where('agent_id', $agentId)
-
-                ->whereDate('delivery_date', '<=', now()->toDateString())
+            ->where('applications.agent_id', $agentId)->whereDate('delivery_date', '<=', today()->toDateString())
                 ->count();
+
 
             // Calculate pending applications count
             $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
 
-            return view("agent.applications", compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount'));
+            return view("agent.applications", compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount','category'));
         } else {
             return view('agent.login');
         }
