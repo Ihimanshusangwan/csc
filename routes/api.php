@@ -1,7 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\AdminApiController;
+use App\Http\Controllers\AgentApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// admin routes
+Route::post('/login', [AdminApiController::class, 'loginAndCreateToken']);
+Route::post('/authenticate', [AdminApiController::class, 'checkAuth']);
+
+
+//agent routes
+
+Route::get('/agent/dashboard', [AgentApiController::class, 'index']);
