@@ -19,6 +19,7 @@ use App\Http\Controllers\AgentApiController;
 // admin routes
 Route::post('/login', [AdminApiController::class, 'loginAndCreateToken']);
 Route::post('/authenticate', [AdminApiController::class, 'checkAuth']);
+Route::delete('/logout', [AdminApiController::class, 'logout']);
 
 
 //agent routes

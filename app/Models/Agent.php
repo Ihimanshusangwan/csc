@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class Agent extends Model
 {
     protected $table = 'agents';
-
+    
     public static function get_dashboard_data($agent_id): array
     {
         $plan = DB::table("agents")->select('plan_id', 'expiration_date', 'balance')->where("id", "=", $agent_id)->first();

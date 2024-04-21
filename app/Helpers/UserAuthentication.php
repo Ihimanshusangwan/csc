@@ -152,4 +152,64 @@ class UserAuthentication
             'message' => "Authentication Failed"
         ];
     }
+    public static function logout(Request $request)
+    {
+        $token = $request->header('Authorization');
+
+        if (!$token) {
+            return [
+                'success' => false,
+                'message' => "Authorization header is missing"
+            ];
+        }
+
+        if (!preg_match('/^Bearer\s+(.*?)$/', $token, $matches)) {
+            return [
+                'success' => false,
+                'message' => "Invalid token format"
+            ];
+        }
+
+        $token = $matches[1];
+        $user = UserAuthentication::authenticate_and_get_user_id_and_role($token);
+        if ($user) {
+            switch ($user['role']) {
+                case "admin":
+                    DB::table('admins')
+                        ->where('id', $user['user_id'])
+                        ->update([
+                            'token' => null,
+                            'token_updated_at' => now(),
+                        ]);
+                    break;
+                case "agent":
+                    DB::table('agents')
+                        ->where('id', $user['user_id'])
+                        ->update([
+                            'token' => null,
+                            'token_updated_at' => now(),
+                        ]);
+                    break;
+                case "staff":
+                    DB::table('staff')
+                        ->where('id', $user['user_id'])
+                        ->update([
+                            'token' => null,
+                            'token_updated_at' => now(),
+                        ]);
+                    break;
+                default:
+                    break;
+            }
+
+            return [
+                'success' => true,
+                'message' => "Logout Successful"
+            ];
+        }
+        return  [
+            'success' => false,
+            'message' => "Logout Unsuccessful"
+        ];
+    }
 }
