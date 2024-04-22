@@ -25,3 +25,4 @@ Route::delete('/logout', [AdminApiController::class, 'logout']);
 //agent routes
 
 Route::get('/agent/dashboard', [AgentApiController::class, 'index']);
+Route::get('/agent/profile', [AgentApiController::class, 'profile']);

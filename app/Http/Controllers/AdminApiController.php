@@ -33,4 +33,7 @@ class AdminApiController extends Controller
     {
       return  UserAuthentication::authenticateUser($request);
     }
+    public function logout(Request $request){
+        return UserAuthentication::logout($request);
+    }
 }
