@@ -50,4 +50,63 @@ class AgentApiController extends Controller
         }
         return response()->json($authResult, 200);
     }
+    public function applications(Request $request)
+    {
+        $authResult = UserAuthentication::authenticateUser($request);
+        if ($authResult['success'] === true && $authResult['user']['role'] === "agent") {
+            $agent_id = $authResult['user']['user_id'];
+            $category = $request->has('category') ? $request->input('category') : 'all';
+            $order = $request->has('order') ? $request->input('order') : 'desc';
+            $offset = $request->has('offset') ? intval($request->input('offset')) : 0;
+            $limit = $request->has('limit') ? intval($request->input('limit')) : 100;
+            $offset = max(0, $offset);
+            $limit = max(1, $limit);
+            if ($order !== "asc" || $order !== "desc") {
+                $order = "desc";
+            }
+            $applications = Agent::get_agent_applications_for_category($agent_id, $category, $offset, $limit, $order);
+            if ($applications) {
+                $response = [
+                    "success" => true,
+                    "data" => $applications
+                ];
+            } else {
+                $response = [
+                    "success" => false,
+                    "message" => "Invalid Agent Id"
+                ];
+            }
+
+            return response()->json($response, 200);
+        } else if ($authResult['success'] === true) {
+            return response()->json([
+                'success' => false,
+                'message' => "You Don't have access to this resource"
+            ], 200);
+        }
+        return response()->json($authResult, 200);
+    }
+    public function applyService(Request $request)
+    {
+        $authResult = UserAuthentication::authenticateUser($request);
+        if ($authResult['success'] === true && $authResult['user']['role'] === "agent") {
+            $agent_id = $authResult['user']['user_id'];
+            $service_id = $request->has('service') ? intval($request->input('service')) : null;
+            if ($service_id) {
+                $response = AGENT::get_service_data($service_id, $agent_id);
+            } else {
+                $response = [
+                    "success" => false,
+                    "message" => "Service Id Not Provided"
+                ];
+            }
+            return response()->json($response, 200);
+        } else if ($authResult['success'] === true) {
+            return response()->json([
+                'success' => false,
+                'message' => "You Don't have access to this resource"
+            ], 200);
+        }
+        return response()->json($authResult, 200);
+    }
 }
