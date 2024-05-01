@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -26,14 +27,14 @@ class Agent extends Model
                     $query->whereNotNull("plan_services.plan_id")
                         ->orWhere("services.availability", 2);
                 })
-                ->select("services.id","services.name", "service_groups.name as group_name", "service_groups.photo as group_photo")
+                ->select("services.id", "services.name", "service_groups.name as group_name", "service_groups.photo as group_photo")
                 ->get()
                 ->groupBy('service_group_id');
         } else {
             $services = DB::table("services")
                 ->where("services.availability", 2)
                 ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
-                ->select("services.id","services.name", "service_groups.name as group_name", "service_groups.photo as group_photo")
+                ->select("services.id", "services.name", "service_groups.name as group_name", "service_groups.photo as group_photo")
                 ->get()
                 ->groupBy('service_group_id');
         }
@@ -204,10 +205,27 @@ class Agent extends Model
                 $is_applicable = DB::table('plan_services')->where('plan_id', $agent->plan_id)->where('service_id', $service_id)->first();
                 if ($is_applicable) {
                     if ($agent->expiration_date >= now()->toDateString()) {
-                        $prices = DB::table('prices')->where('location_id', $agent->location_id)->where('service_id', $service_id)->where('plan_id', $agent->plan_id)->first();
-                        $defaultPrice = $prices->subscribed_default_govt_price + $prices->subscribed_default_commission_price + ($prices->subscribed_default_govt_price * $prices->subscribed_default_tax_percentage / 100);
+                        try {
+                            $prices = DB::table('prices')
+                                ->where('location_id', $agent->location_id)
+                                ->where('service_id', $service_id)
+                                ->where('plan_id', $agent->plan_id)
+                                ->first();
 
-                        $tatkalPrice = $prices->subscribed_tatkal_govt_price + $prices->subscribed_tatkal_commission_price + ($prices->subscribed_tatkal_govt_price * $prices->subscribed_tatkal_tax_percentage / 100);
+                            if ($prices) {
+                                $defaultPrice = $prices->subscribed_default_govt_price + $prices->subscribed_default_commission_price + ($prices->subscribed_default_govt_price * $prices->subscribed_default_tax_percentage / 100);
+
+                                $tatkalPrice = $prices->subscribed_tatkal_govt_price + $prices->subscribed_tatkal_commission_price + ($prices->subscribed_tatkal_govt_price * $prices->subscribed_tatkal_tax_percentage / 100);
+                            } else {
+                                throw new Exception("Prices not configured for service, contact Admin");
+                            }
+                        } catch (Exception $e) {
+                            return [
+                                "success" => false,
+                                "message" => $e->getMessage()
+                            ];
+                        }
+
                         //active plan
                         $data = [
                             "agent_balance" => $agent->balance,
@@ -225,17 +243,28 @@ class Agent extends Model
                         ];
                     }
                     //expired plan
-                    $prices = DB::table('prices')->where('location_id', $agent->location_id)->where('service_id', $service_id)->where('plan_id', null)->first();
-                    $defaultPrice = $prices->default_govt_price + $prices->default_commission_price + ($prices->default_govt_price * $prices->default_tax_percentage / 100);
+                    try {
+                        $prices = DB::table('prices')->where('location_id', $agent->location_id)->where('service_id', $service_id)->where('plan_id', null)->first();
+                        if ($prices) {
+                            $defaultPrice = $prices->default_govt_price + $prices->default_commission_price + ($prices->default_govt_price * $prices->default_tax_percentage / 100);
 
-                    $tatkalPrice = $prices->tatkal_govt_price + $prices->tatkal_commission_price + ($prices->tatkal_govt_price * $prices->tatkal_tax_percentage / 100);
+                            $tatkalPrice = $prices->tatkal_govt_price + $prices->tatkal_commission_price + ($prices->tatkal_govt_price * $prices->tatkal_tax_percentage / 100);
+                        } else {
+                            throw new Exception("Prices not configured for service, contact Admin");
+                        }
+                    } catch (Exception $e) {
+                        return [
+                            "success" => false,
+                            "message" => $e->getMessage()
+                        ];
+                    }
 
                     $data = [
                         "agent_balance" => $agent->balance,
                         "default_price" => $defaultPrice,
                         "tatkal_price" => $tatkalPrice,
                         "service_id" => $service_id,
-                        "service_name" => $service->name, 
+                        "service_name" => $service->name,
                         "document_requirements" => explode(',', $service->requirements),
                         "form" => json_decode($service->form)
 
@@ -257,10 +286,22 @@ class Agent extends Model
             ];
         }
         //free service
-        $prices = DB::table('prices')->where('location_id', $agent->location_id)->where('service_id', $service_id)->where('plan_id', null)->first();
-        $defaultPrice = $prices->default_govt_price + $prices->default_commission_price + ($prices->default_govt_price * $prices->default_tax_percentage / 100);
+        try {
+            $prices = DB::table('prices')->where('location_id', $agent->location_id)->where('service_id', $service_id)->where('plan_id', null)->first();
+            if ($prices) {
 
-        $tatkalPrice = $prices->tatkal_govt_price + $prices->tatkal_commission_price + ($prices->tatkal_govt_price * $prices->tatkal_tax_percentage / 100);
+                $defaultPrice = $prices->default_govt_price + $prices->default_commission_price + ($prices->default_govt_price * $prices->default_tax_percentage / 100);
+
+                $tatkalPrice = $prices->tatkal_govt_price + $prices->tatkal_commission_price + ($prices->tatkal_govt_price * $prices->tatkal_tax_percentage / 100);
+            } else {
+                throw new Exception("Prices not configured for service, contact Admin");
+            }
+        } catch (Exception $e) {
+            return [
+                "success" => false,
+                "message" => $e->getMessage()
+            ];
+        }
 
         $data = [
             "agent_balance" => $agent->balance,

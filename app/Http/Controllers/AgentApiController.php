@@ -11,22 +11,19 @@ class AgentApiController extends Controller
     public function index(Request $request)
     {
         $authResult = UserAuthentication::authenticateUser($request);
-        if ($authResult['success'] === true && $authResult['user']['role'] === "agent") {
+        $verify_agent = UserAuthentication::is_agent($authResult);
+        if ($verify_agent === true) {
             $agent_id = $authResult['user']['user_id'];
             $dashboard_data = Agent::get_dashboard_data($agent_id);
             return response()->json($dashboard_data, 200);
-        } else if ($authResult['success'] === true) {
-            return response()->json([
-                'success' => false,
-                'message' => "You Don't have access to this resource"
-            ], 200);
         }
-        return response()->json($authResult, 200);
+        return response()->json($verify_agent, 200);
     }
     public function profile(Request $request)
     {
         $authResult = UserAuthentication::authenticateUser($request);
-        if ($authResult['success'] === true && $authResult['user']['role'] === "agent") {
+        $verify_agent = UserAuthentication::is_agent($authResult);
+        if ($verify_agent === true) {
             $agent_id = $authResult['user']['user_id'];
             $profile_data = Agent::get_agent_profile_data($agent_id);
             if ($profile_data) {
@@ -42,18 +39,14 @@ class AgentApiController extends Controller
             }
 
             return response()->json($response, 200);
-        } else if ($authResult['success'] === true) {
-            return response()->json([
-                'success' => false,
-                'message' => "You Don't have access to this resource"
-            ], 200);
         }
-        return response()->json($authResult, 200);
+        return response()->json($verify_agent, 200);
     }
     public function applications(Request $request)
     {
         $authResult = UserAuthentication::authenticateUser($request);
-        if ($authResult['success'] === true && $authResult['user']['role'] === "agent") {
+        $verify_agent = UserAuthentication::is_agent($authResult);
+        if ($verify_agent === true) {
             $agent_id = $authResult['user']['user_id'];
             $category = $request->has('category') ? $request->input('category') : 'all';
             $order = $request->has('order') ? $request->input('order') : 'desc';
@@ -78,18 +71,14 @@ class AgentApiController extends Controller
             }
 
             return response()->json($response, 200);
-        } else if ($authResult['success'] === true) {
-            return response()->json([
-                'success' => false,
-                'message' => "You Don't have access to this resource"
-            ], 200);
         }
-        return response()->json($authResult, 200);
+        return response()->json($verify_agent, 200);
     }
     public function applyService(Request $request)
     {
         $authResult = UserAuthentication::authenticateUser($request);
-        if ($authResult['success'] === true && $authResult['user']['role'] === "agent") {
+        $verify_agent = UserAuthentication::is_agent($authResult);
+        if ($verify_agent === true) {
             $agent_id = $authResult['user']['user_id'];
             $service_id = $request->has('service') ? intval($request->input('service')) : null;
             if ($service_id) {
@@ -101,12 +90,7 @@ class AgentApiController extends Controller
                 ];
             }
             return response()->json($response, 200);
-        } else if ($authResult['success'] === true) {
-            return response()->json([
-                'success' => false,
-                'message' => "You Don't have access to this resource"
-            ], 200);
         }
-        return response()->json($authResult, 200);
+        return response()->json($verify_agent, 200);
     }
 }

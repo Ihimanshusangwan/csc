@@ -118,7 +118,7 @@ class UserAuthentication
         }
         return null;
     }
-    public static function authenticateUser(Request $request)
+    public static function authenticateUser(Request $request): array
     {
         $token = $request->header('Authorization');
 
@@ -211,5 +211,19 @@ class UserAuthentication
             'success' => false,
             'message' => "Logout Unsuccessful"
         ];
+    }
+
+    public static function is_agent($auth_result): bool|array
+    {
+        if ($auth_result['success'] === true && $auth_result['user']['role'] === "agent") {
+            return true;
+        } else if ($auth_result['success'] === true) {
+            return [
+                'success' => false,
+                'message' => "You Don't have access to this resource"
+            ];
+        } else {
+            return $auth_result;
+        }
     }
 }
