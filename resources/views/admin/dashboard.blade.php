@@ -67,6 +67,12 @@
                     <a class="nav-link" href="{{ route('staffs.create') }}">Register Staff</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.bill') }}">Create Bill</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.bill-filter') }}">View Bill</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ route('admin.troubleshoot') }}">Run Troubleshooter</a>
                 </li>
                 <li class="nav-item">

@@ -71,10 +71,9 @@ class AdminLoginController extends Controller
         // Check if the custom cookie exists
         if (Cookie::has('Admin_Session')) {
             $troubleshooter = new DatabaseTroubleshooter();
-            $issues= $troubleshooter->checkPricesAndFormData();
+            $issues = $troubleshooter->checkPricesAndFormData();
             // dd($issues);
             return view('admin.troubleshooter', compact('issues'));
-          
         } else {
 
             return view('admin.login');
@@ -252,7 +251,7 @@ class AdminLoginController extends Controller
 
             // Get count of today's applications
             $countOfTodaysApplications = DB::table('applications')
-            ->where('applications.agent_id', $id)
+                ->where('applications.agent_id', $id)
                 ->whereDate('apply_date', now()->toDateString())
                 ->count();
 
@@ -263,7 +262,7 @@ class AdminLoginController extends Controller
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')
-            ->where('applications.agent_id', $id)->whereDate('delivery_date', '<=', today()->toDateString())
+                ->where('applications.agent_id', $id)->whereDate('delivery_date', '<=', today()->toDateString())
                 ->count();
 
             // Calculate pending applications count
@@ -582,6 +581,135 @@ class AdminLoginController extends Controller
         } else {
 
             return view('admin.login');
+        }
+    }
+
+    public function showBill(Request $request)
+    {
+
+        // Check if the custom cookie exists
+        if (Cookie::has('Admin_Session')) {
+            return view('admin.bill');
+        } else {
+
+            return view('admin.login');
+        }
+    }
+
+    public function submitBill(Request $request)
+    {
+        // Check if the custom cookie exists
+        if (Cookie::has('Admin_Session')) {
+            $form_data = $request->input('form_data');
+            $data = json_decode($form_data, true);
+            $customerName = $data['customerName'];
+            $customerNumber = $data['customerNumber'];
+            $description = $data['description'];
+            $grandTotal = $data['grandTotal'];
+            $grandNetCommission = $data['grandNetCommission'];
+            $netTax = $data['netTax'];
+            $items = $data['items'];
+
+
+            // Insert data into the 'bills' table
+            $billId = DB::table('bills')->insertGetId([
+                'customer_name' => $customerName,
+                'customer_number' => $customerNumber,
+                'description' => $description,
+                'grand_total' => $grandTotal,
+                'grand_net_commission' => $grandNetCommission,
+                'net_tax' => $netTax,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            // Insert data into the 'bill_items' table
+            foreach ($items as $item) {
+                DB::table('bill_items')->insert([
+                    'bill_id' => $billId,
+                    'item_name' => $item['itemName'],
+                    'base_price' => $item['basePrice'],
+                    'commission' => $item['commission'],
+                    'tax' => $item['tax'],
+                    'quantity' => $item['quantity'],
+                    'subtotal' => $item['subtotal'],
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+            return redirect()->route('admin.dashboard')->with(['success' => 'Bill data has been stored successfully']);
+        } else {
+
+            return view('admin.login');
+        }
+    }
+    public function billFilter(Request $request)
+    {
+        // Check if the custom cookie exists
+        if (Cookie::has('Admin_Session')) {
+
+            // Retrieve form data
+            $dateFrom = $request->input('dateFrom');
+            $dateTo = $request->input('dateTo');
+            $customerName = $request->input('customerName');
+            $customerNumber = $request->input('customerNumber');
+            $desc = $request->input('desc');
+
+            // Start with a base query
+            $query = DB::table('bills')
+                ->select(
+                    'bills.*',
+                )
+                ->orderBy("bills.id", "desc");
+
+
+
+
+            // Apply filters conditionally based on input values
+            if ($dateFrom) {
+                $query->where('bills.created_at', '>=', $dateFrom);
+            }
+            if ($dateTo) {
+                $query->where('bills.created_at', '<=', $dateTo);
+            }
+            if ($customerName) {
+                $query->where('bills.customer_name', 'like', '%' . $customerName . '%');
+            }
+            if ($customerNumber) {
+                $query->where('bills.customer_number', 'like', '%' . $customerNumber . '%');
+            }
+            if ($desc) {
+                $query->where('bills.description', 'like', '%' . $desc . '%');
+            }
+            $bills = $query->get();
+            // Get sum of all price column
+            $sumOfPrices = $query
+                ->sum('grand_total');
+            //total commission
+            $sumOfCommission = $query->sum('grand_net_commission');
+            //total tax
+            $sumOfTax = $query->sum('net_tax');
+            // Pass data to the view using compact
+            return view('admin.billFilter', compact('bills', 'sumOfPrices', 'sumOfCommission', 'sumOfTax'));
+        } else {
+
+            return view('admin.login');
+        }
+    }
+
+    public function fetchItems($billId)
+    {
+        try {
+            // Fetch items for the specified billId using query builder
+            $items = DB::table('bill_items')
+                ->where('bill_id', $billId)
+                ->get();
+
+            // Return the items as JSON response
+            return response()->json($items);
+        } catch (\Exception $e) {
+            // Handle any errors and return an error response
+            return response()->json(['error' => 'Failed to fetch items.'], 500);
         }
     }
 }

@@ -37,6 +37,13 @@ Route::get('/admin/delete-data', [AdminLoginController::class, 'showDeleteForm']
 Route::get('admin/registered-staff', [AdminLoginController::class, 'showStaffDetails'])->name('admin.registered-staff');
 Route::get('admin/applications/{category}', [AdminLoginController::class, 'applications'])->name('admin.applications');
 Route::get('admin/troubleshooter', [AdminLoginController::class, 'troubleshoot'])->name('admin.troubleshoot');
+Route::get('admin/bill', [AdminLoginController::class, 'showbill'])->name('admin.bill');
+Route::post('admin/bill', [AdminLoginController::class, 'submitBill'])->name('admin.bill-submit');
+Route::get('/admin/bill-filter', [AdminLoginController::class, 'billFilter'])->name('admin.bill-filter');
+Route::get('/fetch-items/{billId}', [AdminLoginController::class, 'fetchItems'])->name('admin.bill-item-fetch');
+// routes/web.php
+
+Route::get('', 'BillController@fetchItems');
 
 Route::get('/admin/customer-data', [AdminLoginController::class, 'customerData'])
     ->withoutMiddleware(\App\Http\Middleware\EnableCors::class);
