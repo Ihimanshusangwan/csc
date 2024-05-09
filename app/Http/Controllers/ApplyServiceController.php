@@ -125,7 +125,11 @@ class ApplyServiceController extends Controller
                 // Start a transaction
                 DB::beginTransaction();
 
-                // Create a new customer record
+                $customer = DB::table('customers')->where('mobile', '=' , $request->input('mobileNumber'))->first();
+                if($customer){
+                    $customerId = $customer->id;
+                }else{
+                    // Create a new customer record
                 $customerId = DB::table('customers')->insertGetId([
                     'name' => $request->input('customerName'),
                     'mobile' => $request->input('mobileNumber'),
@@ -133,6 +137,9 @@ class ApplyServiceController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+                }
+
+                
                 // Get all form input data excluding specific fields
                 $formData = $request->except('_token', 'customerName', 'mobileNumber');
 
