@@ -43,8 +43,6 @@ Route::get('/admin/bill-filter', [AdminLoginController::class, 'billFilter'])->n
 Route::get('/fetch-items/{billId}', [AdminLoginController::class, 'fetchItems'])->name('admin.bill-item-fetch');
 // routes/web.php
 
-Route::get('', 'BillController@fetchItems');
-
 Route::get('/admin/customer-data', [AdminLoginController::class, 'customerData'])
     ->withoutMiddleware(\App\Http\Middleware\EnableCors::class);
 

@@ -28,3 +28,4 @@ Route::get('/agent/dashboard', [AgentApiController::class, 'index']);
 Route::get('/agent/profile', [AgentApiController::class, 'profile']);
 Route::get('/agent/applications', [AgentApiController::class, 'applications']);
 Route::get('/agent/apply', [AgentApiController::class, 'applyService']);
+Route::post('/agent/apply', [AgentApiController::class, 'applyServiceSubmit']);

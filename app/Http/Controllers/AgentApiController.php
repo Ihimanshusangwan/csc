@@ -93,4 +93,28 @@ class AgentApiController extends Controller
         }
         return response()->json($verify_agent, 200);
     }
+    public function applyServiceSubmit(Request $request)
+    {
+        $authResult = UserAuthentication::authenticateUser($request);
+        $verify_agent = UserAuthentication::is_agent($authResult);
+        if ($verify_agent === true) {
+            $agent_id = $authResult['user']['user_id'];
+            $service_id = $request->has('service') ? intval($request->input('service')) : null;
+            if ($service_id) {
+                $data=[];
+                $data['price_type'] = $request->input('price_type');
+                $data['customer_name'] = $request->input('customer_name');
+                $data['customer_number'] = $request->input('customer_name');
+                $data['form_data'] = $request->input('form_data');
+                $response = AGENT::store_service_data($service_id, $agent_id,$data, $request);
+            } else {
+                $response = [
+                    "success" => false,
+                    "message" => "Service Id Not Provided"
+                ];
+            }
+            return response()->json($response, 200);
+        }
+        return response()->json($verify_agent, 200);
+    }
 }
