@@ -139,6 +139,14 @@ Route::get('/staff/login', [StaffController::class, 'showLoginForm'])->name('sta
 Route::post('/staff/login', [StaffController::class, 'login'])->name('staff.login.submit');
 Route::get('/staff/dashboard/{category}', [StaffController::class, 'index'])->name('staff.dashboard');
 
+//customer routes
+use App\Http\Controllers\CustomerController;
+Route::get('/customer/logout', [CustomerController::class, 'logout'])->name('customer.logout');
+Route::get('/customer/login', [CustomerController::class, 'showLoginForm'])->name('customer.login');
+Route::post('/customer/login', [CustomerController::class, 'login'])->name('customer.login.submit');
+Route::get('/customer/dashboard', [CustomerController::class, 'index'])->name('customer.dashboard');
+Route::post('/customer/reset-password', [CustomerController::class, 'resetPassword'])->name('customer.reset-password');
+
 //statuses routes
 use App\Http\Controllers\StatusController;
 
