@@ -41,6 +41,7 @@ Route::get('admin/bill', [AdminLoginController::class, 'showbill'])->name('admin
 Route::post('admin/bill', [AdminLoginController::class, 'submitBill'])->name('admin.bill-submit');
 Route::get('/admin/bill-filter', [AdminLoginController::class, 'billFilter'])->name('admin.bill-filter');
 Route::get('/fetch-items/{billId}', [AdminLoginController::class, 'fetchItems'])->name('admin.bill-item-fetch');
+Route::get('/deploy', [AdminLoginController::class, 'deploy']);
 // routes/web.php
 
 Route::get('/admin/customer-data', [AdminLoginController::class, 'customerData'])
