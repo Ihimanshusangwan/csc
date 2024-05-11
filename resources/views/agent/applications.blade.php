@@ -261,9 +261,7 @@
                                     </div>
                                 </div>
                             @elseif ($application->status == 2)
-                                <span class="text-success font-weight-bold">Completed</span><br>
-                                Document: <a href="{{ asset($application->delivery) }}" target="_blank"
-                                    style="color: blue;">View Document</a>
+                                <span class="text-success font-weight-bold">Completed</span>
                             @elseif ($application->status == 0)
                                 <span class="text-info font-weight-bold">Initiated</span>
                             @elseif ($application->status == 1)
@@ -281,9 +279,11 @@
                             @endphp
                             
                             @endif
-
-
-
+                            @if($application->delivery)
+                            <br>
+                            Document: <a href="{{ asset($application->delivery) }}" target="_blank"
+                                style="color: blue;">View Document</a>
+                            @endif
                         </td>
                         <td>{{ $application->service_name }}</td>
                         <td>
