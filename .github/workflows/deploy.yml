@@ -11,4 +11,4 @@ jobs:
 
     steps:
       - name: Make HTTP request to deployment script
-        run: curl -X GET https://webiflysolutions.com/webhook/index.php
+        run: curl -X GET https://webiflysolutions.com/webhook/deploy.php
