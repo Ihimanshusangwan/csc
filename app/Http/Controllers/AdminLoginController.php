@@ -714,9 +714,8 @@ class AdminLoginController extends Controller
     }
     public function deploy()
     {
-
-
-        // Enable error reporting
+        //deployment script for test
+       // Enable error reporting
         error_reporting(E_ALL);
 
         // Define variables
