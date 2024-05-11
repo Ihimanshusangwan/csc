@@ -1,10 +1,10 @@
-.env
 /.phpunit.cache
 /node_modules
 /public/build
 /public/hot
 /public/storage
 /storage/*.key
+.env
 .env.backup
 .env.production
 .phpunit.result.cache
@@ -17,5 +17,3 @@ yarn-error.log
 /.idea
 /.vscode
 deploy.yml
-deploy.yml
-
