@@ -3,7 +3,7 @@ name: Deploy on Push
 on:
   push:
     branches:
-      - test
+      - master
 
 jobs:
   deploy:
@@ -11,4 +11,5 @@ jobs:
 
     steps:
       - name: Make HTTP request to deployment script
-        run: curl -X GET https://dokumentguru.com/test/deploy
+        run: curl -X GET https://dokumentguru.com/deploy
+
