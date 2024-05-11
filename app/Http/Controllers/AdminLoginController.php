@@ -714,15 +714,14 @@ class AdminLoginController extends Controller
     }
     public function deploy()
     {
-
-
+        //deployment script for test
         // Enable error reporting
         error_reporting(E_ALL);
 
         // Define variables
         $gitRepo = "https://github.com/Ihimanshusangwan/csc";
-        $branch = "master";
-        $hostingerFileManagerDir =dirname(dirname(dirname(__DIR__))); 
+        $branch = env('GIT_BRANCH');
+        $hostingerFileManagerDir = dirname(dirname(dirname(__DIR__)));
         echo $hostingerFileManagerDir;
         // Check if Git is installed
         if (!shell_exec("git --version")) {
@@ -740,7 +739,9 @@ class AdminLoginController extends Controller
             $output = shell_exec("git -C $hostingerFileManagerDir remote add origin $gitRepo 2>&1");
             echo "Git Add Remote Output: <pre>$output</pre>";
         }
-
+        // Discard local changes
+        $output = shell_exec("git -C $hostingerFileManagerDir reset --hard HEAD 2>&1");
+        echo "Discard Local Changes Output: <pre>$output</pre>";
         // Pull latest changes from GitHub
         $output = shell_exec("git -C $hostingerFileManagerDir pull origin $branch 2>&1");
         echo "Git Pull Output: <pre>$output</pre>";
