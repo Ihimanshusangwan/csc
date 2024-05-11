@@ -720,7 +720,7 @@ class AdminLoginController extends Controller
 
         // Define variables
         $gitRepo = "https://github.com/Ihimanshusangwan/csc";
-        $branch = "test";
+        $branch = env('GIT_BRANCH');
         $hostingerFileManagerDir =dirname(dirname(dirname(__DIR__))); 
         echo $hostingerFileManagerDir;
         // Check if Git is installed
