@@ -712,7 +712,7 @@ class AdminLoginController extends Controller
             return response()->json(['error' => 'Failed to fetch items.'], 500);
         }
     }
-    public function deployTest()
+    public function deploy()
     {
 
 
@@ -722,8 +722,8 @@ class AdminLoginController extends Controller
         // Define variables
         $gitRepo = "https://github.com/Ihimanshusangwan/csc";
         $branch = "test";
-        $hostingerFileManagerDir = __DIR__; // Same directory as the PHP script
-
+        $hostingerFileManagerDir =dirname(dirname(dirname(dirname(__DIR__)))).'/test/' ; 
+        echo $hostingerFileManagerDir;
         // Check if Git is installed
         if (!shell_exec("git --version")) {
             echo "Error: Git is not installed or accessible. Please install Git on your server.";
