@@ -11,4 +11,4 @@ jobs:
 
     steps:
       - name: Make HTTP request to deployment script
-        run: curl -X GET https://dokumentguru.com/qatest/deploy
+        run: curl -X GET https://dokumentguru.com/test/deploy
