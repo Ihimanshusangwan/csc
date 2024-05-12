@@ -34,21 +34,21 @@
                 <h3 class="dashboard">Customer Dashboard</h3>
             </div>
             @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        @endif
-        @if ($errors->has('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ $errors->first('error') }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        @endif
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+            @if ($errors->has('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ $errors->first('error') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
         </div>
         <h3 class="mt-4 text-center">All Time Applications</h3>
 
@@ -64,7 +64,7 @@
                     <th scope="col">Ruppes(&#8377;)</th>
                     <th scope="col">Receipt</th>
                 </tr>
-            </thead>    
+            </thead>
             <tbody>
 
 
@@ -102,27 +102,33 @@
                                 </div>
                             @elseif ($application->status == 2)
                                 <span class="text-success font-weight-bold">Completed</span><br>
-                                @if($application->delivery){
-                                    Document: <a href="{{ asset($application->delivery) }}" target="_blank"
-                                        style="color: blue;">View Document</a>
-                                }
+                                @if ($application->delivery)
+                                    @if ($application->is_doc_approved)
+                                        Document: <a href="{{ asset($application->delivery) }}" target="_blank"
+                                            style="color: blue;">View Document</a>
+                                    @else
+                                        Ask Agent to Unlock Document
+                                    @endif
                                 @endif
                             @elseif ($application->status == 0)
                                 <span class="text-info font-weight-bold">Initiated</span>
                             @elseif ($application->status == 1)
                                 <span class="text-warning font-weight-bold">In Progress</span>
                             @else
-                            @php
-                            $statusesArray = explode(',', $application->statuses);
-                            foreach ($statusesArray as $status) {
-                                [$id, $statusName, $statusColor] = explode(':', $status);
-                                if ($application->status == $id) {
-                                    echo '<span class="font-weight-bold" style="color: ' . $statusColor . '">' . ucfirst($statusName) . '</span>';
-                                    break;
-                                }
-                            }
-                            @endphp
-                            
+                                @php
+                                    $statusesArray = explode(',', $application->statuses);
+                                    foreach ($statusesArray as $status) {
+                                        [$id, $statusName, $statusColor] = explode(':', $status);
+                                        if ($application->status == $id) {
+                                            echo '<span class="font-weight-bold" style="color: ' .
+                                                $statusColor .
+                                                '">' .
+                                                ucfirst($statusName) .
+                                                '</span>';
+                                            break;
+                                        }
+                                    }
+                                @endphp
                             @endif
 
 
@@ -133,14 +139,14 @@
                         </td>
                         <td class="text-success"> &#8377;{{ $application->price }}</td>
                         <td>
-                            @if($application->receipt)
-                            <a href="{{ asset($application->receipt) }}" target="_blank"
-                                style="color: blue;">View Receipt</a>
+                            @if ($application->receipt)
+                                <a href="{{ asset($application->receipt) }}" target="_blank" style="color: blue;">View
+                                    Receipt</a>
                             @else
-                            Not Available
+                                Not Available
                             @endif
-                        </td>   
-                    </tr>                       
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
@@ -149,41 +155,44 @@
         </div>
     </div>
 
-    @if(session('reset_password'))
-    <!-- Modal -->
-    <div id="resetPasswordModal" class="modal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Reset Password</h5>
-                    <button type="button" class="close" aria-label="Close" onclick="closeModal()">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Your reset password form here -->
-                    <form id="resetPasswordForm" method="post" action="{{ route('customer.reset-password') }}">
-                        @csrf
-                        <!-- New Password -->
-                        <div class="form-group">
-                            <label for="newPassword">New Password</label>
-                            <input type="password" class="form-control" id="newPassword" name="newPassword" required>
-                        </div>
-                        <!-- Confirm Password -->
-                        <div class="form-group">
-                            <label for="confirmPassword">Confirm Password</label>
-                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-                        </div>
-                        <!-- Error Message -->
-                        <div id="passwordError" class="text-danger"></div>
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-primary m-3" id="submitButton" disabled>Submit</button>
-                    </form>
+    @if (session('reset_password'))
+        <!-- Modal -->
+        <div id="resetPasswordModal" class="modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Reset Password</h5>
+                        <button type="button" class="close" aria-label="Close" onclick="closeModal()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Your reset password form here -->
+                        <form id="resetPasswordForm" method="post" action="{{ route('customer.reset-password') }}">
+                            @csrf
+                            <!-- New Password -->
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" class="form-control" id="newPassword" name="newPassword"
+                                    required>
+                            </div>
+                            <!-- Confirm Password -->
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirmPassword"
+                                    name="confirmPassword" required>
+                            </div>
+                            <!-- Error Message -->
+                            <div id="passwordError" class="text-danger"></div>
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary m-3" id="submitButton"
+                                disabled>Submit</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-@endif
+    @endif
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
@@ -216,26 +225,26 @@
             }
             document.getElementById('resetPasswordModal').style.display = 'none';
         }
-    
+
         document.addEventListener('DOMContentLoaded', function() {
             // Show modal when page is loaded
             if ('{{ session('reset_password') }}') {
                 document.getElementById('resetPasswordModal').style.display = 'block';
             }
-    
+
             // Live validation for password fields
             var newPasswordInput = document.getElementById('newPassword');
             var confirmPasswordInput = document.getElementById('confirmPassword');
             var passwordErrorDiv = document.getElementById('passwordError');
             var submitButton = document.getElementById('submitButton');
-    
+
             newPasswordInput.addEventListener('input', validatePassword);
             confirmPasswordInput.addEventListener('input', validatePassword);
-    
+
             function validatePassword() {
                 var newPassword = newPasswordInput.value;
                 var confirmPassword = confirmPasswordInput.value;
-    
+
                 if (newPassword !== confirmPassword) {
                     passwordErrorDiv.textContent = 'Passwords do not match';
                     submitButton.disabled = true;
@@ -247,7 +256,7 @@
                     submitButton.disabled = false;
                 }
             }
-    
+
             // Submit the form when modal is closed
             document.getElementById('resetPasswordModal').addEventListener('click', function(event) {
                 if (event.target === document.getElementById('resetPasswordModal')) {
@@ -256,10 +265,8 @@
             });
         });
     </script>
-    
-    
+
+
 </body>
 
 </html>
-
-

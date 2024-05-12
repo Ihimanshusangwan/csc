@@ -121,7 +121,8 @@ Route::post('/submit-form/{id}', [ApplyServiceController::class, 'submitForm'])-
 //application routes
 use App\Http\Controllers\ApplicationController;
 Route::post('/update-application', [ApplicationController::class, 'update'])->name('application.update');
-
+Route::post('/update-doc-approval/{id}', [ApplicationController::class, 'changeDocApprovalStatus'])->name('application.update-doc-approval-status');
+    
 
 //appointment routes
 
