@@ -62,6 +62,7 @@
                     <th scope="col">Status</th>
                     <th scope="col">Estimated Delivery Date</th>
                     <th scope="col">Ruppes(&#8377;)</th>
+                    <th scope="col">Receipt</th>
                 </tr>
             </thead>    
             <tbody>
@@ -131,6 +132,14 @@
                             {{ $application->delivery_date ? $application->delivery_date : 'not yet determined' }}
                         </td>
                         <td class="text-success"> &#8377;{{ $application->price }}</td>
+                        <td>
+                            @if($application->receipt)
+                            <a href="{{ asset($application->receipt) }}" target="_blank"
+                                style="color: blue;">View Receipt</a>
+                            @else
+                            Not Available
+                            @endif
+                        </td>   
                     </tr>                       
                 @endforeach
             </tbody>
