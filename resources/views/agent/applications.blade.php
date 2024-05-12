@@ -218,6 +218,7 @@
                     <th scope="col">Applied For</th>
                     <th scope="col">Preview</th>
                     <th scope="col">Ruppes(&#8377;)</th>
+                    <th scope="col">Receipt</th>
                 </tr>
             </thead>
             <tbody>
@@ -293,6 +294,14 @@
                             </span>
                         </td>
                         <td class="text-success"> &#8377;{{ $application->price }}</td>
+                        <td>
+                            @if($application->receipt)
+                            <a href="{{ asset($application->receipt) }}" target="_blank"
+                                style="color: blue;">View Receipt</a>
+                            @else
+                            Not Available
+                            @endif
+                        </td>   
 
 
                         <!-- Modal -->

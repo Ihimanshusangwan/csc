@@ -43,6 +43,20 @@ class ApplicationController extends Controller
             // Update the document path in the update data array
             $updateData['delivery'] = 'uploads/applications/' . $fileName;
         }
+        // Update the receipt if provided
+        if ($request->hasFile('receipt')) {
+            // Retrieve the uploaded file
+            $file = $request->file('receipt');
+    
+            // Generate a unique file name
+            $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+    
+            // Move the uploaded file to the desired directory
+            $file->move(public_path('uploads/applications'), $fileName);
+    
+            // Update the document path in the update data array
+            $updateData['receipt'] = 'uploads/applications/' . $fileName;
+        }
         // dd($updateData);
         // Update the application using the query builder
         DB::table('applications')
