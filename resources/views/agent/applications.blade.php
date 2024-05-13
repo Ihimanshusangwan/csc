@@ -133,7 +133,7 @@
         }
     </style>
 
-<link rel="stylesheet" href="{{ asset('css/adminDashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/adminDashboard.css') }}">
 </head>
 
 <body>
@@ -150,7 +150,8 @@
 
         <div class="row">
             <div class="col-3">
-                <a class="total-registration background-total-registration" href="{{route('agent.applications',[ 'category' => 'all'])}}">
+                <a class="total-registration background-total-registration"
+                    href="{{ route('agent.applications', ['category' => 'all']) }}">
                     <div class="align">
                         <div class="registration-text">Total Applications</div>
                         <div class="count">{{ $totalApplicationCount }}</div>
@@ -159,7 +160,8 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="total-registration todays-registration" href="{{route('agent.applications',[ 'category' => 'today' ])}}">
+                <a class="total-registration todays-registration"
+                    href="{{ route('agent.applications', ['category' => 'today']) }}">
                     <div class="align">
                         <div class="registration-text">Today's Applications</div>
                         <div class="count">{{ $countOfTodaysApplications }}</div>
@@ -168,7 +170,8 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="total-registration background-process-completed" href="{{route('agent.applications',[ 'category' => 'completed' ])}}">
+                <a class="total-registration background-process-completed"
+                    href="{{ route('agent.applications', ['category' => 'completed']) }}">
                     <div class="align">
                         <div class="registration-text">Completed Applications</div>
                         <div class="count">{{ $completedApplicationsCount }}</div>
@@ -177,7 +180,8 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="total-registration background-pending" href="{{route('agent.applications',[ 'category' => 'pending'])}}">
+                <a class="total-registration background-pending"
+                    href="{{ route('agent.applications', ['category' => 'pending']) }}">
                     <div class="align">
                         <div class="registration-text">Pending Applications</div>
                         <div class="count"> {{ $pendingApplicationsCount }}</div>
@@ -226,7 +230,7 @@
                 @php
                     $counter = 1;
                 @endphp
-                 @foreach ($applications as $application)
+                @foreach ($applications as $application)
                     <tr class="text-center">
                         <th scope="row">{{ $counter++ }}</th>
                         <td>{{ $application->customer_name }}</td>
@@ -268,22 +272,36 @@
                             @elseif ($application->status == 1)
                                 <span class="text-warning font-weight-bold">In Progress</span>
                             @else
-                            @php
-                            $statusesArray = explode(',', $application->statuses);
-                            foreach ($statusesArray as $status) {
-                                [$id, $statusName, $statusColor] = explode(':', $status);
-                                if ($application->status == $id) {
-                                    echo '<span class="font-weight-bold" style="color: ' . $statusColor . '">' . ucfirst($statusName) . '</span>';
-                                    break;
-                                }
-                            }
-                            @endphp
-                            
+                                @php
+                                    $statusesArray = explode(',', $application->statuses);
+                                    foreach ($statusesArray as $status) {
+                                        [$id, $statusName, $statusColor] = explode(':', $status);
+                                        if ($application->status == $id) {
+                                            echo '<span class="font-weight-bold" style="color: ' .
+                                                $statusColor .
+                                                '">' .
+                                                ucfirst($statusName) .
+                                                '</span>';
+                                            break;
+                                        }
+                                    }
+                                @endphp
                             @endif
-                            @if($application->delivery)
-                            <br>
-                            Document: <a href="{{ asset($application->delivery) }}" target="_blank"
-                                style="color: blue;">View Document</a>
+                            @if ($application->delivery)
+                                <br>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch"
+                                        id="flexSwitchCheckDefault"
+                                        data-route='{{ route('application.update-doc-approval-status', ['id' => $application->id]) }}'
+                                        onclick='updateApprovalStatus(this)'
+                                        @if($application->is_doc_approved)
+                                               @checked(true)
+                                        @endif
+                                        >
+                                    <label class="form-check-label" for="flexSwitchCheckDefault"> Document: <a
+                                            href="{{ asset($application->delivery) }}" target="_blank"
+                                            style="color: blue;">View Document</a></label>
+                                </div>
                             @endif
                         </td>
                         <td>{{ $application->service_name }}</td>
@@ -295,13 +313,13 @@
                         </td>
                         <td class="text-success"> &#8377;{{ $application->price }}</td>
                         <td>
-                            @if($application->receipt)
-                            <a href="{{ asset($application->receipt) }}" target="_blank"
-                                style="color: blue;">View Receipt</a>
+                            @if ($application->receipt)
+                                <a href="{{ asset($application->receipt) }}" target="_blank"
+                                    style="color: blue;">View Receipt</a>
                             @else
-                            Not Available
+                                Not Available
                             @endif
-                        </td>   
+                        </td>
 
 
                         <!-- Modal -->
@@ -322,7 +340,8 @@
                                         @foreach ($formData as $category => $fields)
                                             @if (strtolower($category) !== 'service_id' && strtolower($category) !== 'filepaths')
                                                 @foreach ($fields as $key => $value)
-                                                    @phpif ($i == 1) {
+                                                    @php
+                                                        if ($i == 1) {
                                                             $i++;
                                                             continue;
                                                         }
@@ -362,7 +381,34 @@
         <div>
             {{ $applications->links('pagination::bootstrap-5') }}
         </div>
-        <script></script>
+        <script>
+            function updateApprovalStatus(checkbox) {
+                var route = checkbox.getAttribute('data-route');
+                var isChecked = checkbox.checked;
+
+
+                var csrfToken = '{{ csrf_token() }}';
+
+                fetch(route, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({
+                            isApproved: isChecked
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error updating approval status');
+                    });
+            }
+        </script>
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

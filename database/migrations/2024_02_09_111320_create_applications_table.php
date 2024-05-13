@@ -26,6 +26,7 @@ class CreateApplicationsTable extends Migration
             $table->longText('form_data')->nullable();
             $table->string('delivery')->nullable();
             $table->string('receipt')->nullable()->default(null);
+            $table->boolean('is_doc_approved')->default(false);
             $table->decimal('price', 10, 2)->nullable();
             $table->timestamps();
         });
