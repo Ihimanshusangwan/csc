@@ -103,6 +103,7 @@
                     <th scope="col">Reporting Staff</th>
                     <th scope="col">Ruppes(&#8377;)</th>
                     <th scope="col">Upload Document</th>
+                    <th scope="col">Upload Receipt</th>
                     <th scope="col">Action</th>
                 </tr>
             </thead>
@@ -210,6 +211,18 @@
                             </div>
                         </td>
                         <td>
+                            @if ($application->receipt)
+                                <div class="form-group">
+                                    Uploaded Reciept:<a href="{{ asset($application->receipt) }}" target="_blank"
+                                        style="color: blue;">View Receipt</a>
+                                </div>
+                            @endif
+                            <div class="form-group">
+                                <input type="file" class="form-control-sm" id="receipt" name="receipt"
+                                    placeholder="upload receipt">
+                            </div>
+                        </td>
+                        <td>
                             <button type="submit" class="btn btn-primary">Update</button>
                         </td>
                         </form>
@@ -226,6 +239,7 @@
                                         </h5>
                                     </div>
                                     <div class="modal-body">
+                                        <p><strong>Mobile Number:</strong> {{$application->customer_mobile}}</p>
                                         @php
                                             $formData = json_decode($application->form_data, true);
                                             $i = 1;
