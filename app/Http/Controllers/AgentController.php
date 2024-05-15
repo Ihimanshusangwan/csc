@@ -455,7 +455,7 @@ class AgentController extends Controller
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')
-            ->where('applications.agent_id', $agentId)->whereDate('delivery_date', '<=', today()->toDateString())
+            ->where('applications.agent_id', $agentId)->Where('applications.status', '==', 2)
                 ->count();
 
 
