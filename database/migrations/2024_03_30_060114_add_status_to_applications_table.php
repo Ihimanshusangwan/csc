@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('applications', function (Blueprint $table) {
-            $table->tinyInteger('status')->default(0)->comment('0: Initiated, 1: In Progress, 2: Completed');
+            $table->unsignedBigInteger('status')->default(0)->comment('0: Initiated, 1: In Progress, 2: Completed');
         });
     }
 
