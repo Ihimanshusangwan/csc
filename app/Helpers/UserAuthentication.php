@@ -24,6 +24,9 @@ class UserAuthentication
             case "staff":
                 $user =  DB::table('staff')->where('username', $username)->first();
                 break;
+            case "customer":
+                $user =  DB::table('customers')->where('mobile', $username)->first();
+                break;
             default:
                 $user = null;
         }
@@ -36,6 +39,10 @@ class UserAuthentication
         }
         if ($role === "admin") {
             $passwordCheck = password_verify($password, $user->password);
+        }
+        else if ($role === "customer") {
+            $validPassword = ($user->password === null)? $user->mobile : $user->password;
+            $passwordCheck = ($validPassword === $password);
         } else {
             $passwordCheck = $password === $user->password;
         }
@@ -74,6 +81,14 @@ class UserAuthentication
                             'token_updated_at' => now(),
                         ]);
                     break;
+                case "customer":
+                    DB::table('customers')
+                        ->where('id', $user->id)
+                        ->update([
+                            'token' => $db_token,
+                            'token_updated_at' => now(),
+                        ]);
+                    break;
                 default:
                     break;
             }
@@ -105,6 +120,9 @@ class UserAuthentication
                         break;
                     case "staff":
                         $user =  DB::table('staff')->where('id', $user_id)->first();
+                        break;
+                    case "customer":
+                        $user =  DB::table('customers')->where('id', $user_id)->first();
                         break;
                     default:
                         $user = null;
@@ -192,6 +210,14 @@ class UserAuthentication
                     break;
                 case "staff":
                     DB::table('staff')
+                        ->where('id', $user['user_id'])
+                        ->update([
+                            'token' => null,
+                            'token_updated_at' => now(),
+                        ]);
+                    break;
+                case "customer":
+                    DB::table('customers')
                         ->where('id', $user['user_id'])
                         ->update([
                             'token' => null,
