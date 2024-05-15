@@ -20,18 +20,14 @@ class Agent extends Model
 
         if ($plan->expiration_date >= $current_date) {
             $services = DB::table("services")
-                ->leftJoin("plan_services", function ($join) use ($plan) {
-                    $join->on("services.id", "=", "plan_services.service_id")
-                        ->where("plan_services.plan_id", "=", $plan->plan_id);
-                })
-                ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
-                ->where(function ($query) {
-                    $query->whereNotNull("plan_services.plan_id")
-                        ->orWhere("services.availability", 2);
-                })
-                ->select("services.id", "services.name", "service_groups.name as group_name", "service_groups.photo as group_photo")
-                ->get()
-                ->groupBy('service_group_id');
+            ->leftJoin("plan_services","services.id", "=", "plan_services.service_id" )
+            ->where("plan_services.plan_id", "=", $plan->plan_id)
+            ->orWhere("services.availability", 2)
+            ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
+            ->select("services.*", "service_groups.name as group_name", "service_groups.photo as group_photo")
+            ->distinct()
+            ->get()
+            ->groupBy('service_group_id');
         } else {
             $services = DB::table("services")
                 ->where("services.availability", 2)
