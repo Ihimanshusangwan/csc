@@ -265,7 +265,7 @@ class AdminLoginController extends Controller
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')
-                ->where('applications.agent_id', $id)->whereDate('delivery_date', '<=', today()->toDateString())
+                ->where('applications.agent_id', $id)->Where('applications.status', '==', 2)
                 ->count();
 
             // Calculate pending applications count
@@ -576,7 +576,7 @@ class AdminLoginController extends Controller
                 ->count();
 
             // Get completed applications count which have delivery date less than today
-            $completedApplicationsCount = DB::table('applications')->whereDate('delivery_date', '<=', today()->toDateString())
+            $completedApplicationsCount = DB::table('applications')->Where('applications.status', '==', 2)
                 ->count();
 
             // Calculate pending applications count
