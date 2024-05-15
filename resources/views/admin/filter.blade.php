@@ -426,6 +426,7 @@
                                     </h5>
                                 </div>
                                 <div class="modal-body">
+                                    <p><strong>Mobile Number:</strong> {{$application->customer_mobile}}</p>
                                     @php
                                         $formData = json_decode($application->form_data, true);
                                         $i = 1;

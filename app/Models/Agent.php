@@ -122,6 +122,7 @@ class Agent extends Model
                 'a.reason as rejection_reason',
                 'services.name as service_name',
                 'customers.name as customer_name',
+                'customers.mobile as customer_mobile',
                 DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color)) FROM service_statuses WHERE service_statuses.service_id = a.service_id) as custom_statuses')
             )
             ->orderBy("a.id", $order);
@@ -133,13 +134,11 @@ class Agent extends Model
                 $query->whereDate("a.apply_date", "=", today()->toDateString());
                 break;
             case "completed":
-                // Filter completed applications
-                $query->whereDate("a.delivery_date", "<=", today()->toDateString());
+                $query->Where('applications.status', '==', 2);
                 break;
             case "pending":
-                // Filter pending applications
-                $query->whereDate("a.delivery_date", ">=", today()->toDateString())
-                    ->orWhere('a.status', '!=', 2);
+                $query->Where('applications.status', '!=', 2);
+
                 break;
             default:
                 // No additional filtering for other categories
@@ -168,7 +167,7 @@ class Agent extends Model
 
         // Get completed applications count which have delivery date less than today
         $completedApplicationsCount = DB::table('applications')
-            ->where('applications.agent_id', $agent_id)->whereDate('delivery_date', '<=', today()->toDateString())
+            ->where('applications.agent_id', $agent_id)->Where('applications.status', '==', 2)
             ->count();
         // Calculate pending applications count
         $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
