@@ -484,6 +484,8 @@ class AgentController extends Controller
             'agent_id' => $id,
             'amount' => $amount,
             'balance_before' => $currentBalance,
+            'created_at' => now(),
+            'updated_at' => now(),
 
         ]);
 
