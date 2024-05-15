@@ -238,10 +238,10 @@ class AdminLoginController extends Controller
                     $query->whereDate("applications.apply_date", "=", today()->toDateString());
                     break;
                 case "completed":
-                    $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
+                    $query->Where('applications.status', '==', 2);
                     break;
                 case "pending":
-                    $query->whereDate("applications.delivery_date", ">=", today()->toDateString())->orWhere('applications.status', '!=', 2);
+                    $query->Where('applications.status', '!=', 2);
 
                     break;
             }
@@ -552,10 +552,10 @@ class AdminLoginController extends Controller
                     $query->whereDate("applications.apply_date", "=", today()->toDateString());
                     break;
                 case "completed":
-                    $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
+                    $query->Where('applications.status', '==', 2);
                     break;
                 case "pending":
-                    $query->whereDate("applications.delivery_date", ">=", today()->toDateString())->orWhere('applications.status', '!=', 2);
+                    $query->Where('applications.status', '!=', 2);
 
                     break;
             }

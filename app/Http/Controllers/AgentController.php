@@ -428,7 +428,7 @@ class AgentController extends Controller
                         $query->whereDate("applications.apply_date", "=", today()->toDateString());
                         break;
                     case "completed":
-                        $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
+                    $query->Where('applications.status', '==', 2);
                         break;
                     case "pending":
                         $query->Where('applications.status', '!=', 2);

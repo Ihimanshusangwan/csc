@@ -134,13 +134,11 @@ class Agent extends Model
                 $query->whereDate("a.apply_date", "=", today()->toDateString());
                 break;
             case "completed":
-                // Filter completed applications
-                $query->whereDate("a.delivery_date", "<=", today()->toDateString());
+                $query->Where('applications.status', '==', 2);
                 break;
             case "pending":
-                // Filter pending applications
-                $query->whereDate("a.delivery_date", ">=", today()->toDateString())
-                    ->orWhere('a.status', '!=', 2);
+                $query->Where('applications.status', '!=', 2);
+
                 break;
             default:
                 // No additional filtering for other categories
