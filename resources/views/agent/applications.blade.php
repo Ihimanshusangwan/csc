@@ -194,22 +194,13 @@
         <h3 class="mt-4 text-center">Today's Applications</h3>
         <div class="sort-filter">
             <div class="dropdown">
-                <label><strong>Sort By : </strong></label>
-                <div class="input-group">
-                    <select class="form-select" id="inputGroupSelect03">
-                        <option selected disabled>Choose...</option>
-                        <option value="1">All</option>
-                        <option value="2">Initiated</option>
-                        <option value="2">In Progress</option>
-                        <option value="2">Completed</option>
-                    </select>
-                </div>
+               
+        <a href="{{ route('agent.dashboard') }}" class="btn btn-secondary m-2">Home</a>
             </div>
             <div class="total-count">
                 <strong class="text-primary">Total : {{ $totalApplicationCount }} </strong>
             </div>
         </div>
-        <a href="{{ route('agent.dashboard') }}" class="btn btn-secondary m-2">Home</a>
 
         <table class="table table-striped mt-4">
             <thead>
