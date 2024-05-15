@@ -31,6 +31,7 @@ class AdminLoginController extends Controller
                     'applications.*',
                     'services.name as service_name',
                     'customers.name as customer_name',
+                    'customers.mobile as customer_mobile',
                     'agents.full_name as agent_name',
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
@@ -94,6 +95,7 @@ class AdminLoginController extends Controller
                 'applications.*',
                 'services.name as service_name',
                 'customers.name as customer_name',
+                'customers.mobile as customer_mobile',
                 'agents.full_name as agent_name',
                 DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
             )
@@ -223,6 +225,7 @@ class AdminLoginController extends Controller
                     'applications.*',
                     'services.name as service_name',
                     'customers.name as customer_name',
+                    'customers.mobile as customer_mobile',
                     'agents.full_name as agent_name',
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
@@ -235,10 +238,10 @@ class AdminLoginController extends Controller
                     $query->whereDate("applications.apply_date", "=", today()->toDateString());
                     break;
                 case "completed":
-                    $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
+                    $query->Where('applications.status', '==', 2);
                     break;
                 case "pending":
-                    $query->whereDate("applications.delivery_date", ">=", today()->toDateString())->orWhere('applications.status', '!=', 2);
+                    $query->Where('applications.status', '!=', 2);
 
                     break;
             }
@@ -304,6 +307,7 @@ class AdminLoginController extends Controller
                     'service_groups.name as service_group_name',
                     'services.name as service_name',
                     'customers.name as customer_name',
+                    'customers.mobile as customer_mobile',
                     'agents.full_name as agent_name',
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" ,color)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
@@ -535,6 +539,7 @@ class AdminLoginController extends Controller
                     'applications.*',
                     'services.name as service_name',
                     'customers.name as customer_name',
+                    'customers.mobile as customer_mobile',
                     'agents.full_name as agent_name',
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
@@ -547,10 +552,10 @@ class AdminLoginController extends Controller
                     $query->whereDate("applications.apply_date", "=", today()->toDateString());
                     break;
                 case "completed":
-                    $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
+                    $query->Where('applications.status', '==', 2);
                     break;
                 case "pending":
-                    $query->whereDate("applications.delivery_date", ">=", today()->toDateString())->orWhere('applications.status', '!=', 2);
+                    $query->Where('applications.status', '!=', 2);
 
                     break;
             }

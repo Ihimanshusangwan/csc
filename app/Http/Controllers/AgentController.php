@@ -416,6 +416,7 @@ class AgentController extends Controller
                     'applications.*',
                     'services.name as service_name',
                     'customers.name as customer_name',
+                    'customers.mobile as customer_mobile',
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
@@ -427,7 +428,7 @@ class AgentController extends Controller
                         $query->whereDate("applications.apply_date", "=", today()->toDateString());
                         break;
                     case "completed":
-                        $query->whereDate("applications.delivery_date", "<=", today()->toDateString());
+                    $query->Where('applications.status', '==', 2);
                         break;
                     case "pending":
                         $query->Where('applications.status', '!=', 2);
