@@ -194,8 +194,8 @@
         <h3 class="mt-4 text-center">Today's Applications</h3>
         <div class="sort-filter">
             <div class="dropdown">
-               
-        <a href="{{ route('agent.dashboard') }}" class="btn btn-secondary m-2">Home</a>
+
+                <a href="{{ route('agent.dashboard') }}" class="btn btn-secondary m-2">Home</a>
             </div>
             <div class="total-count">
                 <strong class="text-primary">Total : {{ $totalApplicationCount }} </strong>
@@ -236,26 +236,7 @@
                                 <span class="text-secondary" style="text-decoration: underline; cursor: pointer;"
                                     data-reason="{{ $application->reason }}" data-toggle="modal"
                                     data-target="#reasonModal{{ $application->id }}">Reason</span>
-                                <!-- Modal -->
-                                <div class="modal fade" id="reasonModal{{ $application->id }}" tabindex="-1"
-                                    role="dialog" aria-labelledby="reasonModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="reasonModalLabel">Reason</h5>
-                                                <button type="button" class="close" data-dismiss="modal"
-                                                    aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">{{ $application->reason }}</div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                               
                             @elseif ($application->status == 2)
                                 <span class="text-success font-weight-bold">Completed</span>
                             @elseif ($application->status == 0)
@@ -266,13 +247,19 @@
                                 @php
                                     $statusesArray = explode(',', $application->statuses);
                                     foreach ($statusesArray as $status) {
-                                        [$id, $statusName, $statusColor] = explode(':', $status);
+                                        [$id, $statusName, $statusColor, $askReason] = explode(':', $status);
                                         if ($application->status == $id) {
                                             echo '<span class="font-weight-bold" style="color: ' .
                                                 $statusColor .
                                                 '">' .
                                                 ucfirst($statusName) .
                                                 '</span>';
+                                            if ($askReason) {
+                                                echo '
+                                <br/><span class="text-secondary" style="text-decoration: underline; cursor: pointer;"
+                                     data-toggle="modal"
+                                    data-target="#reasonModal'.$application->id.'">Reason</span>';
+                                            }
                                             break;
                                         }
                                     }
@@ -285,10 +272,7 @@
                                         id="flexSwitchCheckDefault"
                                         data-route='{{ route('application.update-doc-approval-status', ['id' => $application->id]) }}'
                                         onclick='updateApprovalStatus(this)'
-                                        @if($application->is_doc_approved)
-                                               @checked(true)
-                                        @endif
-                                        >
+                                        @if ($application->is_doc_approved) @checked(true) @endif>
                                     <label class="form-check-label" for="flexSwitchCheckDefault"> Document: <a
                                             href="{{ asset($application->delivery) }}" target="_blank"
                                             style="color: blue;">View Document</a></label>
@@ -324,7 +308,7 @@
                                         </h5>
                                     </div>
                                     <div class="modal-body">
-                                        <p><strong>Mobile Number:</strong> {{$application->customer_mobile}}</p>
+                                        <p><strong>Mobile Number:</strong> {{ $application->customer_mobile }}</p>
                                         @php
                                             $formData = json_decode($application->form_data, true);
                                             $i = 1;
@@ -362,6 +346,26 @@
                                             <button type="button" class="btn btn-secondary"
                                                 data-dismiss="modal">Close</button>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                         <!-- Modal -->
+                         <div class="modal fade" id="reasonModal{{ $application->id }}" tabindex="-1"
+                            role="dialog" aria-labelledby="reasonModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="reasonModalLabel">Reason</h5>
+                                        <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">{{ $application->reason }}</div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Close</button>
                                     </div>
                                 </div>
                             </div>

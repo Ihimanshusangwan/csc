@@ -23,6 +23,7 @@ return new class extends Migration
             
             // Status name
             $table->string('status_name');
+            $table->boolean('ask_reason');
             
             // Timestamps
             $table->timestamps();

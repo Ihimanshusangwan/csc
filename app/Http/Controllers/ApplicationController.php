@@ -25,7 +25,7 @@ class ApplicationController extends Controller
         if ($request->has('status')) {
             $statusId = $request->input('status');
             $updateData['status'] = $statusId;
-            if ($statusId == -1) {
+            if ($request->input('reason')) {
                 $updateData['reason'] = $request->input('reason');
             }
         }

@@ -26,6 +26,7 @@ class StatusController extends Controller
             'status_name' => 'required|string|max:255',
             'color' => 'required|string|max:255',
             'service_id' => 'required',
+            'ask_reason' => 'required',
         ]);
     
         // Insert the new status into the database
@@ -33,6 +34,7 @@ class StatusController extends Controller
             'status_name' => $validatedData['status_name'],
             'color' => $validatedData['color'],
             'service_id' => $validatedData['service_id'],
+            'ask_reason' => $validatedData['ask_reason'],
         ]);
     
         // Redirect back with success message
@@ -44,6 +46,7 @@ class StatusController extends Controller
         $validatedData = $request->validate([
             'status_name' => 'required|string|max:255',
             'color' => 'required|string|max:255',
+            'ask_reason' => 'required',
         ]);
     
         // Update the status record in the database
@@ -52,6 +55,7 @@ class StatusController extends Controller
             ->update([
                 'status_name' => $validatedData['status_name'],
                 'color' => $validatedData['color'],
+                'ask_reason' => $validatedData['ask_reason'],
             ]);
     
         // Redirect back with success message
