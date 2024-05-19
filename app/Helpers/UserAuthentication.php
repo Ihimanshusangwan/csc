@@ -252,4 +252,17 @@ class UserAuthentication
             return $auth_result;
         }
     }
+    public static function is_customer($auth_result): bool|array
+    {
+        if ($auth_result['success'] === true && $auth_result['user']['role'] === "customer") {
+            return true;
+        } else if ($auth_result['success'] === true) {
+            return [
+                'success' => false,
+                'message' => "You Don't have access to this resource"
+            ];
+        } else {
+            return $auth_result;
+        }
+    }
 }
