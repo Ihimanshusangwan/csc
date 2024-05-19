@@ -193,10 +193,11 @@
                                             $id = $statusParts[0] ?? null;
                                             $statusName = $statusParts[1] ?? null;
                                             $statuscolor = $statusParts[2] ?? null;
+                                            $askReason = $statusParts[3] ?? null;
                                         @endphp
 
                                         @if ($id !== null && $statusName !== null)
-                                            <option value="{{ $id }}" style="color: {{ $statuscolor }};"
+                                            <option value="{{ $id }}" style="color: {{ $statuscolor }};" data-ask_reason="{{$askReason}}"
                                                 {{ $application->status == $id ? 'selected' : '' }}>
                                                 {{ $statusName }}</option>
                                         @endif
@@ -343,8 +344,15 @@
         document.querySelectorAll('.statuses-menu').forEach((e) => {
             const reasonInput = e.previousElementSibling;
             e.addEventListener('change', (event) => {
+                var askReason = 0;
                 let statusId = event.target.value;
-                if (statusId == -1) {
+                for (var i = 0; i < event.target.options.length; i++) {
+                    if (event.target.options[i].value === statusId) {
+                        askReason = event.target.options[i].dataset.ask_reason;
+                        break;
+                    }
+                }
+                if (statusId == -1 || askReason == 1) {
                     var reason = prompt("Please enter the reason:");
                     if (reason !== null) {
                         reasonInput.value = reason;

@@ -119,7 +119,7 @@ class Agent extends Model
                 'services.name as service_name',
                 'customers.name as customer_name',
                 'customers.mobile as customer_mobile',
-                DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color)) FROM service_statuses WHERE service_statuses.service_id = a.service_id) as custom_statuses')
+                DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color , ":" , ask_reason)) FROM service_statuses WHERE service_statuses.service_id = a.service_id) as custom_statuses')
             )
             ->orderBy("a.id", $order);
 

@@ -80,26 +80,8 @@
                                 <span class="text-secondary" style="text-decoration: underline; cursor: pointer;"
                                     data-reason="{{ $application->reason }}" data-toggle="modal"
                                     data-target="#reasonModal{{ $application->id }}">Reason</span>
-                                <!-- Modal -->
-                                <div class="modal fade" id="reasonModal{{ $application->id }}" tabindex="-1"
-                                    role="dialog" aria-labelledby="reasonModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="reasonModalLabel">Reason</h5>
-                                                <button type="button" class="close" data-dismiss="modal"
-                                                    aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">{{ $application->reason }}</div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                
+                                
                             @elseif ($application->status == 2)
                                 <span class="text-success font-weight-bold">Completed</span><br>
                                 @if ($application->delivery)
@@ -118,13 +100,19 @@
                                 @php
                                     $statusesArray = explode(',', $application->statuses);
                                     foreach ($statusesArray as $status) {
-                                        [$id, $statusName, $statusColor] = explode(':', $status);
+                                        [$id, $statusName, $statusColor, $askReason] = explode(':', $status);
                                         if ($application->status == $id) {
                                             echo '<span class="font-weight-bold" style="color: ' .
                                                 $statusColor .
                                                 '">' .
                                                 ucfirst($statusName) .
                                                 '</span>';
+                                                if ($askReason) {
+                                                echo '
+                                <br/><span class="text-secondary" style="text-decoration: underline; cursor: pointer;"
+                                     data-toggle="modal"
+                                    data-target="#reasonModal'.$application->id.'">Reason</span>';
+                                            }
                                             break;
                                         }
                                     }
@@ -146,6 +134,25 @@
                                 Not Available
                             @endif
                         </td>
+                        <div class="modal fade" id="reasonModal{{ $application->id }}" tabindex="-1"
+                            role="dialog" aria-labelledby="reasonModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="reasonModalLabel">Reason</h5>
+                                        <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">{{ $application->reason }}</div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </tr>
                 @endforeach
             </tbody>
@@ -204,8 +211,15 @@
         document.querySelectorAll('.statuses-menu').forEach((e) => {
             const reasonInput = e.previousElementSibling;
             e.addEventListener('change', (event) => {
+                var askReason = 0;
                 let statusId = event.target.value;
-                if (statusId == -1) {
+                for (var i = 0; i < event.target.options.length; i++) {
+                    if (event.target.options[i].value === statusId) {
+                        askReason = event.target.options[i].dataset.ask_reason;
+                        break;
+                    }
+                }
+                if (statusId == -1 || askReason == 1) {
                     var reason = prompt("Please enter the reason:");
                     if (reason !== null) {
                         reasonInput.value = reason;

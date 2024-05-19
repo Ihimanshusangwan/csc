@@ -117,7 +117,8 @@
 
         <div class="row">
             <div class="col-3">
-                <a class="total-registration background-total-registration" href="{{route('admin.applications',[ 'category' => 'all'])}}">
+                <a class="total-registration background-total-registration"
+                    href="{{ route('admin.applications', ['category' => 'all']) }}">
                     <div class="align">
                         <div class="registration-text">Total Applications</div>
                         <div class="count">{{ $totalApplicationCount }}</div>
@@ -126,7 +127,8 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="total-registration todays-registration" href="{{route('admin.applications',[ 'category' => 'today'])}}">
+                <a class="total-registration todays-registration"
+                    href="{{ route('admin.applications', ['category' => 'today']) }}">
                     <div class="align">
                         <div class="registration-text">Today's Applications</div>
                         <div class="count">{{ $countOfTodaysApplications }}</div>
@@ -135,7 +137,8 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="total-registration background-process-completed" href="{{route('admin.applications',[ 'category' => 'completed'])}}">
+                <a class="total-registration background-process-completed"
+                    href="{{ route('admin.applications', ['category' => 'completed']) }}">
                     <div class="align">
                         <div class="registration-text">Completed Applications</div>
                         <div class="count">{{ $completedApplicationsCount }}</div>
@@ -144,7 +147,8 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="total-registration background-pending" href="{{route('admin.applications',[ 'category' => 'pending'])}}">
+                <a class="total-registration background-pending"
+                    href="{{ route('admin.applications', ['category' => 'pending']) }}">
                     <div class="align">
                         <div class="registration-text">Pending Applications</div>
                         <div class="count"> {{ $pendingApplicationsCount }}</div>
@@ -223,7 +227,7 @@
 
 
                 @php   $counter = 1; @endphp @foreach ($applications as $application)
-                    <tr class="text-center" >
+                    <tr class="text-center">
                         <th scope="row">{{ $counter++ }}</th>
                         <td>{{ $application->customer_name }}</td>
                         <td>{{ $application->agent_name }}</td>
@@ -262,10 +266,12 @@
                                             $id = $statusParts[0] ?? null;
                                             $statusName = $statusParts[1] ?? null;
                                             $statuscolor = $statusParts[2] ?? null;
+                                            $askReason = $statusParts[3] ?? null;
                                         @endphp
 
                                         @if ($id !== null && $statusName !== null)
-                                            <option value="{{ $id }}"  style="color: {{ $statuscolor }};"
+                                            <option value="{{ $id }}" style="color: {{ $statuscolor }};"
+                                                data-ask_reason="{{ $askReason }}"
                                                 {{ $application->status == $id ? 'selected' : '' }}>
                                                 {{ $statusName }}</option>
                                         @endif
@@ -275,10 +281,10 @@
 
                             </select>
                             @if ($application->status == -1)
-                            <span class="text-danger" style="text-decoration: underline; cursor: pointer;" data-reason="{{ $application->reason }}"
-                                data-toggle="modal"
-                                data-target="#reasonModal{{ $application->id }}">Reason</span>
-                          
+                                <span class="text-danger" style="text-decoration: underline; cursor: pointer;"
+                                    data-reason="{{ $application->reason }}" data-toggle="modal"
+                                    data-target="#reasonModal{{ $application->id }}">Reason</span>
+
                                 <!-- Modal -->
                                 <div class="modal fade" id="reasonModal{{ $application->id }}" tabindex="-1"
                                     role="dialog" aria-labelledby="reasonModalLabel" aria-hidden="true">
@@ -357,7 +363,7 @@
                                         </h5>
                                     </div>
                                     <div class="modal-body">
-                                        <p><strong>Mobile Number:</strong> {{$application->customer_mobile}}</p>
+                                        <p><strong>Mobile Number:</strong> {{ $application->customer_mobile }}</p>
                                         @php
                                             $formData = json_decode($application->form_data, true);
                                             $i = 1;
@@ -366,11 +372,11 @@
                                             @if (strtolower($category) !== 'service_id' && strtolower($category) !== 'filepaths')
                                                 @foreach ($fields as $key => $value)
                                                     @php
-                                                    if ($i == 1) {
-                                                        $i++;
-                                                        continue;
-                                                    }
-                                                    @endphp               
+                                                        if ($i == 1) {
+                                                            $i++;
+                                                            continue;
+                                                        }
+                                                    @endphp
                                                     @if (!empty($value))
                                                         @if (is_array($value))
                                                             <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong>
@@ -418,8 +424,15 @@
         document.querySelectorAll('.statuses-menu').forEach((e) => {
             const reasonInput = e.previousElementSibling;
             e.addEventListener('change', (event) => {
+                var askReason = 0;
                 let statusId = event.target.value;
-                if (statusId == -1) {
+                for (var i = 0; i < event.target.options.length; i++) {
+                    if (event.target.options[i].value === statusId) {
+                        askReason = event.target.options[i].dataset.ask_reason;
+                        break;
+                    }
+                }
+                if (statusId == -1 || askReason == 1) {
                     var reason = prompt("Please enter the reason:");
                     if (reason !== null) {
                         reasonInput.value = reason;

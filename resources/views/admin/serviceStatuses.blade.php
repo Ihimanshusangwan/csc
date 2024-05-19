@@ -34,6 +34,7 @@
                     <th>Sr. No</th>
                     <th>Status</th>
                     <th>Color code</th>
+                    <th>Ask Reason</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -43,6 +44,7 @@
                     <td>{{ $key + 1 }}</td>
                     <td>{{ $status->status_name }}</td>
                     <td>{{ $status->color }}</td>
+                    <td>{{ $status->ask_reason ? 'Yes' : 'No' }}</td>
                     <td>
                         <button class="btn btn-warning" data-toggle="modal"
                             data-target="#editstatusModal-{{ $status->id }}">Edit</button>
@@ -74,6 +76,11 @@
                                         <label for="editstatus_name-{{ $status->id }}">Color Hex code:</label>
                                         <input type="text" class="form-control" id="editstatus_name-{{ $status->id }}"
                                             name="color" value="{{ $status->color }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="addstatus_name">Ask Reason while Setting this Status :  </label>
+                                        <input type="radio"  id="addstatus_name" name="ask_reason"  value="1" required {{$status->ask_reason?'checked' : ''}}> Yes
+                                        <input type="radio" id="addstatus_name" name="ask_reason" value='0' required {{$status->ask_reason?'' : 'checked'}}> No
                                     </div>
                                     
                                     <button type="submit" class="btn btn-primary">Update status</button>
@@ -109,6 +116,11 @@
                         <div class="form-group">
                             <label for="addstatus_name">Status Color Hex Code:</label>
                             <input type="text" class="form-control" id="addstatus_name" name="color" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="addstatus_name">Ask Reason while Setting this Status :  </label>
+                            <input type="radio"  id="addstatus_name" name="ask_reason"  value="1" required> Yes
+                            <input type="radio" id="addstatus_name" name="ask_reason" value='0' required> No
                         </div>
                         <button type="submit" class="btn btn-primary">Add status</button>
                     </form>
