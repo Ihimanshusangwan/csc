@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AdminApiController;
 use App\Http\Controllers\AgentApiController;
+use App\Http\Controllers\CustomerApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,3 +30,8 @@ Route::get('/agent/profile', [AgentApiController::class, 'profile']);
 Route::get('/agent/applications', [AgentApiController::class, 'applications']);
 Route::get('/agent/apply', [AgentApiController::class, 'applyService']);
 Route::post('/agent/apply', [AgentApiController::class, 'applyServiceSubmit']);
+
+//customer routes
+
+Route::get('/customer/get_all_applications', [CustomerApiController::class, 'get_all_applications']);
+Route::post('/customer/update-password', [CustomerApiController::class, 'update_password']);
