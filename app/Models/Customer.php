@@ -76,4 +76,20 @@ class Customer extends Model
         }
         return $structured_data;
     }
+
+    public static function update_password(int $customer_id , array $input_data){
+        $customer = DB::table('customers')->where('id',$customer_id)->first();
+        if( $input_data['current_password'] === $customer->mobile || $input_data['current_password'] === $customer->password){
+            DB::table('customers')->update(['password'=>$input_data['new_password']]);
+            return [
+                'success' => true,
+                'message' => "Password Updated Successfully"
+            ];
+        }
+        return [
+            'success' => false,
+            'message' => 'Incorrect Password'
+        ];
+
+    }
 }
