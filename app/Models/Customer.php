@@ -19,7 +19,6 @@ class Customer extends Model
             ->select(
                 'applications.apply_date',
                 'applications.delivery_date',
-                'applications.price',
                 'applications.status',
                 'applications.reason',
                 'applications.is_doc_approved',
@@ -37,7 +36,7 @@ class Customer extends Model
             $data['agentName'] =  $application->agent_name;
             $data['service'] =  $application->service_name;
             $data['applyDate'] =  $application->apply_date;
-            $data['deliveryDate'] = ($application->delivery_date) ? $application->delivery_date : 'Not yer determined';
+            $data['deliveryDate'] = ($application->delivery_date) ? $application->delivery_date : 'Not yet determined';
             if ($application->status == -1) {
                 $data['status']['name'] = 'Rejected';
                 $data['status']['color'] = 'green';
@@ -65,7 +64,6 @@ class Customer extends Model
                     }
                 }
             }
-            $data['price'] = $application->price;
             $data['reciept'] = $application->receipt ? $application->receipt : "Available Soon";
             if ($application->delivery_doc) {
                 $data['deliveryDoc'] = ($application->is_doc_approved) ? $application->delivery_doc : 'Ask Agent to Unlock';
