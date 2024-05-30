@@ -56,8 +56,6 @@
     </head>
 
     <body>
-
-
         <h2></h2>
 
         <a href="{{ route('agent.dashboard') }}" class="btn btn-secondary m-3">Home</a>

@@ -33,4 +33,23 @@ class CustomerApiController extends Controller
         }
         return response()->json($verify_customer, 200);
     }
+    public function get_all_services(Request $request){
+        $authResult = UserAuthentication::authenticateUser($request);
+        $verify_customer = UserAuthentication::is_customer($authResult);
+        if ($verify_customer === true) {
+            $data = Customer::get_all_services_data();
+            return response()->json($data, 200);
+        }
+        return response()->json($verify_customer, 200);
+    }
+    public function get_form_data(Request $request, $service_id){
+        $authResult = UserAuthentication::authenticateUser($request);
+        $verify_customer = UserAuthentication::is_customer($authResult);
+        if ($verify_customer === true) {
+            $customer_id = $authResult['user']['user_id'];
+            $data = Customer::get_form_data_by_service_id($service_id,$customer_id);
+            return response()->json($data, 200);
+        }
+        return response()->json($verify_customer, 200);
+    }
 }

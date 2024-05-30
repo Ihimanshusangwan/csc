@@ -20,14 +20,14 @@ class Agent extends Model
 
         if ($plan->expiration_date >= $current_date) {
             $services = DB::table("services")
-            ->leftJoin("plan_services","services.id", "=", "plan_services.service_id" )
-            ->where("plan_services.plan_id", "=", $plan->plan_id)
-            ->orWhere("services.availability", 2)
-            ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
-            ->select("services.*", "service_groups.name as group_name", "service_groups.photo as group_photo")
-            ->distinct()
-            ->get()
-            ->groupBy('service_group_id');
+                ->leftJoin("plan_services", "services.id", "=", "plan_services.service_id")
+                ->where("plan_services.plan_id", "=", $plan->plan_id)
+                ->orWhere("services.availability", 2)
+                ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
+                ->select("services.*", "service_groups.name as group_name", "service_groups.photo as group_photo")
+                ->distinct()
+                ->get()
+                ->groupBy('service_group_id');
         } else {
             $services = DB::table("services")
                 ->where("services.availability", 2)
@@ -315,7 +315,7 @@ class Agent extends Model
             "data" => $data
         ];
     }
-    public static function store_service_data($service_id, $agent_id, $data , Request $request): array
+    public static function store_service_data($service_id, $agent_id, $data, Request $request): array
     {
         $service = DB::table('services')->where('id', $service_id)->first();
         if (!$service) {
@@ -331,7 +331,7 @@ class Agent extends Model
             ];
         }
         $agent = DB::table('agents')->where('id', $agent_id)->first();
-        
+
         if ($service->availability === 1) {
             //paid service
             if ($agent->plan_id) {
@@ -358,15 +358,15 @@ class Agent extends Model
                                 "message" => $e->getMessage()
                             ];
                         }
-                         $price_type = isset($data['price_type']) ? $data['price_type'] : null;
-        $customer_name = isset($data['customer_name']) ? $data['customer_name'] : null;
-        $customer_number = isset($data['customer_number']) ? $data['customer_number'] : null;
-        if(!$customer_name || !$customer_number){
-            return [
-                "success" => false,
-                "message" => 'Customer Name and Number are required'
-            ];
-        }
+                        $price_type = isset($data['price_type']) ? $data['price_type'] : null;
+                        $customer_name = isset($data['customer_name']) ? $data['customer_name'] : null;
+                        $customer_number = isset($data['customer_number']) ? $data['customer_number'] : null;
+                        if (!$customer_name || !$customer_number) {
+                            return [
+                                "success" => false,
+                                "message" => 'Customer Name and Number are required'
+                            ];
+                        }
 
                         if ($price_type) {
                             if ($price_type == "default") {
@@ -498,15 +498,15 @@ class Agent extends Model
                             "message" => $e->getMessage()
                         ];
                     }
-                     $price_type = isset($data['price_type']) ? $data['price_type'] : null;
-        $customer_name = isset($data['customer_name']) ? $data['customer_name'] : null;
-        $customer_number = isset($data['customer_number']) ? $data['customer_number'] : null;
-        if(!$customer_name || !$customer_number){
-            return [
-                "success" => false,
-                "message" => 'Customer Name and Number are required'
-            ];
-        }
+                    $price_type = isset($data['price_type']) ? $data['price_type'] : null;
+                    $customer_name = isset($data['customer_name']) ? $data['customer_name'] : null;
+                    $customer_number = isset($data['customer_number']) ? $data['customer_number'] : null;
+                    if (!$customer_name || !$customer_number) {
+                        return [
+                            "success" => false,
+                            "message" => 'Customer Name and Number are required'
+                        ];
+                    }
 
                     if ($price_type) {
                         if ($price_type == "default") {
@@ -650,10 +650,10 @@ class Agent extends Model
                 "message" => $e->getMessage()
             ];
         }
-         $price_type = isset($data['price_type']) ? $data['price_type'] : null;
+        $price_type = isset($data['price_type']) ? $data['price_type'] : null;
         $customer_name = isset($data['customer_name']) ? $data['customer_name'] : null;
         $customer_number = isset($data['customer_number']) ? $data['customer_number'] : null;
-        if(!$customer_name || !$customer_number){
+        if (!$customer_name || !$customer_number) {
             return [
                 "success" => false,
                 "message" => 'Customer Name and Number are required'
@@ -661,7 +661,7 @@ class Agent extends Model
         }
         $customer_name = isset($data['customer_name']) ? $data['customer_name'] : null;
         $customer_number = isset($data['customer_number']) ? $data['customer_number'] : null;
-        if(!$customer_name || !$customer_number){
+        if (!$customer_name || !$customer_number) {
             return [
                 "success" => false,
                 "message" => 'Customer Name and Number are required'
