@@ -32,4 +32,5 @@ Route::post('/agent/apply', [AgentApiController::class, 'applyServiceSubmit']);
 Route::get('/customer/get_all_applications', [CustomerApiController::class, 'get_all_applications']);
 Route::get('/customer/get_all_services', [CustomerApiController::class, 'get_all_services']);
 Route::get('/customer/get_form_data/{service_id}', [CustomerApiController::class, 'get_form_data']);
+Route::post('/customer/submit_application/{service_id}', [CustomerApiController::class, 'submit_application']);
 Route::post('/customer/update-password', [CustomerApiController::class, 'update_password']);

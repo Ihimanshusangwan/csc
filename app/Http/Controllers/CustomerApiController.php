@@ -52,4 +52,17 @@ class CustomerApiController extends Controller
         }
         return response()->json($verify_customer, 200);
     }
+    public function submit_application(Request $request)
+    {
+        $authResult = UserAuthentication::authenticateUser($request);
+        $verify_customer = UserAuthentication::is_customer($authResult);
+        if ($verify_customer === true) {
+            $customer_id = $authResult['user']['user_id'];
+            $formData = $_POST;
+    $fileData = $_FILES;
+
+            return response()->json($fileData, 200);    
+        }
+        return response()->json($verify_customer, 200);
+    }
 }
