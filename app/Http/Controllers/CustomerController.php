@@ -21,6 +21,7 @@ class CustomerController extends Controller
                 ->where('applications.customer_id', $customer_id)
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->join('agents', 'applications.agent_id', '=', 'agents.id')
+                ->where('applications.is_approved', '=', 1)
                 ->select(
                     'applications.*',
                     'services.name as service_name',

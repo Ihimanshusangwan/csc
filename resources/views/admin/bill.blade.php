@@ -151,7 +151,7 @@
                     billData.items.push(item);
                 });
 
-                console.log(billData);
+                // console.log(billData);
                 document.getElementById('bill-form-hidden-input').value = JSON.stringify(billData);
                 document.getElementById('bill-submit-form').submit();
             });

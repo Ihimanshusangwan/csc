@@ -50,6 +50,7 @@ class Agent extends Model
         // Get sum of all price column
         $earnings = DB::table('applications')
             ->where('agent_id', $agent_id)
+            ->where('applications.is_approved', '=', 1)
             ->sum('price');
 
         return [
@@ -106,6 +107,7 @@ class Agent extends Model
             ->where('a.agent_id', $agent_id)
             ->join('customers', 'a.customer_id', '=', 'customers.id')
             ->join('services', 'a.service_id', '=', 'services.id')
+            ->where('applications.is_approved', '=', 1)
             ->select(
                 'a.id',
                 'a.apply_date',
@@ -154,16 +156,19 @@ class Agent extends Model
         $countOfTodaysApplications = DB::table('applications')
             ->where('agent_id', $agent_id)
             ->whereDate('apply_date', now()->toDateString())
+            ->where('applications.is_approved', '=', 1)
             ->count();
 
         // Get total application count
         $totalApplicationCount = DB::table('applications')
             ->where('agent_id', $agent_id)
+            ->where('applications.is_approved', '=', 1)
             ->count();
 
         // Get completed applications count which have delivery date less than today
         $completedApplicationsCount = DB::table('applications')
             ->where('applications.agent_id', $agent_id)->Where('applications.status', '==', 2)
+            ->where('applications.is_approved', '=', 1)
             ->count();
         // Calculate pending applications count
         $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;

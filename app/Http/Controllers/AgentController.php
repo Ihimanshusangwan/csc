@@ -366,6 +366,7 @@ class AgentController extends Controller
             }
             // Get sum of all price column
             $sumOfPrices = DB::table('applications')
+            ->where('applications.is_approved', '=', 1)
                 ->where('agent_id', $agentId)
                 ->sum('price');
             //agent balance
@@ -407,6 +408,7 @@ class AgentController extends Controller
                 ->where('applications.agent_id', $agentId)
                 ->join('customers', 'applications.customer_id', '=', 'customers.id')
                 ->join('services', 'applications.service_id', '=', 'services.id')
+                ->where('applications.is_approved', '=', 1)
                 ->select(
 
                     'applications.*',
@@ -441,17 +443,20 @@ class AgentController extends Controller
             // Get count of today's applications
             $countOfTodaysApplications = DB::table('applications')
                 ->where('agent_id', $agentId)
+                ->where('applications.is_approved', '=', 1)
                 ->whereDate('apply_date', now()->toDateString())
                 ->count();
 
             // Get total application count
             $totalApplicationCount = DB::table('applications')
                 ->where('agent_id', $agentId)
+                ->where('applications.is_approved', '=', 1)
                 ->count();
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')
             ->where('applications.agent_id', $agentId)->Where('applications.status', '==', 2)
+            ->where('applications.is_approved', '=', 1)
                 ->count();
 
 

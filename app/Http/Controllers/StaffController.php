@@ -77,6 +77,7 @@ class StaffController extends Controller
                 ->join('customers', 'applications.customer_id', '=', 'customers.id')
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->join('agents', 'applications.agent_id', '=', 'agents.id')
+                ->where('applications.is_approved', '=', 1)
                 ->select(
                     'applications.*',
                     'services.name as service_name',
@@ -104,17 +105,20 @@ class StaffController extends Controller
             // Get count of today's applications
             $countOfTodaysApplications = DB::table('applications')
                 ->where('applications.staff_id', $staffId)
+                ->where('applications.is_approved', '=', 1)
                 ->whereDate('apply_date', now()->toDateString())
                 ->count();
 
             // Get total application count
             $totalApplicationCount = DB::table('applications')
                 ->where('applications.staff_id', $staffId)
+                ->where('applications.is_approved', '=', 1)
                 ->count();
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')
                 ->where('applications.staff_id', $staffId)
+                ->where('applications.is_approved', '=', 1)
                 ->whereDate('delivery_date', '<=', today()->toDateString())
                 ->count();
 

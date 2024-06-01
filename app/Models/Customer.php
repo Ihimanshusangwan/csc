@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Helpers\Constants;
 
+use App\Models\Staff;
 use function Laravel\Prompts\select;
 
 class Customer extends Model
@@ -19,6 +20,7 @@ class Customer extends Model
             ->where('applications.customer_id', $customer_id)
             ->join('services', 'applications.service_id', '=', 'services.id')
             ->join('agents', 'applications.agent_id', '=', 'agents.id')
+            ->where('applications.is_approved', '=', 1)
             ->select(
                 'applications.apply_date',
                 'applications.delivery_date',
@@ -143,7 +145,58 @@ class Customer extends Model
     }
 
     private static function get_agents_by_customer_id($customer_id) {
-        $agents = DB::table('applications')->where('customer_id','=',$customer_id)->join('agents','applications.agent_id', '=', 'agents.id')->select('applications.agent_id as id','agents.full_name as name')->get();
+        $agents = DB::table('applications')->where('customer_id','=',$customer_id)->join('agents','applications.agent_id', '=', 'agents.id')->select('applications.agent_id as id','agents.full_name as name')->distinct()->get();
         return $agents;
+    }
+
+    public static function store_application_data($request , $customer_id){
+        $service_id = $request->input('service_id');
+        $agent_id = $request->input('agent_id');
+        $location_id = DB::table('agents')->where('id',$agent_id)->value('location_id');
+        $service = DB::table('services')->where('id', $service_id)->select('requirements','service_group_id')->first();
+        $nextStaffId = Staff::get_staff_id($service->service_group_id, $location_id);
+        $requirements = [];
+        $requirements_from_service = explode(',',$service->requirements);
+        foreach($requirements_from_service as $doc){
+            array_push($requirements,trim($doc));
+        }
+        array_push($requirements,'_token');
+        array_push($requirements,'file');
+        array_push($requirements,'agent_id');
+        array_push($requirements,'service_id');
+        $form_data = $request->except($requirements);
+        $filePaths = [];
+        foreach ($request->allFiles() as $fieldName => $files) {
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+
+            foreach ($files as $file) {
+                $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads/applications'), $fileName);
+                $filePaths[$fieldName] = 'uploads/applications/' . $fileName;
+            }
+        }
+        $formDataJson = json_encode([
+            'formData' => $form_data,
+            'filePaths' => $filePaths
+        ]);
+        $application = DB::table('applications')->insertGetId([
+            'service_id' => $service_id,
+            'agent_id' => $agent_id,
+            'customer_id' => $customer_id,
+            'location_id' => $location_id,
+            'service_group_id' => $service->service_group_id,
+            'staff_id' => $nextStaffId,
+            'is_applicant_customer' => true,
+            'is_approved' => false,
+            'apply_date' => today(),
+            'form_data' => $formDataJson,
+        ]);
+        return [
+            'success' => true,
+            'message' => 'Application Successfull'
+        ];
+        
     }
 }
