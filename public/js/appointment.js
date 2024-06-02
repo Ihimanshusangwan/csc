@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 div.appendChild(element);
                 summaryDiv.appendChild(div);
             });
-            console.log(formData);
+            // console.log(formData);
 
             // Now formData contains all the collected data including the selected tile's data-id
             document
