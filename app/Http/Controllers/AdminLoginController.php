@@ -26,6 +26,7 @@ class AdminLoginController extends Controller
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->join('agents', 'applications.agent_id', '=', 'agents.id')
                 ->leftJoin('staff', 'applications.staff_id', '=', 'staff.id')
+                ->where('applications.is_approved', '=', 1)
                 ->select(
                     'staff.name as staffName',
                     'applications.*',
@@ -42,19 +43,23 @@ class AdminLoginController extends Controller
             // dd($applications);
             // Get sum of all price column
             $sumOfPrices = DB::table('applications')
+            ->where('applications.is_approved', '=', 1)
                 ->sum('price');
 
             // Get count of today's applications
             $countOfTodaysApplications = DB::table('applications')
+            ->where('applications.is_approved', '=', 1)
                 ->whereDate('apply_date', now()->toDateString())
                 ->count();
 
             // Get total application count
             $totalApplicationCount = DB::table('applications')
+            ->where('applications.is_approved', '=', 1)
                 ->count();
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')
+            ->where('applications.is_approved', '=', 1)
                 ->where('status', 2)
                 ->count();
 
@@ -90,6 +95,7 @@ class AdminLoginController extends Controller
             ->join('services', 'applications.service_id', '=', 'services.id')
             ->join('agents', 'applications.agent_id', '=', 'agents.id')
             ->leftJoin('staff', 'applications.staff_id', '=', 'staff.id')
+            ->where('applications.is_approved', '=', 1)
             ->select(
                 'staff.name as staffName',
                 'applications.*',
@@ -220,6 +226,7 @@ class AdminLoginController extends Controller
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->join('agents', 'applications.agent_id', '=', 'agents.id')
                 ->leftJoin('staff', 'applications.staff_id', '=', 'staff.id')
+                ->where('applications.is_approved', '=', 1)
                 ->select(
                     'staff.name as staffName',
                     'applications.*',
@@ -255,16 +262,19 @@ class AdminLoginController extends Controller
             // Get count of today's applications
             $countOfTodaysApplications = DB::table('applications')
                 ->where('applications.agent_id', $id)
+                ->where('applications.is_approved', '=', 1)
                 ->whereDate('apply_date', now()->toDateString())
                 ->count();
 
             // Get total application count
             $totalApplicationCount = DB::table('applications')
+            ->where('applications.is_approved', '=', 1)
                 ->where('agent_id', $id)
                 ->count();
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')
+            ->where('applications.is_approved', '=', 1)
                 ->where('applications.agent_id', $id)->Where('applications.status', '==', 2)
                 ->count();
 
@@ -302,6 +312,7 @@ class AdminLoginController extends Controller
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->join('agents', 'applications.agent_id', '=', 'agents.id')
                 ->join('service_groups', 'services.service_group_id', '=', 'service_groups.id')
+                ->where('applications.is_approved', '=', 1)
                 ->select(
                     'applications.*',
                     'service_groups.name as service_group_name',
@@ -534,6 +545,7 @@ class AdminLoginController extends Controller
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->join('agents', 'applications.agent_id', '=', 'agents.id')
                 ->leftJoin('staff', 'applications.staff_id', '=', 'staff.id')
+                ->where('applications.is_approved', '=', 1)
                 ->select(
                     'staff.name as staffName',
                     'applications.*',
@@ -568,15 +580,18 @@ class AdminLoginController extends Controller
 
             // Get count of today's applications
             $countOfTodaysApplications = DB::table('applications')
+            ->where('applications.is_approved', '=', 1)
                 ->whereDate('apply_date', now()->toDateString())
                 ->count();
 
             // Get total application count
             $totalApplicationCount = DB::table('applications')
+            ->where('applications.is_approved', '=', 1)
                 ->count();
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')->Where('applications.status', '==', 2)
+            ->where('applications.is_approved', '=', 1)
                 ->count();
 
             // Calculate pending applications count
