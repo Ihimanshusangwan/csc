@@ -337,14 +337,14 @@ class AgentController extends Controller
 
             if ($plan->expiration_date >= $currentDate) {
                 $services = DB::table("services")
-                ->leftJoin("plan_services","services.id", "=", "plan_services.service_id" )
-                ->where("plan_services.plan_id", "=", $plan->plan_id)
-                ->orWhere("services.availability", 2)
-                ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
-                ->select("services.*", "service_groups.name as group_name", "service_groups.photo as group_photo")
-                ->distinct()
-                ->get()
-                ->groupBy('service_group_id');
+                    ->leftJoin("plan_services", "services.id", "=", "plan_services.service_id")
+                    ->where("plan_services.plan_id", "=", $plan->plan_id)
+                    ->orWhere("services.availability", 2)
+                    ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
+                    ->select("services.*", "service_groups.name as group_name", "service_groups.photo as group_photo")
+                    ->distinct()
+                    ->get()
+                    ->groupBy('service_group_id');
             } else {
                 $services = DB::table("services")
                     ->where("services.availability", 2)
@@ -366,7 +366,7 @@ class AgentController extends Controller
             }
             // Get sum of all price column
             $sumOfPrices = DB::table('applications')
-            ->where('applications.is_approved', '=', 1)
+                ->where('applications.is_approved', '=', 1)
                 ->where('agent_id', $agentId)
                 ->sum('price');
             //agent balance
@@ -397,7 +397,7 @@ class AgentController extends Controller
         return view('agent.serviceGroup', compact('services'));
     }
 
-    public function applications(Request $request,$category)
+    public function applications(Request $request, $category)
     {
         if (Cookie::has('Agent_Session')) {
             // Retrieve and decrypt the agent's ID from the cookie
@@ -410,7 +410,6 @@ class AgentController extends Controller
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->where('applications.is_approved', '=', 1)
                 ->select(
-
                     'applications.*',
                     'services.name as service_name',
                     'customers.name as customer_name',
@@ -418,22 +417,22 @@ class AgentController extends Controller
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color , ":" , ask_reason)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
-                switch ($category) {
-                    case "all":
-                        // No need for any additional filtering
-                        break;
-                    case "today":
-                        $query->whereDate("applications.apply_date", "=", today()->toDateString());
-                        break;
-                    case "completed":
+            switch ($category) {
+                case "all":
+                    // No need for any additional filtering
+                    break;
+                case "today":
+                    $query->whereDate("applications.apply_date", "=", today()->toDateString());
+                    break;
+                case "completed":
                     $query->Where('applications.status', '==', 2);
-                        break;
-                    case "pending":
-                        $query->Where('applications.status', '!=', 2);
-    
-                        break;
-                }
-    
+                    break;
+                case "pending":
+                    $query->Where('applications.status', '!=', 2);
+
+                    break;
+            }
+
             // Fetch paginated applications
             $applications = $query->paginate(15);
 
@@ -455,15 +454,15 @@ class AgentController extends Controller
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')
-            ->where('applications.agent_id', $agentId)->Where('applications.status', '==', 2)
-            ->where('applications.is_approved', '=', 1)
+                ->where('applications.agent_id', $agentId)->Where('applications.status', '==', 2)
+                ->where('applications.is_approved', '=', 1)
                 ->count();
 
 
             // Calculate pending applications count
             $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
 
-            return view("agent.applications", compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount','category'));
+            return view("agent.applications", compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount', 'category'));
         } else {
             return view('agent.login');
         }
@@ -536,6 +535,145 @@ class AgentController extends Controller
             $agentData = DB::table('agents')->where('id', $agentId)->first();
 
             return view('agent.profile', compact('agentData'));
+        } else {
+
+            return view('agent.login');
+        }
+    }
+
+    public function application_requests(Request $request)
+    {
+        if (Cookie::has('Agent_Session')) {
+            $encryptedAgentId = Cookie::get('Agent_Session');
+            $agentId = Crypt::decrypt($encryptedAgentId);
+            $query = DB::table('applications')
+                ->where('applications.agent_id', $agentId)
+                ->join('customers', 'applications.customer_id', '=', 'customers.id')
+                ->join('services', 'applications.service_id', '=', 'services.id')
+                ->where('applications.is_applicant_customer', '=', 1)
+                ->where('applications.is_approved', '=', 0)
+                ->select(
+
+                    'applications.*',
+                    'services.name as service_name',
+                    'customers.name as customer_name',
+                    'customers.mobile as customer_mobile',
+                )
+                ->orderBy("applications.id", "desc");
+            $applications = $query->paginate(15);
+
+            return view('agent.applicationRequests', compact('applications'));
+        } else {
+
+            return view('agent.login');
+        }
+    }
+
+    public function update_application(Request $request)
+    {
+        if (Cookie::has('Agent_Session')) {
+            $encryptedAgentId = Cookie::get('Agent_Session');
+            $agentId = Crypt::decrypt($encryptedAgentId);
+            $data = DB::table("agents")->select('location_id', 'expiration_date', 'plan_id')->where("id", "=", $agentId)->first();
+            $currentDate = date('Y-m-d');
+            $locationId = $data->location_id;
+            $totalPrice = 0;
+            $govtPrice = 0;
+            $commission = 0;
+            $tax = 0;
+            $is_agent_subscribed = false;
+            $priceType = $request->input('price_type');
+            $reason = $request->input('reason');
+            $id = $request->input('id');
+            if ($reason) {
+                DB::table('applications')->update([
+                    'price' => 0,
+                    'price_type' => $priceType,
+                    'govt_price' => 0,
+                    'commission' => 0,
+                    'is_agent_subscribed' => $is_agent_subscribed,
+                    'is_approved' => 1,
+                    'reason' => $reason,
+                    'status' => -1,
+                    'tax' => 0,
+                    'apply_date' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                return back()->with('success', 'Rejected Successfully');
+            }
+            $service_id = DB::table('applications')->where('id', $id)->value('service_id');
+            if ($data->plan_id && $data->expiration_date >= $currentDate) {
+                $is_agent_subscribed = true;
+                // active plan check
+                $prices = DB::table('prices')->where('location_id', $locationId)->where('service_id', $service_id)->where('plan_id', $data->plan_id)->first();
+                if ($priceType === 'default') {
+                    $totalPrice =  $prices->subscribed_default_govt_price + $prices->subscribed_default_commission_price + ($prices->subscribed_default_govt_price * $prices->subscribed_default_tax_percentage / 100);
+                    $govtPrice = $prices->subscribed_default_govt_price;
+                    $commission = $prices->subscribed_default_commission_price;
+                    $tax =  ($prices->subscribed_default_govt_price * $prices->subscribed_default_tax_percentage / 100);
+                } else {
+                    $totalPrice = $prices->subscribed_tatkal_govt_price + $prices->subscribed_tatkal_commission_price + ($prices->subscribed_tatkal_govt_price * $prices->subscribed_tatkal_tax_percentage / 100);
+                    $govtPrice = $prices->subscribed_tatkal_govt_price;
+                    $commission = $prices->subscribed_tatkal_commission_price;
+                    $tax = ($prices->subscribed_tatkal_govt_price * $prices->subscribed_tatkal_tax_percentage / 100);
+                }
+            } else {
+                //free plan
+                $prices = DB::table('prices')->where('location_id', $locationId)->where('service_id', $service_id)->where('plan_id', null)->first();
+
+                if ($priceType === 'default') {
+                    $totalPrice = $prices->default_govt_price + $prices->default_commission_price + ($prices->default_govt_price * $prices->default_tax_percentage / 100);
+                    $govtPrice = $prices->default_govt_price;
+                    $commission = $prices->default_commission_price;
+                    $tax =  ($prices->default_govt_price * $prices->default_tax_percentage / 100);
+                } else {
+                    $totalPrice = $prices->tatkal_govt_price + $prices->tatkal_commission_price + ($prices->tatkal_govt_price * $prices->tatkal_tax_percentage / 100);
+                    $govtPrice = $prices->tatkal_govt_price;
+                    $commission = $prices->tatkal_commission_price;
+                    $tax = ($prices->tatkal_govt_price * $prices->tatkal_tax_percentage / 100);
+                }
+            }
+
+            //update balance of agent
+            // Retrieve the current balance of the agent
+            $currentBalance = DB::table('agents')
+                ->where('id', $agentId)
+                ->value('balance');
+
+            // Calculate the new balance after recharge
+            $newBalance = $currentBalance - $totalPrice;
+            if ($newBalance < 1) {
+
+                return back()->with('error', 'Insufficient Balance');
+            }
+
+            // Update the balance in the database
+            DB::table('agents')
+                ->where('id', $agentId)
+                ->update([
+                    'balance' => $newBalance
+                ]);
+
+            DB::table('applications')->update([
+                'price' => $totalPrice,
+                'price_type' => $priceType,
+                'govt_price' => $govtPrice,
+                'commission' => $commission,
+                'is_agent_subscribed' => $is_agent_subscribed,
+                'is_approved' => 1,
+                'tax' => $tax,
+                'apply_date' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+
+
+
+
+            return back()->with('success', 'Approved Successfully');
         } else {
 
             return view('agent.login');

@@ -101,6 +101,7 @@ Route::post('/agent/unhold', [AgentController::class, 'unhold'])->name('agents.u
 Route::get('admin/registered-agents', [AgentController::class, 'showAgentDetails'])->name('admin.registered-agents');
 Route::get('admin/requested-agents', [AgentController::class, 'showRequestedAgentDetails'])->name('admin.requested-agents');
 Route::post('/recharge/{id}', [AgentController::class, 'recharge'])->name('agent.recharge');
+Route::get('/application-request', [AgentController::class, 'application_requests'])->name('agent.application-request');
 Route::get('/agent/recharge-history', [AgentController::class, 'rechargeHistory'])->name('agent.recharge-history');
 
 
@@ -111,6 +112,7 @@ Route::get('/agent/profile', [AgentController::class, 'profile'])->name('agent.p
 Route::get('/agent/applications/{category}', [AgentController::class, 'applications'])->name('agent.applications');
 Route::get('/agent/logout', [AgentController::class, 'logout'])->name('agent.logout');
 Route::get('/servicegroup/view/{serviceGroupId}', [AgentController::class, 'view'])->name('service-group.view');
+Route::post('/agent/update-application',[AgentController::class,'update_application'])->name('agent.update-application');
 
 //Appy Services
 use App\Http\Controllers\ApplyServiceController; 
