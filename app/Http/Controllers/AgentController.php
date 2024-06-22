@@ -403,6 +403,16 @@ class AgentController extends Controller
             // Retrieve and decrypt the agent's ID from the cookie
             $encryptedAgentId = Cookie::get('Agent_Session');
             $agentId = Crypt::decrypt($encryptedAgentId);
+            $services = DB::table('services')->where("is_active", 1)->get();
+            $statuses = DB::table('service_statuses')->select('id', 'status_name')->get();
+
+            $dateFrom = $request->input('dateFrom');
+            $dateTo = $request->input('dateTo');
+            $status = $request->input('status');
+            $applicantName = $request->input('applicantName');
+            $applicantNumber = $request->input('applicantNumber');
+            $service = $request->input('services');
+            $price_type = $request->input('price_type');
 
             $query = DB::table('applications')
                 ->where('applications.agent_id', $agentId)
@@ -431,6 +441,29 @@ class AgentController extends Controller
                     $query->Where('applications.status', '!=', 2);
 
                     break;
+            }
+            // Apply filters conditionally based on input values
+            if ($dateFrom) {
+                $query->where('applications.apply_date', '>=', $dateFrom);
+            }
+            if ($dateTo) {
+                $query->where('applications.apply_date', '<=', $dateTo);
+            }
+            if ($service) {
+                $query->where('services.id', $service);
+            }
+            if ($applicantName) {
+                $query->where('customers.name', 'like', '%' . $applicantName . '%');
+            }
+            if ($applicantNumber) {
+                $query->where('customers.mobile', 'like', '%' . $applicantNumber . '%');
+                
+            }
+            if ($status !== null && $status !== '') {
+                $query->where('applications.status', '=', $status);
+            }
+            if ($price_type) {
+                $query->where('price_type', '=', $price_type);
             }
 
             // Fetch paginated applications
@@ -462,7 +495,7 @@ class AgentController extends Controller
             // Calculate pending applications count
             $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
 
-            return view("agent.applications", compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount', 'category'));
+            return view("agent.applications", compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount', 'category','services','statuses'));
         } else {
             return view('agent.login');
         }
