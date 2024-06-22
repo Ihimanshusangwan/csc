@@ -100,7 +100,7 @@ class Customer extends Model
     {
         $services = DB::table("services")
             ->join("service_groups", "services.service_group_id", "=", "service_groups.id")
-            // ->where('service_groups.id','<>',Constants::MAHA_ESEVA_KENDRA_SERVICE_GROUP_ID)
+            ->where('service_groups.id','<>',Constants::MAHA_ESEVA_KENDRA_SERVICE_GROUP_ID)
             ->select("services.id", "services.name", "service_groups.name as groupName", "service_groups.photo as groupPhoto")
             ->get()
             ->groupBy('groupName');

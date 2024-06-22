@@ -198,10 +198,90 @@
                 <a href="{{ route('agent.dashboard') }}" class="btn btn-secondary m-2">Home</a>
                 <a href="{{ route('agent.application-request') }}" class="btn btn-secondary m-2">Application Requests</a>
             </div>
-            <div class="total-count">
-                <strong class="text-primary">Total : {{ $totalApplicationCount }} </strong>
+            
+        </div>
+        <form method="GET" action="">
+            @csrf
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-1">
+                    <strong>Filters:</strong>
+                </div>
+                
+                <div class="col-2">
+                    <div class="form-group">
+                        <label for="dateFrom">Date From:</label>
+                        <input type="date" class="form-control" id="dateFrom" name="dateFrom"
+                            value="{{ request('dateFrom') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="dateTo">Date To:</label>
+                        <input type="date" class="form-control" id="dateTo" name="dateTo"
+                            value="{{ request('dateTo') }}">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <select class="form-control" id="status" name="status">
+                            <option value="" selected>All</option>
+                            <option value="-1" {{ request('status') == -1 ? 'selected' : '' }}>Rejected
+                            </option>
+                            <option value="0" {{ request('status') === 0 ? 'selected' : '' }}>Initiated
+                            </option>
+                            <option value="1" {{ request('status') == 1 ? 'selected' : '' }}>In Progress
+                            </option>
+                            <option value="2" {{ request('status') == 2 ? 'selected' : '' }}>Completed</option>
+                            @if (!empty($statuses))
+                                @foreach ($statuses as $status)
+                                    <option value="{{ $status->id }}"
+                                        {{ request('status') === $status->id ? 'selected' : '' }}>
+                                        {{ $status->status_name }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Service Type:</label>
+                        <select class="form-control" id="status" name="price_type">
+                            <option value="" selected>All</option>
+                            <option value="default" {{ request('price_type') === "default" ? 'selected' : '' }}>Default
+                            </option>
+                            <option value="tatkal" {{ request('price_type') === "tatkal" ? 'selected' : '' }}>Tatkal
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="form-group">
+                        <label for="applicantName">Applicant Name:</label>
+                        <input type="text" class="form-control" id="applicantName" name="applicantName"
+                            value="{{ request('applicantName') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="services">Services:</label>
+                        <select class="form-control" id="services" name="services">
+                            <option value="" selected>All</option>
+                            @foreach ($services as $service)
+                                <option value="{{ $service->id }}"
+                                    {{ request('services') == $service->id ? 'selected' : '' }}>{{ $service->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="form-group">
+                        <label for="applicantNumber">Mobile Number:</label>
+                        <input type="number" class="form-control" id="applicantNumber" name="applicantNumber"
+                            value="{{ request('applicantNumber') }}">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-primary mt-3">Apply Filters</button></div>
             </div>
         </div>
+    </form>
 
         <table class="table table-striped mt-4">
             <thead>
