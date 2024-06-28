@@ -312,12 +312,15 @@ class AgentController extends Controller
             // Get the session lifetime from the configuration
             $sessionLifetime = config('session.lifetime');
 
+
             // Encrypt the agent's ID before storing it in the cookie
             $encryptedAgentId = Crypt::encrypt($agent->id);
-            $cookie = cookie('Agent_Session', $encryptedAgentId, $sessionLifetime);
+            $cookie1 = cookie('Agent_Session', $encryptedAgentId, $sessionLifetime);
+            $to_show_recharge_alert = $agent->balance < 80;
+            $cookie2 = cookie('recharge_alert', $to_show_recharge_alert, $sessionLifetime);
 
-            // Redirect with the custom cookie
-            return redirect()->intended('/agent/dashboard')->withCookie($cookie);
+            // Redirect with the custom cookies
+            return redirect()->intended('/agent/dashboard')->withCookies([$cookie1, $cookie2]);
         } else {
             // Authentication failed for agent
             return back()->withErrors(['username' => 'Invalid credentials'])->withInput($request->only('username'));
@@ -327,8 +330,6 @@ class AgentController extends Controller
     {
         // Check if the custom cookie exists
         if (Cookie::has('Agent_Session')) {
-            // The cookie exists, proceed to the admin dashboard
-            // Retrieve and decrypt the agent's ID from the cookie
             $encryptedAgentId = Cookie::get('Agent_Session');
             $agentId = Crypt::decrypt($encryptedAgentId);
             // Find the corresponding agent by their Id
@@ -373,9 +374,14 @@ class AgentController extends Controller
             $balance = DB::table('agents')
                 ->where('id', $agentId)
                 ->first(["balance"])->balance;
-
+            $recharge_alert = false;
+            if (Cookie::has('recharge_alert')) {
+                $recharge_alert = Cookie::get('recharge_alert');
+            }
+            $cookie = cookie('recharge_alert', null, -1);
             // Pass data to the view using compact, including the decrypted agent ID
-            return view('agent.dashboard', compact('serviceGroups', 'sumOfPrices', 'balance'));
+            $response = response()->view('agent.dashboard', compact('serviceGroups', 'sumOfPrices', 'balance', 'recharge_alert'));
+            return $response->withCookie($cookie);
         } else {
 
             return view('agent.login');
@@ -457,7 +463,6 @@ class AgentController extends Controller
             }
             if ($applicantNumber) {
                 $query->where('customers.mobile', 'like', '%' . $applicantNumber . '%');
-                
             }
             if ($status !== null && $status !== '') {
                 $query->where('applications.status', '=', $status);
@@ -495,7 +500,7 @@ class AgentController extends Controller
             // Calculate pending applications count
             $pendingApplicationsCount = $totalApplicationCount - $completedApplicationsCount;
 
-            return view("agent.applications", compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount', 'category','services','statuses'));
+            return view("agent.applications", compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount', 'category', 'services', 'statuses'));
         } else {
             return view('agent.login');
         }

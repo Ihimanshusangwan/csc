@@ -245,6 +245,15 @@
             });
         </script>
     @endif
+    @if($recharge_alert)
+        <script>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Your Account Balance is Low ! <br> Balance:  Rs. {{$balance}}',
+                showConfirmButton: true,
+            });
+        </script>
+    @endif
 </div>
 
 
