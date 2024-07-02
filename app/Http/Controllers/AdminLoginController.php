@@ -135,6 +135,34 @@ class AdminLoginController extends Controller
         // return view('admin.dashboard', compact('plans', 'locations', 'applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount'));
         return $applications->toJson();
     }
+    public function showFieldBoyDetails(Request $request)
+    {
+        // Check if the custom cookie exists
+        if (Cookie::has('Admin_Session')) {
+            // The cookie exists, proceed to the admin dashboard
+
+
+            $query = DB::table('fieldboys')
+            ->leftJoin('locations', 'fieldboys.location_id', '=', 'locations.id')
+            ->leftJoin('agents', 'fieldboys.referal_code', '=', 'agents.referral_code')
+            ->select(
+                'fieldboys.*',
+                'locations.district as city',
+                DB::raw('(SELECT COUNT(*) FROM agents WHERE agents.referral_code = fieldboys.referal_code) as referred_agent_count')
+            )
+            ->orderBy("fieldboys.id", "desc");
+        
+        // Fetch paginated applications
+        $fieldboys = $query->paginate(15);
+        
+
+            // Pass data to the view using compact
+            return view('admin.registeredFieldBoys', compact('fieldboys'));
+        } else {
+
+            return view('admin.login');
+        }
+    }
     public function showStaffDetails(Request $request)
     {
         // Check if the custom cookie exists

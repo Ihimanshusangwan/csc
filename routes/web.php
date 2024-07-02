@@ -35,6 +35,7 @@ Route::get('/admin/rejected-appointment', [AdminLoginController::class, 'rejecte
 Route::post('/admin/delete-data', [AdminLoginController::class, 'deleteData'])->name('admin.delete-data');
 Route::get('/admin/delete-data', [AdminLoginController::class, 'showDeleteForm'])->name('admin.delete-form');
 Route::get('admin/registered-staff', [AdminLoginController::class, 'showStaffDetails'])->name('admin.registered-staff');
+Route::get('admin/registered-fieldboy', [AdminLoginController::class, 'showFieldBoyDetails'])->name('admin.registered-fieldboy');
 Route::get('admin/applications/{category}', [AdminLoginController::class, 'applications'])->name('admin.applications');
 Route::get('admin/troubleshooter', [AdminLoginController::class, 'troubleshoot'])->name('admin.troubleshoot');
 Route::get('admin/bill', [AdminLoginController::class, 'showbill'])->name('admin.bill');
@@ -162,6 +163,13 @@ Route::post('statuses', [StatusController::class, 'store'])->name('statuses.stor
 use App\Http\Controllers\HomeController;
 
 Route::get('join-as-agent', [HomeController::class, 'registerAgent'])->name('home.register-agent');
+
+//Field boy controller 
+
+use App\Http\Controllers\FieldBoyController;
+Route::get('/register-fieldboy',[FieldBoyController::class,'create'])->name("fieldboy.create");
+Route::post('/register/fieldboy', [FieldBoyController::class, 'register'])->name('fieldboy.register');
+Route::get('/leaderboard', [FieldBoyController::class, 'generateLeaderBoard'])->name('admin.leaderboard');
 
 
 
