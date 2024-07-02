@@ -143,6 +143,14 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="exampleInputUsername"
+                                    class="form-label"><strong>Referral Code (Optional):</strong></label>
+                                <input type="text" class="form-control" name="referral_code"
+                                    placeholder="Enter Referral Code" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="exampleInputUsername"
                                     class="form-label"><strong>Username:</strong></label>
                                 <input required type="text" class="form-control" name="username"
                                     placeholder="Enter Username" />

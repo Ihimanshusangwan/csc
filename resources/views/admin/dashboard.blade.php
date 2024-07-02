@@ -43,6 +43,9 @@
                     <a class="nav-link" href="{{ route('admin.registered-staff') }}">Registered Staffs</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.registered-fieldboy') }}">Registered Field Boys</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ route('service-groups.index') }}">Manage Service Groups</a>
                 </li>
                 <li class="nav-item">
@@ -65,6 +68,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('staffs.create') }}">Register Staff</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('fieldboy.create') }}">Register Field Boy</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('admin.bill') }}">Create Bill</a>
