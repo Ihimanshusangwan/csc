@@ -44,6 +44,7 @@ class AgentController extends Controller
         $username = $request->input('username');
         $password = $request->input('password');
         $plan_id = $request->input('plan_id') ? $request->input('plan_id') : null;
+        $referral_code = $request->input('referral_code') ? $request->input('referral_code') : null;
         $location_id = $request->input('location_id');
         $password = $request->input('password');
         // Additional fields for the payment section
@@ -52,18 +53,18 @@ class AgentController extends Controller
         $paidAmount = ($type == 'Register') ? $request->input('paid_amount') : null;
         $unpaidAmount = ($type == 'Register') ? $request->input('unpaid_amount') : null;
 
-
-        $aadharPath = $this->uploadFile($request->file('upload_aadhar'), 'aadhar');
-        $shopLicensePath = $this->uploadFile($request->file('upload_shop_license'), 'shop_license');
-        $ownerPhotoPath = $this->uploadFile($request->file('upload_owner_photo'), 'owner_photo');
-        $uploadSupportingDocumentPath = $this->uploadFile($request->file('uploadSupportingDocument'), 'supporting_document');
-
         $existingUsername = DB::table('agents')->where('username', $username)->exists();
 
         // If the username already exists, return an error response
         if ($existingUsername) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'The username is already taken. Please choose a different one.']);
+            return redirect()->back()->withInput()->with(['error' => 'The username is already taken. Please choose a different one.']);
         }
+        if($referral_code){
+            $fieldboy = DB::table('fieldboys')->where('referal_code', $referral_code)->exists();
+            if(!$fieldboy){
+                return redirect()->back()->withInput()->with(['error' => 'The referral code is invalid']);
+            }
+            }
         if ($plan_id) {
             $planDuration = DB::table('plans')->where('id', '=', $plan_id)
                 ->select('duration')
@@ -74,6 +75,11 @@ class AgentController extends Controller
             $expirationDate = null;
         }
 
+
+        $aadharPath = $this->uploadFile($request->file('upload_aadhar'), 'aadhar');
+        $shopLicensePath = $this->uploadFile($request->file('upload_shop_license'), 'shop_license');
+        $ownerPhotoPath = $this->uploadFile($request->file('upload_owner_photo'), 'owner_photo');
+        $uploadSupportingDocumentPath = $this->uploadFile($request->file('uploadSupportingDocument'), 'supporting_document');
 
 
         // Save the data to the database using query builder
@@ -98,7 +104,9 @@ class AgentController extends Controller
             'owner_photo' => $ownerPhotoPath,
             'supporting_document' => $uploadSupportingDocumentPath,
             'purchase_date' => $purchaseDate,
-            'expiration_date' => $expirationDate
+            'reg_date' => now(),
+            'expiration_date' => $expirationDate,
+            'referral_code' => $referral_code,
         ]);
         return redirect()->back()->with(['success' => 'Registration successful']);
     }
