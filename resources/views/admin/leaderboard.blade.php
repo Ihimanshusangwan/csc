@@ -158,6 +158,17 @@
             <label for="end_date" class="form-label">End Date</label>
             <input type="date" class="form-control" id="end_date" name="end_date" value="{{ request()->get('end_date') }}">
         </div>
+        <div class="col-md-4">
+          <label for="services" class="form-label">Location:</label>
+          <select class="form-control" id="location" name="location">
+              <option value="" selected>All</option>
+              @foreach ($locations as $location)
+                  <option value="{{ $location->id }}"
+                      {{ request('location') == $location->id ? 'selected' : '' }}>{{ $location->district }} ({{$location->state}})
+                  </option>
+              @endforeach
+          </select>
+        </div>
         <div class="col-md-4 align-self-end">
             <button type="submit" class="btn btn-primary">Filter</button>
         </div>
