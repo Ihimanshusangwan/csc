@@ -103,6 +103,7 @@ Route::post('/agent/unhold', [AgentController::class, 'unhold'])->name('agents.u
 Route::get('admin/registered-agents', [AgentController::class, 'showAgentDetails'])->name('admin.registered-agents');
 Route::get('admin/requested-agents', [AgentController::class, 'showRequestedAgentDetails'])->name('admin.requested-agents');
 Route::post('/recharge/{id}', [AgentController::class, 'recharge'])->name('agent.recharge');
+Route::post('/update-plan-for-agent/{id}', [AgentController::class, 'update_plan'])->name('agent.update-plan');
 Route::get('/application-request', [AgentController::class, 'application_requests'])->name('agent.application-request');
 Route::get('/agent/recharge-history', [AgentController::class, 'rechargeHistory'])->name('agent.recharge-history');
 

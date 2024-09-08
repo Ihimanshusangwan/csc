@@ -59,12 +59,12 @@ class AgentController extends Controller
         if ($existingUsername) {
             return redirect()->back()->withInput()->with(['error' => 'The username is already taken. Please choose a different one.']);
         }
-        if($referral_code){
+        if ($referral_code) {
             $fieldboy = DB::table('fieldboys')->where('referal_code', $referral_code)->exists();
-            if(!$fieldboy){
+            if (!$fieldboy) {
                 return redirect()->back()->withInput()->with(['error' => 'The referral code is invalid']);
             }
-            }
+        }
         if ($plan_id) {
             $planDuration = DB::table('plans')->where('id', '=', $plan_id)
                 ->select('duration')
@@ -544,6 +544,27 @@ class AgentController extends Controller
 
         // Redirect back with a success message
         return back()->with('success', 'Recharge successful.');
+    }
+    public function update_plan(Request $request, $id)
+    {
+        $plan_id = $request->input('plan_id');
+        $planDuration = DB::table('plans')->where('id', '=', $plan_id)
+            ->select('duration')
+            ->get()[0]->duration;
+
+        $expirationDate = now()->addDays($planDuration)->toDateString();
+
+        DB::table('agents')
+            ->where('id', $id)
+            ->update([
+
+                'plan_id' => $plan_id,
+                'purchase_date' => now()->toDateString(),
+                'expiration_date' => $expirationDate
+            ]);
+
+        // Redirect back with a success message
+        return back()->with('success', 'Plan Updated Successfully ');
     }
     public function rechargeHistory(Request $request)
     {
