@@ -23,6 +23,7 @@ class PlanController extends Controller
                 'services.name as service_name',
                 'service_groups.name as service_group_name'
             )
+            ->orderBy('plans.id', 'desc')
             ->get();
 
         $groupedPlans = $plans->groupBy('plan_id');
