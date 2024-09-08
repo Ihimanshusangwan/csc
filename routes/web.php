@@ -91,6 +91,7 @@ use App\Http\Controllers\PlanController;
 Route::get('/plans', [PlanController::class, 'index'])->name('plans.index');
 Route::post('/plans', [PlanController::class, 'store'])->name('plans.store');
 Route::delete('/plans/{id}', [PlanController::class, 'destroy'])->name('plans.destroy');
+Route::put('/plans/{id}', [PlanController::class, 'update'])->name('plans.update');
 
 //agent routes
 
