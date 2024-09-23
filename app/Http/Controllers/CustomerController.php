@@ -26,6 +26,7 @@ class CustomerController extends Controller
                     'applications.*',
                     'services.name as service_name',
                     'agents.full_name as agent_name',
+                    'agents.shop_name as shop_name',
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color , ":" , ask_reason)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");

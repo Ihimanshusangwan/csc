@@ -31,6 +31,7 @@ class Customer extends Model
                 'applications.receipt',
                 'services.name as service_name',
                 'agents.full_name as agent_name',
+                'agents.shop_name as shop_name',
                 DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color , ":" , ask_reason)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
             )
             ->orderBy("applications.id", "desc");
@@ -39,6 +40,7 @@ class Customer extends Model
         foreach ($result as $application) {
             $data = [];
             $data['agentName'] =  $application->agent_name;
+            $data['shopName'] =  $application->shop_name;
             $data['service'] =  $application->service_name;
             $data['applyDate'] =  $application->apply_date;
             $data['deliveryDate'] = ($application->delivery_date) ? $application->delivery_date : 'Not yet determined';

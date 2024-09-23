@@ -152,7 +152,7 @@
     @foreach($recharges as $index => $recharge)
         <tr class='text-center'>
             <td>{{ $index + 1 }}</td>
-            <td>{{ $recharge->agent_name }}</td>
+            <td>{{$recharge->shop_name}} ( {{ $recharge->agent_name }} )</td>
             <td>{{ $recharge->created_at }}</td>
             <td class="text-danger"> &#8377;{{ $recharge->balance_before }}</td>
             <td class="text-success"> &#8377;{{ $recharge->amount }}</td>
