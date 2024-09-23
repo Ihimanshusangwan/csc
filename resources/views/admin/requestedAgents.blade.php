@@ -158,7 +158,7 @@
         @php $counter = 1; @endphp @foreach ($agents as $agent)
             <tr class="text-center">
                 <th scope="row">{{ $counter++ }}</th>
-                <td>{{ $agent->full_name }}</td>
+                <td>{{ $agent->full_name }}( {{ $agent->shop_name }} )</td>
                 <td>{{ $agent->reg_date }}</td>
                 <td>
                     <span style="cursor: pointer" class="material-icons" data-toggle="modal"

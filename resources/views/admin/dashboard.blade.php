@@ -236,7 +236,7 @@
                     <tr class="text-center">
                         <th scope="row">{{ $counter++ }}</th>
                         <td>{{ $application->customer_name }}</td>
-                        <td>{{ $application->agent_name }}</td>
+                        <td>{{$application->shop_name}} ( {{ $application->agent_name }} )</td>
                         <td>{{ $application->apply_date }}</td>
                         <td>
                             <form action="{{ route('application.update') }}" method="post"
