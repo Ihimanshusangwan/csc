@@ -34,6 +34,7 @@ class AdminLoginController extends Controller
                     'customers.name as customer_name',
                     'customers.mobile as customer_mobile',
                     'agents.full_name as agent_name',
+                    'agents.shop_name as shop_name',
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color , ":" , ask_reason)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
@@ -103,6 +104,7 @@ class AdminLoginController extends Controller
                 'customers.name as customer_name',
                 'customers.mobile as customer_mobile',
                 'agents.full_name as agent_name',
+                'agents.shop_name as shop_name',
                 DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ";" , ask_reason)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
             )
             ->orderBy("applications.id", "desc");
@@ -262,6 +264,7 @@ class AdminLoginController extends Controller
                     'customers.name as customer_name',
                     'customers.mobile as customer_mobile',
                     'agents.full_name as agent_name',
+                    'agents.shop_name as shop_name',
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , ask_reason)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
@@ -348,6 +351,7 @@ class AdminLoginController extends Controller
                     'customers.name as customer_name',
                     'customers.mobile as customer_mobile',
                     'agents.full_name as agent_name',
+                    'agents.shop_name as shop_name',
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" ,color, ":" , ask_reason)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
@@ -451,6 +455,7 @@ class AdminLoginController extends Controller
             ->select(
                 'recharges.*',
                 'agents.full_name as agent_name',
+                'agents.shop_name as shop_name',
             )
             ->orderBy("recharges.id", "desc");
 
@@ -581,6 +586,7 @@ class AdminLoginController extends Controller
                     'customers.name as customer_name',
                     'customers.mobile as customer_mobile',
                     'agents.full_name as agent_name',
+                    'agents.shop_name as shop_name',
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , ask_reason)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");

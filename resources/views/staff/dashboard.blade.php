@@ -52,7 +52,8 @@
         </div>
         <div class="row">
             <div class="col-3">
-                <a class="total-registration background-total-registration" href="{{route('staff.dashboard',[ 'category' => 'all'])}}">
+                <a class="total-registration background-total-registration"
+                    href="{{ route('staff.dashboard', ['category' => 'all']) }}">
                     <div class="align">
                         <div class="registration-text">Total Applications</div>
                         <div class="count">{{ $totalApplicationCount }}</div>
@@ -61,7 +62,8 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="total-registration todays-registration" href="{{route('staff.dashboard',[ 'category' => 'today'])}}">
+                <a class="total-registration todays-registration"
+                    href="{{ route('staff.dashboard', ['category' => 'today']) }}">
                     <div class="align">
                         <div class="registration-text">Today's Applications</div>
                         <div class="count">{{ $countOfTodaysApplications }}</div>
@@ -70,7 +72,7 @@
                 </a>
             </div>
             <div class="col-3">
-                <div class="total-registration background-process-completed" >
+                <div class="total-registration background-process-completed">
                     <div class="align">
                         <div class="registration-text">Completed Applications</div>
                         <div class="count">{{ $completedApplicationsCount }}</div>
@@ -79,7 +81,8 @@
                 </div>
             </div>
             <div class="col-3">
-                <a class="total-registration background-pending" href="{{route('staff.dashboard',[ 'category' => 'pending'])}}">
+                <a class="total-registration background-pending"
+                    href="{{ route('staff.dashboard', ['category' => 'pending']) }}">
                     <div class="align">
                         <div class="registration-text">Pending Applications</div>
                         <div class="count"> {{ $pendingApplicationsCount }}</div>
@@ -88,7 +91,7 @@
                 </a>
             </div>
         </div>
-        <h3 class="mt-4 text-center">{{ucfirst($category) . "'s"}} Applications</h3>
+        <h3 class="mt-4 text-center">{{ ucfirst($category) . "'s" }} Applications</h3>
         <div class="sort-filter">
             <div class="dropdowns">
                 <div class="dropdown">
@@ -158,7 +161,7 @@
                     <tr class="text-center">
                         <th scope="row">{{ $counter++ }}</th>
                         <td>{{ $application->customer_name }}</td>
-                        <td>{{ $application->agent_name }}</td>
+                        <td>{{ $application->shop_name }} ( {{ $application->agent_name }} )</td>
                         <td>{{ $application->apply_date }}</td>
                         <td>
                             <form action="{{ route('application.update') }}" method="post"
@@ -197,7 +200,8 @@
                                         @endphp
 
                                         @if ($id !== null && $statusName !== null)
-                                            <option value="{{ $id }}" style="color: {{ $statuscolor }};" data-ask_reason="{{$askReason}}"
+                                            <option value="{{ $id }}" style="color: {{ $statuscolor }};"
+                                                data-ask_reason="{{ $askReason }}"
                                                 {{ $application->status == $id ? 'selected' : '' }}>
                                                 {{ $statusName }}</option>
                                         @endif
@@ -284,7 +288,7 @@
                                         </h5>
                                     </div>
                                     <div class="modal-body">
-                                        <p><strong>Mobile Number:</strong> {{$application->customer_mobile}}</p>
+                                        <p><strong>Mobile Number:</strong> {{ $application->customer_mobile }}</p>
                                         @php
                                             $formData = json_decode($application->form_data, true);
                                             $i = 1;

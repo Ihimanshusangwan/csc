@@ -71,7 +71,7 @@
                 @php   $counter = 1; @endphp @foreach ($applications as $application)
                     <tr class="text-center">
                         <th scope="row">{{ $counter++ }}</th>
-                        <td>{{ $application->agent_name }}</td>
+                        <td>{{$application->shop_name}} ( {{ $application->agent_name }} )</td>
                         <td>{{ $application->service_name }}</td>
                         <td>{{ $application->apply_date }}</td>
                         <td>
