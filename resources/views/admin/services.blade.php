@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>        
+    <title>Home Page</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 
@@ -51,6 +51,7 @@
                             </ol>
 
                             <!-- Button to Preview Form -->
+                            <a href="{{ route('services.edit', $service->id) }}" class="btn btn-warning">Edit</a>
                             <button type="button" class="btn btn-warning m-1"
                                 onclick="previewServiceForm('{{ addslashes($service->form) }}')">Preview Form</button>
                             <a href="{{ route('services.delete', $service->id) }}" class="btn btn-danger m-1"
@@ -78,17 +79,19 @@
                             </div>
                             <h6>Availability</h6>
                             <div class="btn-group" role="group" aria-label="Basic example"
-                            id="availability-btn-group-{{ $service->id }}">
-                            <button type="button"
-                                class="btn btn-sm btn-secondary {{ $service->availability == 1 ? 'active' : '' }}"
-                                data-route="{{ route('update-availability', ['serviceId' => $service->id]) }}"
-                                onclick="handleAvailability(this, {{ $service->id }}, 1)">Subscription only</button>
-                            <button type="button"
-                                class="btn btn-sm btn-secondary {{ $service->availability == 2 ? 'active' : '' }}"
-                                data-route="{{ route('update-availability', ['serviceId' => $service->id]) }}"
-                                onclick="handleAvailability(this, {{ $service->id }}, 2)">With and Without Subscription</button>
-                            
-                        </div>
+                                id="availability-btn-group-{{ $service->id }}">
+                                <button type="button"
+                                    class="btn btn-sm btn-secondary {{ $service->availability == 1 ? 'active' : '' }}"
+                                    data-route="{{ route('update-availability', ['serviceId' => $service->id]) }}"
+                                    onclick="handleAvailability(this, {{ $service->id }}, 1)">Subscription
+                                    only</button>
+                                <button type="button"
+                                    class="btn btn-sm btn-secondary {{ $service->availability == 2 ? 'active' : '' }}"
+                                    data-route="{{ route('update-availability', ['serviceId' => $service->id]) }}"
+                                    onclick="handleAvailability(this, {{ $service->id }}, 2)">With and Without
+                                    Subscription</button>
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -108,7 +111,7 @@
                     </div>
                     <div class="modal-body">
                         <!-- Service Form -->
-                        <form method="POST" action="{{ route('services.store') }}">
+                        <form method="POST" action="{{ route('services.store') }}" id='add-new-service'>
                             @csrf
 
                             <!-- Service Name -->
@@ -177,7 +180,7 @@
 
 
     </div>
-    
+
     <script src="{{ asset('js/sweetAlert.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
@@ -237,6 +240,7 @@
                     // Handle errors
                 });
         }
+
         function handleAvailability(button, serviceId, availabilityId) {
             // Get the button group element
             const buttonGroup = button.parentElement;
@@ -348,6 +352,11 @@
                 // console.log(JSON.stringify(formData));
             }
 
+            document.getElementById("add-new-service").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            updateFormData(); // Update the form data before submission
+            this.submit(); // Now submit the form
+        });
 
             formFieldsContainer.addEventListener("change", function(event) {
                 const target = event.target;
@@ -373,7 +382,7 @@
                     formPreviewHTML += '<div class="form-group col-md-4">';
                     formPreviewHTML += `<label>${field.label}</label>`;
 
-                    if (["text", "textarea", "date"].includes(field.type)) {
+                    if (["text", "textarea", "date", "number"].includes(field.type)) {
                         formPreviewHTML += `<input type="${field.type}" class="form-control">`;
                     } else if (["selectbox"].includes(field.type)) {
                         formPreviewHTML += '<select class="form-control">';
@@ -421,7 +430,7 @@
                 formPreviewHTML += '<div class="form-group col-md-4">';
                 formPreviewHTML += `<label>${field.label}</label>`;
 
-                if (["text", "textarea", "date"].includes(field.type)) {
+                if (["text", "textarea", "date", "number"].includes(field.type)) {
                     formPreviewHTML += `<input type="${field.type}" class="form-control">`;
                 } else if (["selectbox"].includes(field.type)) {
                     formPreviewHTML += '<select class="form-control">';

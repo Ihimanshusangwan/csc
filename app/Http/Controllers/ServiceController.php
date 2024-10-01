@@ -73,5 +73,33 @@ class ServiceController extends Controller
         // Return response
         return response()->json(['message' => 'Availability updated successfully'], 200);
     }
+    public function edit($id)
+{
+    $service = DB::table('services')->where('id', $id)->first();
+    $serviceGroups = DB::table('service_groups')->get();
+
+    return view('services.edit', compact('service', 'serviceGroups'));
+}
+
+public function update(Request $request, $id)
+{
+    $validatedData = $request->validate([
+        'name' => 'required|string|max:255',
+        'service_group_id' => 'required|integer',
+        'requirements' => 'required|string',
+        'form' => 'required|string',
+    ]);
+
+    DB::table('services')->where('id', $id)->update([
+        'name' => $validatedData['name'],
+        'service_group_id' => $validatedData['service_group_id'],
+        'requirements' => $validatedData['requirements'],
+        'form' => $validatedData['form'],
+        'updated_at' => now(),
+    ]);
+
+    return redirect()->route('services.index')->with('success', 'Service updated successfully');
+}
+
 
 }
