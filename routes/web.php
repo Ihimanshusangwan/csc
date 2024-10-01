@@ -65,6 +65,11 @@ Route::post('/services', [ServiceController::class, 'store'])->name('services.st
 Route::get('services/{id}/delete', [ServiceController::class, 'destroy'])->name('services.delete');
 Route::post('/update-visibility/{serviceId}', [ServiceController::class, 'updateVisibility'])->name('update-visibility');
 Route::post('/update-availability/{serviceId}', [ServiceController::class, 'updateAvailability'])->name('update-availability');
+// Show the edit form for a specific service
+Route::get('/services/{id}/edit', [ServiceController::class, 'edit'])->name('services.edit');
+
+// Handle the edit form submission
+Route::put('/services/{id}', [ServiceController::class, 'update'])->name('services.update');
 
 
 // location routes
