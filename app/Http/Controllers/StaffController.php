@@ -70,14 +70,13 @@ class StaffController extends Controller
             $encryptedStaffId = Cookie::get('Staff_Session');
             $staffId = Crypt::decrypt($encryptedStaffId);
             $query = DB::table('applications')
-                ->where('applications.staff_id', $staffId)->where(function ($query) {
-                    $query->whereDate("applications.delivery_date", ">=", today()->toDateString())
-                        ->orWhereNull("applications.delivery_date");
-                })
+                ->where('applications.staff_id', $staffId)
                 ->join('customers', 'applications.customer_id', '=', 'customers.id')
                 ->join('services', 'applications.service_id', '=', 'services.id')
                 ->join('agents', 'applications.agent_id', '=', 'agents.id')
                 ->where('applications.is_approved', '=', 1)
+                ->where('applications.status', '!=', 2)
+                ->where('applications.status', '!=', -1)
                 ->select(
                     'applications.*',
                     'services.name as service_name',
