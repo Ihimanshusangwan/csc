@@ -200,6 +200,7 @@
                 <th scope="col">Details</th>
                 <th scope="col">Recharge</th>
                 <th scope="col">Change Plan</th>
+                <th scope="col">Delete</th>
             </tr>
         </thead>
         <tbody>
@@ -260,6 +261,12 @@
                         <button style="cursor: pointer" class="btn btn-success btn-sm" data-toggle="modal"
                             data-target="#agentPlanUpdateModal{{ $agent->id }}">
                             Update Plan
+                        </button>
+                    </td>
+                    <td>
+                        <button style="cursor: pointer" class="btn btn-danger" data-toggle="modal"
+                            data-target="#agentDelete{{ $agent->id }}">
+                            Delete
                         </button>
                     </td>
 
@@ -343,6 +350,37 @@
                                         </div>
                                         <button type="submit" class="btn btn-primary">Recharge</button>
                                     </form>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- deletion modal -->
+                    <div class="modal fade" id="agentDelete{{ $agent->id }}" tabindex="-1" role="dialog"
+                        aria-labelledby="agentModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <span class="text-danger">This action can't be reverted ! please provide a valid
+                                        reason for deleting !</span>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{{ route('agent.delete', ['id' => $agent->id]) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <div class="form-group">
+                                            <label for="delete_reason">Reason:</label>
+                                            <textarea class="form-control" id="delete_reason" name="delete_reason" required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger m-2">Delete</button>
+                                    </form>
+
                                 </div>
 
                                 <div class="modal-footer">

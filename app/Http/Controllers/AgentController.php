@@ -124,6 +124,7 @@ class AgentController extends Controller
                 'locations.state'
             )
             ->where("agents.type", "=", "Register")
+            ->where('agents.is_deleted', 0)
             ->orderBy("agents.id", "desc");
 
         $earnings = DB::table('agents')
@@ -312,6 +313,7 @@ class AgentController extends Controller
         // Attempt to authenticate using query builder
         $agent = DB::table('agents')
             ->where('username', $credentials['username'])
+            ->where('is_deleted', 0)
             ->first();
 
         if ($agent && $credentials['password'] == $agent->password) {
@@ -544,6 +546,18 @@ class AgentController extends Controller
 
         // Redirect back with a success message
         return back()->with('success', 'Recharge successful.');
+    }
+    public function delete(Request $request, $id)
+    {
+        $reason = $request->input('delete_reason');
+        DB::table('agents')
+            ->where('id', $id)
+            ->update([
+                'is_deleted' => 1,
+                'delete_reason' => $reason,
+            ]);
+
+        return back()->with('success', 'Deleted successful.');
     }
     public function update_plan(Request $request, $id)
     {
