@@ -202,7 +202,7 @@ class ApplyServiceController extends Controller
                     'updated_at' => now(),
                 ]);
 
-                // Commit the transaction
+                // Commit the transaction 
                 DB::commit();
                 return redirect()->route('agent.dashboard')->with('success', 'Application submitted successfully!');
             } catch (\Exception $e) {
@@ -212,7 +212,7 @@ class ApplyServiceController extends Controller
                 // Handle the exception, log it, etc.
                 return redirect()->route('agent.dashboard')->with('error', 'An error occurred while submitting the application.');
             }
-        } else {
+        } else {// test
 
             return view('agent.login');
         }
