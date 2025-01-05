@@ -167,7 +167,6 @@ class AdminLoginController extends Controller
     }
     public function showStaffDetails(Request $request)
     {
-        // Check if the custom cookie exists
         if (Cookie::has('Admin_Session')) {
             // The cookie exists, proceed to the admin dashboard
 
@@ -176,11 +175,16 @@ class AdminLoginController extends Controller
                 ->leftJoin('staffs_services', 'staff.id', '=', 'staffs_services.staff_id')
                 ->leftJoin('services', 'staffs_services.service_id', '=', 'services.id')
                 ->select(
-                    'staff.*',
+                    'staff.id',
+                    'staff.username',
+                    'staff.name',
+                    'staff.mobile',
+                    'staff.created_at',
+                    'staff.password',
                     'locations.district as city',
                     DB::raw("GROUP_CONCAT(services.name ORDER BY services.name SEPARATOR ', ') as services")
                 )
-                ->groupBy('staff.id');
+                ->groupBy('staff.id', 'staff.username', 'staff.name', 'staff.mobile', 'locations.district');
 
             // Fetch paginated staff details
             $staffs = $query->paginate(15);
