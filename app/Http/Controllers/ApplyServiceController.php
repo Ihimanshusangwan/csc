@@ -95,51 +95,49 @@ class ApplyServiceController extends Controller
                 }
             }
             $latestStaffId = DB::table('applications')
-                ->where('service_group_id', $serviceGroupId)
                 ->where('location_id', $locationId)
                 ->latest()
                 ->value('staff_id');
 
-            // Retrieve all staff IDs
-            $staffIds = DB::table('staff')
-                ->where('location_id', $locationId)
-                ->where('service_group_id', $serviceGroupId)
-                ->pluck('id')
+            $staffIds = DB::table('staffs_services')
+                ->join('staff', 'staffs_services.staff_id', '=', 'staff.id')
+                ->where('staff.location_id', $locationId)
+                ->where('staffs_services.service_id', $id)
+                ->pluck('staff.id')
                 ->toArray();
 
-            // Check if the staff IDs array is empty
             if (count($staffIds) > 0) {
-                // Find the index of the last staff ID in the array
                 $lastStaffIdIndex = array_search($latestStaffId, $staffIds);
 
-                // Calculate the index of the next staff ID
-                $nextStaffIdIndex = ($lastStaffIdIndex + 1) % count($staffIds);
-
-                // Get the next staff ID
-                $nextStaffId = $staffIds[$nextStaffIdIndex];
+                if ($lastStaffIdIndex === false) {
+                    $nextStaffId = $staffIds[0];
+                } else {
+                    $nextStaffIdIndex = ($lastStaffIdIndex + 1) % count($staffIds);
+                    $nextStaffId = $staffIds[$nextStaffIdIndex];
+                }
             } else {
-                // If the array is empty, set the next staff ID to null
                 $nextStaffId = null;
             }
+
             try {
                 // Start a transaction
                 DB::beginTransaction();
 
-                $customer = DB::table('customers')->where('mobile', '=' , $request->input('mobileNumber'))->first();
-                if($customer){
+                $customer = DB::table('customers')->where('mobile', '=', $request->input('mobileNumber'))->first();
+                if ($customer) {
                     $customerId = $customer->id;
-                }else{
+                } else {
                     // Create a new customer record
-                $customerId = DB::table('customers')->insertGetId([
-                    'name' => $request->input('customerName'),
-                    'mobile' => $request->input('mobileNumber'),
-                    'agent_id' => $agentId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                    $customerId = DB::table('customers')->insertGetId([
+                        'name' => $request->input('customerName'),
+                        'mobile' => $request->input('mobileNumber'),
+                        'agent_id' => $agentId,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
                 }
 
-                
+
                 // Get all form input data excluding specific fields
                 $formData = $request->except('_token', 'customerName', 'mobileNumber');
 
