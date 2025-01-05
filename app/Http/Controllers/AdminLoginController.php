@@ -184,7 +184,7 @@ class AdminLoginController extends Controller
                     'locations.district as city',
                     DB::raw("GROUP_CONCAT(services.name ORDER BY services.name SEPARATOR ', ') as services")
                 )
-                ->groupBy('staff.id', 'staff.username', 'staff.name', 'staff.mobile', 'locations.district');
+                ->groupBy('staff.id', 'staff.username', 'staff.name', 'staff.mobile', 'locations.district', 'staff.password', 'staff.created_at');
 
             // Fetch paginated staff details
             $staffs = $query->paginate(15);
