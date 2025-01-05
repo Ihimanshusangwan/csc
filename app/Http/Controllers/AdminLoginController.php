@@ -44,23 +44,23 @@ class AdminLoginController extends Controller
             // dd($applications);
             // Get sum of all price column
             $sumOfPrices = DB::table('applications')
-            ->where('applications.is_approved', '=', 1)
+                ->where('applications.is_approved', '=', 1)
                 ->sum('price');
 
             // Get count of today's applications
             $countOfTodaysApplications = DB::table('applications')
-            ->where('applications.is_approved', '=', 1)
+                ->where('applications.is_approved', '=', 1)
                 ->whereDate('apply_date', now()->toDateString())
                 ->count();
 
             // Get total application count
             $totalApplicationCount = DB::table('applications')
-            ->where('applications.is_approved', '=', 1)
+                ->where('applications.is_approved', '=', 1)
                 ->count();
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')
-            ->where('applications.is_approved', '=', 1)
+                ->where('applications.is_approved', '=', 1)
                 ->where('status', 2)
                 ->count();
 
@@ -145,18 +145,18 @@ class AdminLoginController extends Controller
 
 
             $query = DB::table('fieldboys')
-            ->leftJoin('locations', 'fieldboys.location_id', '=', 'locations.id')
-            ->leftJoin('agents', 'fieldboys.referal_code', '=', 'agents.referral_code')
-            ->select(
-                'fieldboys.*',
-                'locations.district as city',
-                DB::raw('(SELECT COUNT(*) FROM agents WHERE agents.referral_code = fieldboys.referal_code) as referred_agent_count')
-            )
-            ->orderBy("fieldboys.id", "desc");
-        
-        // Fetch paginated applications
-        $fieldboys = $query->paginate(15);
-        
+                ->leftJoin('locations', 'fieldboys.location_id', '=', 'locations.id')
+                ->leftJoin('agents', 'fieldboys.referal_code', '=', 'agents.referral_code')
+                ->select(
+                    'fieldboys.*',
+                    'locations.district as city',
+                    DB::raw('(SELECT COUNT(*) FROM agents WHERE agents.referral_code = fieldboys.referal_code) as referred_agent_count')
+                )
+                ->orderBy("fieldboys.id", "desc");
+
+            // Fetch paginated applications
+            $fieldboys = $query->paginate(15);
+
 
             // Pass data to the view using compact
             return view('admin.registeredFieldBoys', compact('fieldboys'));
@@ -171,27 +171,28 @@ class AdminLoginController extends Controller
         if (Cookie::has('Admin_Session')) {
             // The cookie exists, proceed to the admin dashboard
 
-
             $query = DB::table('staff')
                 ->leftJoin('locations', 'staff.location_id', '=', 'locations.id')
-                ->leftJoin('service_groups', 'staff.service_group_id', '=', 'service_groups.id')
+                ->leftJoin('staffs_services', 'staff.id', '=', 'staffs_services.staff_id')
+                ->leftJoin('services', 'staffs_services.service_id', '=', 'services.id')
                 ->select(
                     'staff.*',
                     'locations.district as city',
-                    'service_groups.name as service_group_name'
+                    DB::raw("GROUP_CONCAT(services.name ORDER BY services.name SEPARATOR ', ') as services")
                 )
-                ->orderBy("staff.id", "desc");
+                ->groupBy('staff.id');
 
-            // Fetch paginated applications
+            // Fetch paginated staff details
             $staffs = $query->paginate(15);
 
             // Pass data to the view using compact
             return view('admin.registeredStaff', compact('staffs'));
         } else {
-
+            // Redirect to login if the cookie does not exist
             return view('admin.login');
         }
     }
+
 
     // Display the login form
     public function showLoginForm()
@@ -299,13 +300,13 @@ class AdminLoginController extends Controller
 
             // Get total application count
             $totalApplicationCount = DB::table('applications')
-            ->where('applications.is_approved', '=', 1)
+                ->where('applications.is_approved', '=', 1)
                 ->where('agent_id', $id)
                 ->count();
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')
-            ->where('applications.is_approved', '=', 1)
+                ->where('applications.is_approved', '=', 1)
                 ->where('applications.agent_id', $id)->Where('applications.status', '==', 2)
                 ->count();
 
@@ -614,18 +615,18 @@ class AdminLoginController extends Controller
 
             // Get count of today's applications
             $countOfTodaysApplications = DB::table('applications')
-            ->where('applications.is_approved', '=', 1)
+                ->where('applications.is_approved', '=', 1)
                 ->whereDate('apply_date', now()->toDateString())
                 ->count();
 
             // Get total application count
             $totalApplicationCount = DB::table('applications')
-            ->where('applications.is_approved', '=', 1)
+                ->where('applications.is_approved', '=', 1)
                 ->count();
 
             // Get completed applications count which have delivery date less than today
             $completedApplicationsCount = DB::table('applications')->Where('applications.status', '==', 2)
-            ->where('applications.is_approved', '=', 1)
+                ->where('applications.is_approved', '=', 1)
                 ->count();
 
             // Calculate pending applications count

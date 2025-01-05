@@ -158,7 +158,7 @@ class Customer extends Model
         $agent_id = $request->input('agent_id');
         $location_id = DB::table('agents')->where('id', $agent_id)->value('location_id');
         $service = DB::table('services')->where('id', $service_id)->select('requirements', 'service_group_id')->first();
-        $nextStaffId = Staff::get_staff_id($service->service_group_id, $location_id);
+        $nextStaffId = Staff::get_staff_id($service_id, $location_id);
         $requirements = [];
         $requirements_from_service = explode(',', $service->requirements);
         foreach ($requirements_from_service as $doc) {
