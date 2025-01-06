@@ -115,6 +115,9 @@
             <div class="dashboard-content">
                 <span class="material-icons home-icon"> home </span>
                 <h3 class="dashboard">Admin Dashboard</h3>
+                <a href="{{ route('admin.configurations.index') }}" class="btn btn-primary btn-sm mx-5">Go to
+                    Configurations</a>
+
             </div>
             <div class="background-points">
                 <div class="points">Total Earnings: &#8377;{{ $sumOfPrices }}</div>
@@ -236,7 +239,7 @@
                     <tr class="text-center">
                         <th scope="row">{{ $counter++ }}</th>
                         <td>{{ $application->customer_name }}</td>
-                        <td>{{$application->shop_name}} ( {{ $application->agent_name }} )</td>
+                        <td>{{ $application->shop_name }} ( {{ $application->agent_name }} )</td>
                         <td>{{ $application->apply_date }}</td>
                         <td>
                             <form action="{{ route('application.update') }}" method="post"

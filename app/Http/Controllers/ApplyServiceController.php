@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Configuration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cookie;
@@ -47,7 +48,6 @@ class ApplyServiceController extends Controller
     }
     public function submitForm(Request $request, $id)
     {
-
         if (Cookie::has('Agent_Session')) {
             // Retrieve and decrypt the agent's ID from the cookie
             $encryptedAgentId = Cookie::get('Agent_Session');
@@ -94,6 +94,10 @@ class ApplyServiceController extends Controller
                     $tax = ($prices->tatkal_govt_price * $prices->tatkal_tax_percentage / 100);
                 }
             }
+            if ($request->input('photo_charge')) {
+                $photoMakingCharge = (int)Configuration::getValue('photo_making_charge');
+                $totalPrice += $photoMakingCharge;
+            }
             $latestStaffId = DB::table('applications')
                 ->where('service_group_id', $serviceGroupId)
                 ->where('location_id', $locationId)
@@ -125,21 +129,21 @@ class ApplyServiceController extends Controller
                 // Start a transaction
                 DB::beginTransaction();
 
-                $customer = DB::table('customers')->where('mobile', '=' , $request->input('mobileNumber'))->first();
-                if($customer){
+                $customer = DB::table('customers')->where('mobile', '=', $request->input('mobileNumber'))->first();
+                if ($customer) {
                     $customerId = $customer->id;
-                }else{
+                } else {
                     // Create a new customer record
-                $customerId = DB::table('customers')->insertGetId([
-                    'name' => $request->input('customerName'),
-                    'mobile' => $request->input('mobileNumber'),
-                    'agent_id' => $agentId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                    $customerId = DB::table('customers')->insertGetId([
+                        'name' => $request->input('customerName'),
+                        'mobile' => $request->input('mobileNumber'),
+                        'agent_id' => $agentId,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
                 }
 
-                
+
                 // Get all form input data excluding specific fields
                 $formData = $request->except('_token', 'customerName', 'mobileNumber');
 
