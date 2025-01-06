@@ -44,7 +44,8 @@
         <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary m-2">Home</a>
         <div class="row">
             <div class="col-3">
-                <a class="total-registration background-total-registration" href="{{route('admin.applications',[ 'category' => 'all'])}}">
+                <a class="total-registration background-total-registration"
+                    href="{{ route('admin.applications', ['category' => 'all']) }}">
                     <div class="align">
                         <div class="registration-text">Total Applications</div>
                         <div class="count">{{ $totalApplicationCount }}</div>
@@ -53,7 +54,8 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="total-registration todays-registration" href="{{route('admin.applications',[ 'category' => 'today'])}}">
+                <a class="total-registration todays-registration"
+                    href="{{ route('admin.applications', ['category' => 'today']) }}">
                     <div class="align">
                         <div class="registration-text">Today's Applications</div>
                         <div class="count">{{ $countOfTodaysApplications }}</div>
@@ -62,7 +64,8 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="total-registration background-process-completed" href="{{route('admin.applications',[ 'category' => 'completed'])}}">
+                <a class="total-registration background-process-completed"
+                    href="{{ route('admin.applications', ['category' => 'completed']) }}">
                     <div class="align">
                         <div class="registration-text">Completed Applications</div>
                         <div class="count">{{ $completedApplicationsCount }}</div>
@@ -71,7 +74,8 @@
                 </a>
             </div>
             <div class="col-3">
-                <a class="total-registration background-pending" href="{{route('admin.applications',[ 'category' => 'pending'])}}">
+                <a class="total-registration background-pending"
+                    href="{{ route('admin.applications', ['category' => 'pending']) }}">
                     <div class="align">
                         <div class="registration-text">Pending Applications</div>
                         <div class="count"> {{ $pendingApplicationsCount }}</div>
@@ -80,7 +84,7 @@
                 </a>
             </div>
         </div>
-        <h3 class="mt-4 text-center">{{ucfirst($category) . "'s"}} Applications</h3>
+        <h3 class="mt-4 text-center">{{ ucfirst($category) . "'s" }} Applications</h3>
         <div class="sort-filter">
 
 
@@ -102,7 +106,7 @@
                     <th scope="col">Ruppes(&#8377;)</th>
                     <th scope="col">Upload Document</th>
                     <th scope="col">Upload Receipt</th>
-                    <th scope="col">Action</th>
+                    <th scope="col" colspan="2">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -149,7 +153,8 @@
                                         @endphp
 
                                         @if ($id !== null && $statusName !== null)
-                                            <option value="{{ $id }}" style="color: {{ $statuscolor }};" data-ask_reason="{{$askReason}}"
+                                            <option value="{{ $id }}" style="color: {{ $statuscolor }};"
+                                                data-ask_reason="{{ $askReason }}"
                                                 {{ $application->status == $id ? 'selected' : '' }}>
                                                 {{ $statusName }}</option>
                                         @endif
@@ -226,6 +231,16 @@
                         </td>
                         </form>
 
+                        <td>
+                            <form action="{{ route('applications.destroy', $application->id) }}" method="POST"
+                                onsubmit="return confirm('Are you sure you want to delete this application?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+
+                        </td>
+
 
                         <!-- Modal -->
                         <div class="modal fade" id="agentModal{{ $application->id }}" tabindex="-1" role="dialog"
@@ -238,7 +253,7 @@
                                         </h5>
                                     </div>
                                     <div class="modal-body">
-                                        <p><strong>Mobile Number:</strong> {{$application->customer_mobile}}</p>
+                                        <p><strong>Mobile Number:</strong> {{ $application->customer_mobile }}</p>
                                         @php
                                             $formData = json_decode($application->form_data, true);
                                             $i = 1;
@@ -246,7 +261,8 @@
                                         @foreach ($formData as $category => $fields)
                                             @if (strtolower($category) !== 'service_id' && strtolower($category) !== 'filepaths')
                                                 @foreach ($fields as $key => $value)
-                                                    @phpif ($i == 1) {
+                                                    @php
+                                                        if ($i == 1) {
                                                             $i++;
                                                             continue;
                                                         }

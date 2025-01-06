@@ -79,4 +79,22 @@ class ApplicationController extends Controller
             'application' => $application
         ]);
     }
+    public function destroy($id)
+    {
+        $application = DB::table('applications')->where('id', $id)->first();
+
+        if (!$application) {
+            return redirect()->back()->with('error', 'Application not found.');
+        }
+
+        DB::table('deleted_applications')->insert([
+            'data' => json_encode($application),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('applications')->where('id', $id)->delete();
+
+        return redirect()->back()->with('success', 'Application deleted and archived successfully.');
+    }
 }
