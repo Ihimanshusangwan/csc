@@ -15,8 +15,10 @@ class StaffController extends Controller
         if (Cookie::has('Admin_Session')) {
             $locations = DB::table('locations')->get();
             $serviceGroups = DB::table('service_groups')->get();
+            $services = DB::table('services')
+                ->where("is_active", 1)->get();
 
-            return view('admin.registerStaff', compact('locations', 'serviceGroups'));
+            return view('admin.registerStaff', compact('locations', 'serviceGroups', 'services'));
         } else {
 
             return view('admin.login');
@@ -150,8 +152,10 @@ class StaffController extends Controller
             'name' => 'required',
             'mobile' => 'required',
             'location' => 'required|exists:locations,id',
-            'servicegroup' => 'required|exists:service_groups,id',
+            'selected_services' => 'required|array',
+            'selected_services.*' => 'exists:services,id',
         ]);
+
         // Check if the username already exists
         $existingUser = DB::table('staff')->where('username', $request->username)->first();
         if ($existingUser) {
@@ -159,16 +163,25 @@ class StaffController extends Controller
         }
 
         // Insert staff data into the database
-        DB::table('staff')->insert([
+        $staffId = DB::table('staff')->insertGetId([
             'username' => $request->username,
             'password' => $request->password,
             'name' => $request->name,
             'mobile' => $request->mobile,
             'location_id' => $request->location,
-            'service_group_id' => $request->servicegroup,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // Insert selected services into staffs_services table
+        $staffServices = array_map(function ($serviceId) use ($staffId) {
+            return [
+                'staff_id' => $staffId,
+                'service_id' => $serviceId,
+            ];
+        }, $request->selected_services);
+
+        DB::table('staffs_services')->insert($staffServices);
 
         // Redirect after successful registration
         return redirect()->route('admin.dashboard')->with('success', 'Staff registered successfully.');
