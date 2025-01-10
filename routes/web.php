@@ -81,6 +81,7 @@ Route::resource('locations', LocationController::class);
 //price routes
 
 use App\Http\Controllers\PriceController;
+
 Route::get('/prices/{serviceId}', [PriceController::class, 'index'])->name('prices.index');
 Route::get('/plan-based-prices/{serviceId}/{locationId}', [PriceController::class, 'planBasedPrices'])->name('prices.plan-based-prices');
 Route::post('/prices/{serviceId}/{locationId}/store', [PriceController::class, 'store'])->name('prices.store');
@@ -121,23 +122,25 @@ Route::get('/agent/profile', [AgentController::class, 'profile'])->name('agent.p
 Route::get('/agent/applications/{category}', [AgentController::class, 'applications'])->name('agent.applications');
 Route::get('/agent/logout', [AgentController::class, 'logout'])->name('agent.logout');
 Route::get('/servicegroup/view/{serviceGroupId}', [AgentController::class, 'view'])->name('service-group.view');
-Route::post('/agent/update-application',[AgentController::class,'update_application'])->name('agent.update-application');
+Route::post('/agent/update-application', [AgentController::class, 'update_application'])->name('agent.update-application');
 
 //Appy Services
-use App\Http\Controllers\ApplyServiceController; 
+use App\Http\Controllers\ApplyServiceController;
 
 Route::get('/service/apply/direct/{id}', [ApplyServiceController::class, 'direct'])->name('service.direct-apply');
 Route::post('/submit-form/{id}', [ApplyServiceController::class, 'submitForm'])->name('submitForm');
 
 //application routes
 use App\Http\Controllers\ApplicationController;
+
 Route::post('/update-application', [ApplicationController::class, 'update'])->name('application.update');
 Route::post('/update-doc-approval/{id}', [ApplicationController::class, 'changeDocApprovalStatus'])->name('application.update-doc-approval-status');
-    
+
 
 //appointment routes
 
 use App\Http\Controllers\AppointmentController;
+
 Route::get('/appointment', [AppointmentController::class, 'index'])->name('appointment');
 Route::post('/appointments/store', [AppointmentController::class, 'store'])->name('appointments.store');
 Route::post('/appointments/visited', [AppointmentController::class, 'markVisited'])->name('appointments.visited');
@@ -145,7 +148,8 @@ Route::post('/appointments/reject', [AppointmentController::class, 'rejectAppoin
 
 //staff routes
 use App\Http\Controllers\StaffController;
-Route::get('/register-staff',[StaffController::class,'create'])->name("staffs.create");
+
+Route::get('/register-staff', [StaffController::class, 'create'])->name("staffs.create");
 Route::post('/register/staff', [StaffController::class, 'register'])->name('staff.register');
 Route::get('/staff/logout', [StaffController::class, 'logout'])->name('staff.logout');
 Route::get('/staff/login', [StaffController::class, 'showLoginForm'])->name('staff.login');
@@ -154,6 +158,7 @@ Route::get('/staff/dashboard/{category}', [StaffController::class, 'index'])->na
 
 //customer routes
 use App\Http\Controllers\CustomerController;
+
 Route::get('/customer/logout', [CustomerController::class, 'logout'])->name('customer.logout');
 Route::get('/customer/login', [CustomerController::class, 'showLoginForm'])->name('customer.login');
 Route::post('/customer/login', [CustomerController::class, 'login'])->name('customer.login.submit');
@@ -175,10 +180,16 @@ Route::get('join-as-agent', [HomeController::class, 'registerAgent'])->name('hom
 //Field boy controller 
 
 use App\Http\Controllers\FieldBoyController;
-Route::get('/register-fieldboy',[FieldBoyController::class,'create'])->name("fieldboy.create");
+
+Route::get('/register-fieldboy', [FieldBoyController::class, 'create'])->name("fieldboy.create");
 Route::post('/register/fieldboy', [FieldBoyController::class, 'register'])->name('fieldboy.register');
 Route::get('/leaderboard', [FieldBoyController::class, 'generateLeaderBoard'])->name('admin.leaderboard');
 
 
 
+//configurations routes
 
+use App\Http\Controllers\Admin\ConfigurationController;
+
+Route::get('/admin/configurations', [ConfigurationController::class, 'index'])->name('admin.configurations.index');
+Route::post('/admin/configurations/update', [ConfigurationController::class, 'update'])->name('admin.configurations.update');

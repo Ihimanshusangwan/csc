@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Configuration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cookie;
@@ -47,7 +48,6 @@ class ApplyServiceController extends Controller
     }
     public function submitForm(Request $request, $id)
     {
-
         if (Cookie::has('Agent_Session')) {
             // Retrieve and decrypt the agent's ID from the cookie
             $encryptedAgentId = Cookie::get('Agent_Session');
@@ -93,6 +93,10 @@ class ApplyServiceController extends Controller
                     $commission = $prices->tatkal_commission_price;
                     $tax = ($prices->tatkal_govt_price * $prices->tatkal_tax_percentage / 100);
                 }
+            }
+            if ($request->input('photo_charge')) {
+                $photoMakingCharge = (int)Configuration::getValue('photo_making_charge');
+                $totalPrice += $photoMakingCharge;
             }
             $latestStaffId = DB::table('applications')
                 ->where('location_id', $locationId)
