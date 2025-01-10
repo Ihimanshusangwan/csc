@@ -115,6 +115,9 @@
             <div class="dashboard-content">
                 <span class="material-icons home-icon"> home </span>
                 <h3 class="dashboard">Admin Dashboard</h3>
+                <a href="{{ route('admin.configurations.index') }}" class="btn btn-primary btn-sm mx-5">Go to
+                    Configurations</a>
+
             </div>
             <div class="background-points">
                 <div class="points">Total Earnings: &#8377;{{ $sumOfPrices }}</div>
