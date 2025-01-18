@@ -137,8 +137,6 @@ Route::post('/update-application', [ApplicationController::class, 'update'])->na
 Route::post('/update-doc-approval/{id}', [ApplicationController::class, 'changeDocApprovalStatus'])->name('application.update-doc-approval-status');
 Route::delete('/applications/{id}', [ApplicationController::class, 'destroy'])->name('applications.destroy');
 
-    
-
 //appointment routes
 
 use App\Http\Controllers\AppointmentController;

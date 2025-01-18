@@ -63,7 +63,7 @@ class StaffController extends Controller
             return back()->withErrors(['username' => 'Invalid credentials'])->withInput($request->only('username'));
         }
     }
-    public function index($category)
+    public function index(Request $request, $category)
     {
         // Check if the custom cookie exists
         if (Cookie::has('Staff_Session')) {
@@ -71,6 +71,7 @@ class StaffController extends Controller
             // Retrieve and decrypt the agent's ID from the cookie
             $encryptedStaffId = Cookie::get('Staff_Session');
             $staffId = Crypt::decrypt($encryptedStaffId);
+            $applicantName = $request->input('applicantName');
             $query = DB::table('applications')
                 ->where('applications.staff_id', $staffId)
                 ->join('customers', 'applications.customer_id', '=', 'customers.id')
@@ -98,6 +99,9 @@ class StaffController extends Controller
                     break;
                 case "pending":
                     break;
+            }
+            if ($applicantName) {
+                $query->where('customers.name', 'like', '%' . $applicantName . '%');
             }
 
             // Fetch paginated applications
