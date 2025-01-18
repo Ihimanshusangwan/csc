@@ -229,7 +229,7 @@
                     <th scope="col">Ruppes(&#8377;)</th>
                     <th scope="col">Upload Document</th>
                     <th scope="col">Upload Receipt</th>
-                    <th scope="col">Action</th>
+                    <th scope="col" colspan="2">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -356,6 +356,15 @@
                             <button type="submit" class="btn btn-sm btn-primary mb-1">Update</button>
                             </form>
 
+
+                        </td>
+                        <td>
+                            <form action="{{ route('applications.destroy', $application->id) }}" method="POST"
+                                onsubmit="return confirm('Are you sure you want to delete this application?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
 
                         </td>
 
