@@ -387,7 +387,7 @@ class Agent extends Model
                             }
                             $locationId = $agent->location_id;
                             $serviceGroupId = $service->service_group_id;
-                            $nextStaffId = Staff::get_staff_id($serviceGroupId, $locationId);
+                            $nextStaffId = Staff::get_staff_id($service_id, $locationId);
 
 
                             try {
@@ -452,7 +452,6 @@ class Agent extends Model
                                     'form_data' => $formDataJson,
                                     'price' => $totalPrice,
                                     'location_id' => $locationId,
-                                    'service_group_id' => $serviceGroupId,
                                     'staff_id' => $nextStaffId,
                                     'price_type' => $price_type,
                                     'govt_price' => $govtPrice,
@@ -527,7 +526,7 @@ class Agent extends Model
                         }
                         $locationId = $agent->location_id;
                         $serviceGroupId = $service->service_group_id;
-                        $nextStaffId = Staff::get_staff_id($serviceGroupId, $locationId);
+                        $nextStaffId = Staff::get_staff_id($service_id, $locationId);
 
 
                         try {
@@ -687,7 +686,7 @@ class Agent extends Model
             }
             $locationId = $agent->location_id;
             $serviceGroupId = $service->service_group_id;
-            $nextStaffId = Staff::get_staff_id($serviceGroupId, $locationId);
+            $nextStaffId = Staff::get_staff_id($service_id, $locationId);
 
 
             try {

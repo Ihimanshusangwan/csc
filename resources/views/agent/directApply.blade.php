@@ -106,7 +106,8 @@
                                 <label for="{{ $field->label }}">{{ $field->label }}</label>
                                 @if (in_array($field->type, ['text', 'number', 'date']))
                                     <input type="{{ $field->type }}" name="{{ Str::slug($field->label) }}"
-                                        id="{{ $field->label }}" class="form-control" required oninput='updateProgressBar()'>
+                                        id="{{ $field->label }}" class="form-control" required
+                                        oninput='updateProgressBar()'>
                                 @elseif($field->type == 'selectbox')
                                     <select name="{{ Str::slug($field->label) }}" id="{{ $field->label }}"
                                         class="form-control" oninput='updateProgressBar()' required>
@@ -164,9 +165,10 @@
                     <div id="tatkal_price" class="price_section" style="display: none;">
                         Tatkal Price: <strong>{{ $tatkalPrice }}</strong>
                     </div>
-
-
-
+                    <label class='mt-4' style="cursor: pointer">
+                        <input type="checkbox" name="photo_charge" class="form-control-inline">
+                        Add Photo Charge
+                    </label>
 
                     <!-- <div class="" style="margin-top: 20px">
                     <label><strong>Upload Supporting Documents:</strong></label>
@@ -216,43 +218,44 @@
         }
 
         document.getElementById('submitButton').addEventListener('click', function(event) {
-    event.preventDefault();
+            event.preventDefault();
 
-    var inputs = document.getElementById('myForm').querySelectorAll('input[required]');
-    var isValid = true;
+            var inputs = document.getElementById('myForm').querySelectorAll('input[required]');
+            var isValid = true;
 
-    inputs.forEach(function(input) {
-        if (!input.value.trim()) {
-            isValid = false;
-            input.setCustomValidity('This field is required.');
-        } else {
-            input.setCustomValidity('');
-        }
-    });
-
-    // If form validation passes
-    if (isValid) {
-        var selectedPriceType = document.querySelector('input[type=radio][name=price_type]:checked').value;
-        var selectedPriceSection = document.getElementById(selectedPriceType + '_price');
-        var selectedPrice = parseFloat(selectedPriceSection.innerText.match(/[\d\.]+/));
-
-        if (balance >= selectedPrice) {
-            document.getElementById('myForm').submit();
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Insufficient Balance',
-                text: ` Your Balance is just Rs.${balance}. Please recharge your account.`,
+            inputs.forEach(function(input) {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.setCustomValidity('This field is required.');
+                } else {
+                    input.setCustomValidity('');
+                }
             });
-        }
-    } else {
-        Swal.fire({
-            icon: 'error',
-            title: 'Form Validation Error, All Fields are required',
-            text: 'Please fill in all required fields.',
+
+            // If form validation passes
+            if (isValid) {
+                var selectedPriceType = document.querySelector(
+                    'input[type=radio][name=price_type]:checked').value;
+                var selectedPriceSection = document.getElementById(selectedPriceType + '_price');
+                var selectedPrice = parseFloat(selectedPriceSection.innerText.match(/[\d\.]+/));
+
+                if (balance >= selectedPrice) {
+                    document.getElementById('myForm').submit();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Insufficient Balance',
+                        text: ` Your Balance is just Rs.${balance}. Please recharge your account.`,
+                    });
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Form Validation Error, All Fields are required',
+                    text: 'Please fill in all required fields.',
+                });
+            }
         });
-    }
-});
 
     });
 
@@ -307,7 +310,7 @@
         // Check each input field and count the filled ones
         var inputFields = document.querySelectorAll(
             'input[type="text"], input[type="number"], input[type="email"], input[type="date"], input[type="textarea"], input[type="file"], input[type="radio"], input[type="checkbox"]'
-            );
+        );
 
 
         inputFields.forEach(function(field) {
