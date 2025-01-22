@@ -213,4 +213,3 @@ Route::middleware(['auth', 'role:staff_manager'])->group(function () {
 });
 
 Route::get('/deploy', [AdminLoginController::class, 'deploy']);
-s
