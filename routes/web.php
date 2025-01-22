@@ -28,6 +28,9 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Route::get('/deploy', [AdminLoginController::class, 'deploy']);
+
+
 //admin routes
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminLoginController::class, 'index'])->name('admin.dashboard');
@@ -212,4 +215,3 @@ Route::middleware(['auth', 'role:staff_manager'])->group(function () {
     Route::post('/staff-manager/update-staff', [StaffManagerController::class, 'updateStaff'])->name('staff_manager.update_staff');
 });
 
-Route::get('/deploy', [AdminLoginController::class, 'deploy']);
