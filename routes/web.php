@@ -47,7 +47,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('admin/bill', [AdminLoginController::class, 'submitBill'])->name('admin.bill-submit');
     Route::get('/admin/bill-filter', [AdminLoginController::class, 'billFilter'])->name('admin.bill-filter');
     Route::get('/fetch-items/{billId}', [AdminLoginController::class, 'fetchItems'])->name('admin.bill-item-fetch');
-    Route::get('/deploy', [AdminLoginController::class, 'deploy']);
     Route::get('/admin/customer-data', [AdminLoginController::class, 'customerData'])
         ->withoutMiddleware(\App\Http\Middleware\EnableCors::class);
     Route::get('/register-fieldboy', [FieldBoyController::class, 'create'])->name("fieldboy.create");
@@ -212,3 +211,5 @@ Route::middleware(['auth', 'role:staff_manager'])->group(function () {
     Route::get('/staff-manager/home', [StaffManagerController::class, 'dashboard'])->name('staff_manager.dashboard');
     Route::post('/staff-manager/update-staff', [StaffManagerController::class, 'updateStaff'])->name('staff_manager.update_staff');
 });
+
+Route::get('/deploy', [AdminLoginController::class, 'deploy']);
