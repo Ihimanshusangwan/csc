@@ -11,18 +11,14 @@ class StaffController extends Controller
 {
     public function create(Request $request)
     {
-        // Check if the custom cookie exists
-        if (Cookie::has('Admin_Session')) {
-            $locations = DB::table('locations')->get();
-            $serviceGroups = DB::table('service_groups')->get();
-            $services = DB::table('services')
-                ->where("is_active", 1)->get();
 
-            return view('admin.registerStaff', compact('locations', 'serviceGroups', 'services'));
-        } else {
+        $locations = DB::table('locations')->get();
+        $serviceGroups = DB::table('service_groups')->get();
+        $services = DB::table('services')
+            ->where("is_active", 1)->get();
 
-            return view('admin.login');
-        }
+        return view('admin.registerStaff', compact('locations', 'serviceGroups', 'services'));
+
     }
     public function showLoginForm()
     {

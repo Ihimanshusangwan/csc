@@ -6,6 +6,13 @@ use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\ServiceGroupController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\FieldBoyController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\Admin\ConfigurationController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,34 +26,43 @@ use App\Http\Controllers\ServiceController;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 //admin routes
-Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
-Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
-Route::get('/admin/dashboard', [AdminLoginController::class, 'index'])->name('admin.dashboard');
-Route::get('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
-Route::get('/agents/{id}/{category}', [AdminLoginController::class, 'agentView'])->name('agent.show');
-Route::get('/admin/filter', [AdminLoginController::class, 'filter'])->name('admin.filter');
-Route::get('/admin/recharge-history', [AdminLoginController::class, 'rechargeHistory'])->name('admin.recharge-history');
-Route::get('/admin/appointment-history', [AdminLoginController::class, 'appointments'])->name('admin.appointment-history');
-Route::get('/admin/visited-appointments', [AdminLoginController::class, 'visitedAppointments'])->name('admin.appointment-visited');
-Route::get('/admin/rejected-appointment', [AdminLoginController::class, 'rejectedAppointments'])->name('admin.appointment-rejected');
-Route::post('/admin/delete-data', [AdminLoginController::class, 'deleteData'])->name('admin.delete-data');
-Route::get('/admin/delete-data', [AdminLoginController::class, 'showDeleteForm'])->name('admin.delete-form');
-Route::get('admin/registered-staff', [AdminLoginController::class, 'showStaffDetails'])->name('admin.registered-staff');
-Route::get('admin/registered-fieldboy', [AdminLoginController::class, 'showFieldBoyDetails'])->name('admin.registered-fieldboy');
-Route::get('admin/applications/{category}', [AdminLoginController::class, 'applications'])->name('admin.applications');
-Route::get('admin/troubleshooter', [AdminLoginController::class, 'troubleshoot'])->name('admin.troubleshoot');
-Route::get('admin/bill', [AdminLoginController::class, 'showbill'])->name('admin.bill');
-Route::post('admin/bill', [AdminLoginController::class, 'submitBill'])->name('admin.bill-submit');
-Route::get('/admin/bill-filter', [AdminLoginController::class, 'billFilter'])->name('admin.bill-filter');
-Route::get('/fetch-items/{billId}', [AdminLoginController::class, 'fetchItems'])->name('admin.bill-item-fetch');
-Route::get('/deploy', [AdminLoginController::class, 'deploy']);
-// routes/web.php
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminLoginController::class, 'index'])->name('admin.dashboard');
+    Route::get('/agents/{id}/{category}', [AdminLoginController::class, 'agentView'])->name('agent.show');
+    Route::get('/admin/filter', [AdminLoginController::class, 'filter'])->name('admin.filter');
+    Route::get('/admin/recharge-history', [AdminLoginController::class, 'rechargeHistory'])->name('admin.recharge-history');
+    Route::get('/admin/appointment-history', [AdminLoginController::class, 'appointments'])->name('admin.appointment-history');
+    Route::get('/admin/visited-appointments', [AdminLoginController::class, 'visitedAppointments'])->name('admin.appointment-visited');
+    Route::get('/admin/rejected-appointment', [AdminLoginController::class, 'rejectedAppointments'])->name('admin.appointment-rejected');
+    Route::post('/admin/delete-data', [AdminLoginController::class, 'deleteData'])->name('admin.delete-data');
+    Route::get('/admin/delete-data', [AdminLoginController::class, 'showDeleteForm'])->name('admin.delete-form');
+    Route::get('admin/registered-staff', [AdminLoginController::class, 'showStaffDetails'])->name('admin.registered-staff');
+    Route::get('admin/registered-fieldboy', [AdminLoginController::class, 'showFieldBoyDetails'])->name('admin.registered-fieldboy');
+    Route::get('admin/applications/{category}', [AdminLoginController::class, 'applications'])->name('admin.applications');
+    Route::get('admin/troubleshooter', [AdminLoginController::class, 'troubleshoot'])->name('admin.troubleshoot');
+    Route::get('admin/bill', [AdminLoginController::class, 'showbill'])->name('admin.bill');
+    Route::post('admin/bill', [AdminLoginController::class, 'submitBill'])->name('admin.bill-submit');
+    Route::get('/admin/bill-filter', [AdminLoginController::class, 'billFilter'])->name('admin.bill-filter');
+    Route::get('/fetch-items/{billId}', [AdminLoginController::class, 'fetchItems'])->name('admin.bill-item-fetch');
+    Route::get('/deploy', [AdminLoginController::class, 'deploy']);
+    Route::get('/admin/customer-data', [AdminLoginController::class, 'customerData'])
+        ->withoutMiddleware(\App\Http\Middleware\EnableCors::class);
+    Route::get('/register-fieldboy', [FieldBoyController::class, 'create'])->name("fieldboy.create");
+    Route::post('/register/fieldboy', [FieldBoyController::class, 'register'])->name('fieldboy.register');
+    Route::get('/leaderboard', [FieldBoyController::class, 'generateLeaderBoard'])->name('admin.leaderboard');
+    Route::get('/register-staff', [StaffController::class, 'create'])->name("staffs.create");
+    Route::post('/register/staff', [StaffController::class, 'register'])->name('staff.register');
+    Route::get('/admin/configurations', [ConfigurationController::class, 'index'])->name('admin.configurations.index');
+    Route::post('/admin/configurations/update', [ConfigurationController::class, 'update'])->name('admin.configurations.update');
+    Route::get('/admin/register-manager', [RegisterController::class, 'showRegistrationForm'])->name('register-manager');
+    Route::post('/register', [RegisterController::class, 'register'])->name('register.manager');
+    Route::get('/admin/staff-managers', [AdminLoginController::class, 'showStaffManagers'])->name('admin.staff_managers');
+    Route::post('/admin/reset-password/{id}', [AdminLoginController::class, 'resetPassword'])->name('admin.reset_password');
 
-Route::get('/admin/customer-data', [AdminLoginController::class, 'customerData'])
-    ->withoutMiddleware(\App\Http\Middleware\EnableCors::class);
+});
 
 
 
@@ -147,10 +163,7 @@ Route::post('/appointments/visited', [AppointmentController::class, 'markVisited
 Route::post('/appointments/reject', [AppointmentController::class, 'rejectAppointment'])->name('appointments.reject');
 
 //staff routes
-use App\Http\Controllers\StaffController;
 
-Route::get('/register-staff', [StaffController::class, 'create'])->name("staffs.create");
-Route::post('/register/staff', [StaffController::class, 'register'])->name('staff.register');
 Route::get('/staff/logout', [StaffController::class, 'logout'])->name('staff.logout');
 Route::get('/staff/login', [StaffController::class, 'showLoginForm'])->name('staff.login');
 Route::post('/staff/login', [StaffController::class, 'login'])->name('staff.login.submit');
@@ -177,19 +190,25 @@ use App\Http\Controllers\HomeController;
 
 Route::get('join-as-agent', [HomeController::class, 'registerAgent'])->name('home.register-agent');
 
-//Field boy controller 
 
-use App\Http\Controllers\FieldBoyController;
+Route::get('/login', function () {
+    if (auth()->check()) {
+        if (auth()->user()->hasRole('admin')) {
+            return redirect()->route('admin.dashboard');
+        } elseif (auth()->user()->hasRole('staff_manager')) {
+            return redirect()->route('staff_manager.dashboard');
+        }
+    }
+    return app(LoginController::class)->showLoginForm();
+})->name('login');  
 
-Route::get('/register-fieldboy', [FieldBoyController::class, 'create'])->name("fieldboy.create");
-Route::post('/register/fieldboy', [FieldBoyController::class, 'register'])->name('fieldboy.register');
-Route::get('/leaderboard', [FieldBoyController::class, 'generateLeaderBoard'])->name('admin.leaderboard');
+Route::post('/login', [LoginController::class, 'login'])->name('login.manager');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
+use App\Http\Controllers\StaffManagerController;
 
-//configurations routes
-
-use App\Http\Controllers\Admin\ConfigurationController;
-
-Route::get('/admin/configurations', [ConfigurationController::class, 'index'])->name('admin.configurations.index');
-Route::post('/admin/configurations/update', [ConfigurationController::class, 'update'])->name('admin.configurations.update');
+Route::middleware(['auth', 'role:staff_manager'])->group(function () {
+    Route::get('/staff-manager/home', [StaffManagerController::class, 'dashboard'])->name('staff_manager.dashboard');
+    Route::post('/staff-manager/update-staff', [StaffManagerController::class, 'updateStaff'])->name('staff_manager.update_staff');
+});

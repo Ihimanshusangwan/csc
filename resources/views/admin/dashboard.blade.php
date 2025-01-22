@@ -46,6 +46,9 @@
                     <a class="nav-link" href="{{ route('admin.registered-fieldboy') }}">Registered Field Boys</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.staff_managers') }}">Registered Staff Managers</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ route('service-groups.index') }}">Manage Service Groups</a>
                 </li>
                 <li class="nav-item">
@@ -70,6 +73,9 @@
                     <a class="nav-link" href="{{ route('staffs.create') }}">Register Staff</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ route('register-manager') }}">Register Staff Manager</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ route('fieldboy.create') }}">Register Field Boy</a>
                 </li>
                 <li class="nav-item">
@@ -89,7 +95,10 @@
 
         <!-- Logout Button -->
         <div class="navbar-nav">
-            <a href="{{ route('admin.logout') }}" class="nav-link text-danger">Logout</a>
+            <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" class="nav-link btn btn-link text-danger">Logout</button>
+            </form>
         </div>
     </nav>
 
