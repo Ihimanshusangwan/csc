@@ -70,9 +70,11 @@
           <li class="drop-down"><a href="">Login</a>
             <ul>
               <li><a href="{{ route('customer.login') }}">Customer Login</a></li>
-              <li><a href="{{ route('admin.login') }}">Admin Login</a></li>
+              <li><a href="{{ route('login') }}">Admin Login</a></li>
               <li><a  href="{{ route('agent.login') }}">Agent Login</a></li>
               <li><a href="{{ route('staff.login') }}">Staff Login</a></li>
+              <li><a href="{{ route('login') }}">Staff Manager Login</a></li>
+
             </ul>
           </li>
           
