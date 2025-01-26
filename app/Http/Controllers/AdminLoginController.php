@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminLoginController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $plans = DB::table('plans')->where("is_active", 1)->get();
         $locations = DB::table('locations')->get();

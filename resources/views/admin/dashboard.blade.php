@@ -177,275 +177,244 @@
         </div>
 
         <h3 class="mt-4 text-center">Latest Applications</h3>
-        <div class="sort-filter">
+        <div class="sort-filter flex justify-content-start">
             <div class="dropdowns">
-                <div class="dropdown">
-                    <label><strong>Sort By Status: </strong></label>
-                    <div class="input-group">
-                        <select class="form-select" id="inputGroupSelect01">
-                            <option selected disabled>Choose...</option>
-                            <option value="1">All</option>
-                            <option value="2">Pending</option>
-                            <option value="2">Success</option>
-                            <option value="2">Failed</option>
-                        </select>
+                <form method="GET" action="">
+                    @csrf
+                    <div class="form-group">
+                        <label for="applicantName">Applicant Name:</label>
+                        <input type="text" class="form-control" id="applicantName" name="applicantName"
+                            value="{{ request('applicantName') }}">
                     </div>
-                </div>
-                <div class="dropdown" style="margin-left: 1rem">
-                    <label><strong>Sort By Agent: </strong></label>
-                    <div class="input-group">
-                        <select class="form-select" id="inputGroupSelect02">
-                            <option selected disabled>Choose Agent Name...</option>
-                            <option value="1">All</option>
-                            <option value="1">Lokesh Thakare</option>
-                            <option value="2">Himanshu Sangwan</option>
-                            <option value="2">Sadashiv</option>
-                            <option value="2">Avinash</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="dropdown" style="margin-left: 1rem">
-                    <label><strong>Sort By Requested: </strong></label>
-                    <div class="input-group">
-                        <select class="form-select" id="inputGroupSelect04">
-                            <option selected disabled>Choose...</option>
-                            <option value="1">All</option>
-                            <option value="1">Requested</option>
-                            <option value="2">Approve</option>
-                            <option value="2">Rejected</option>
-                            <option value="2">Hold</option>
-                        </select>
-                    </div>
-                </div>
             </div>
 
-            <div class="total-count">
-                <strong class="text-primary">Total : {{ $totalApplicationCount }} </strong>
-            </div>
+            <button type="submit" class="btn btn-primary mx-4 mt-4">Search</button>
+            </form>
         </div>
-        <table class="table table-striped mt-4">
-            <thead>
-                <tr class="table-dark text-center">
-                    <th scope="col">Sr.No</th>
-                    <th scope="col">Applicant Name</th>
-                    <th scope="col">Agent Name</th>
-                    <th scope="col">Date of Application</th>
-                    <th scope="col">Estimated Delivery Date</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Applied For</th>
-                    <th scope="col">Preview</th>
-                    <th scope="col">Reporting Staff</th>
-                    <th scope="col">Ruppes(&#8377;)</th>
-                    <th scope="col">Upload Document</th>
-                    <th scope="col">Upload Receipt</th>
-                    <th scope="col" colspan="2">Action</th>
-                </tr>
-            </thead>
-            <tbody>
+    </div>
+
+    <div class="total-count">
+        <strong class="text-primary">Total : {{ $totalApplicationCount }} </strong>
+    </div>
+    </div>
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr class="table-dark text-center">
+                <th scope="col">Sr.No</th>
+                <th scope="col">Applicant Name</th>
+                <th scope="col">Agent Name</th>
+                <th scope="col">Date of Application</th>
+                <th scope="col">Estimated Delivery Date</th>
+                <th scope="col">Status</th>
+                <th scope="col">Applied For</th>
+                <th scope="col">Preview</th>
+                <th scope="col">Reporting Staff</th>
+                <th scope="col">Ruppes(&#8377;)</th>
+                <th scope="col">Upload Document</th>
+                <th scope="col">Upload Receipt</th>
+                <th scope="col" colspan="2">Action</th>
+            </tr>
+        </thead>
+        <tbody>
 
 
-                @php   $counter = 1; @endphp @foreach ($applications as $application)
-                    <tr class="text-center">
-                        <th scope="row">{{ $counter++ }}</th>
-                        <td>{{ $application->customer_name }}</td>
-                        <td>{{ $application->shop_name }} ( {{ $application->agent_name }} )</td>
-                        <td>{{ $application->apply_date }}</td>
-                        <td>
-                            <form action="{{ route('application.update') }}" method="post"
-                                enctype="multipart/form-data">
-                                @csrf
-                                <input type="hidden" name="application_id" value="{{ $application->id }}" />
-                                <input type="date" class="form-control-sm" id="delivery_date"
-                                    name="delivery_date"
-                                    value="{{ $application->delivery_date ? $application->delivery_date : '' }}">
-                        </td>
+            @php $counter = 1; @endphp @foreach ($applications as $application)
+                        <tr class="text-center">
+                            <th scope="row">{{ $counter++ }}</th>
+                            <td>{{ $application->customer_name }}</td>
+                            <td>{{ $application->shop_name }} ( {{ $application->agent_name }} )</td>
+                            <td>{{ $application->apply_date }}</td>
+                            <td>
+                                <form action="{{ route('application.update') }}" method="post" enctype="multipart/form-data">
+                                    @csrf
+                                    <input type="hidden" name="application_id" value="{{ $application->id }}" />
+                                    <input type="date" class="form-control-sm" id="delivery_date" name="delivery_date"
+                                        value="{{ $application->delivery_date ? $application->delivery_date : '' }}">
+                            </td>
 
-                        <td>
-                            <input type="hidden" name="reason" value="NA">
-                            <select class="form-control-sm statuses-menu" id="status" name="status">
-                                <option value="-1" {{ $application->status == -1 ? 'selected' : '' }}
-                                    class="text-danger">Rejected</option>
-                                <option value="0" {{ $application->status == 0 ? 'selected' : '' }}
-                                    class="text-info">Initiated</option>
-                                <option value="1" {{ $application->status == 1 ? 'selected' : '' }}
-                                    class="text-warning">In Progress</option>
-                                <option value="2" {{ $application->status == 2 ? 'selected' : '' }}
-                                    class="text-success">Completed</option>
+                            <td>
+                                <input type="hidden" name="reason" value="NA">
+                                <select class="form-control-sm statuses-menu" id="status" name="status">
+                                    <option value="-1" {{ $application->status == -1 ? 'selected' : '' }} class="text-danger">Rejected
+                                    </option>
+                                    <option value="0" {{ $application->status == 0 ? 'selected' : '' }} class="text-info">Initiated
+                                    </option>
+                                    <option value="1" {{ $application->status == 1 ? 'selected' : '' }} class="text-warning">In
+                                        Progress</option>
+                                    <option value="2" {{ $application->status == 2 ? 'selected' : '' }} class="text-success">Completed
+                                    </option>
 
-                                {{-- Explode statuses and create options --}}
-                                @php
-                                    $statusesArray = explode(',', $application->statuses);
-                                @endphp
+                                    {{-- Explode statuses and create options --}}
+                                    @php
+                                        $statusesArray = explode(',', $application->statuses);
+                                    @endphp
 
-                                @if (count($statusesArray) > 0)
-                                    @foreach ($statusesArray as $status)
-                                        @php
-                                            $statusParts = explode(':', $status);
-                                            $id = $statusParts[0] ?? null;
-                                            $statusName = $statusParts[1] ?? null;
-                                            $statuscolor = $statusParts[2] ?? null;
-                                            $askReason = $statusParts[3] ?? null;
-                                        @endphp
+                                    @if (count($statusesArray) > 0)
+                                                    @foreach ($statusesArray as $status)
+                                                                    @php
+                                                                        $statusParts = explode(':', $status);
+                                                                        $id = $statusParts[0] ?? null;
+                                                                        $statusName = $statusParts[1] ?? null;
+                                                                        $statuscolor = $statusParts[2] ?? null;
+                                                                        $askReason = $statusParts[3] ?? null;
+                                                                    @endphp
 
-                                        @if ($id !== null && $statusName !== null)
-                                            <option value="{{ $id }}" style="color: {{ $statuscolor }};"
-                                                data-ask_reason="{{ $askReason }}"
-                                                {{ $application->status == $id ? 'selected' : '' }}>
-                                                {{ $statusName }}</option>
-                                        @endif
-                                    @endforeach
+                                                                    @if ($id !== null && $statusName !== null)
+                                                                        <option value="{{ $id }}" style="color: {{ $statuscolor }};" data-ask_reason="{{ $askReason }}"
+                                                                            {{ $application->status == $id ? 'selected' : '' }}>
+                                                                            {{ $statusName }}
+                                                                        </option>
+                                                                    @endif
+                                                    @endforeach
+                                    @endif
+
+
+                                </select>
+                                @if ($application->status == -1)
+                                    <span class="text-danger" style="text-decoration: underline; cursor: pointer;"
+                                        data-reason="{{ $application->reason }}" data-toggle="modal"
+                                        data-target="#reasonModal{{ $application->id }}">Reason</span>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="reasonModal{{ $application->id }}" tabindex="-1" role="dialog"
+                                        aria-labelledby="reasonModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="reasonModalLabel">Reason</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    {{ $application->reason }}
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 @endif
+                            </td>
+                            <td>{{ $application->service_name }}</td>
+                            <td>
+                                <span style="cursor: pointer" class="material-icons" data-toggle="modal"
+                                    data-target="#agentModal{{ $application->id }}">
+                                    preview
+                                </span>
+                            </td>
+                            <td>{{ $application->staffName }}</td>
+                            <td class="text-success"> &#8377;{{ $application->price }}</td>
+                            <td>
+                                @if ($application->delivery_date && $application->delivery)
+                                    <!-- If delivery date exists, display a link to open the document in another tab -->
+                                    <div class="form-group">
+                                        Uploaded Document:<a href="{{ asset($application->delivery) }}" target="_blank"
+                                            style="color: blue;">View Document</a>
+                                    </div>
+                                @endif
+                                <div class="form-group">
+                                    <input type="file" class="form-control-sm" id="document" name="document"
+                                        placeholder="upload Document">
+                                </div>
+                            </td>
+                            <td>
+                                @if ($application->receipt)
+                                    <div class="form-group">
+                                        Uploaded Reciept:<a href="{{ asset($application->receipt) }}" target="_blank"
+                                            style="color: blue;">View Receipt</a>
+                                    </div>
+                                @endif
+                                <div class="form-group">
+                                    <input type="file" class="form-control-sm" id="receipt" name="receipt"
+                                        placeholder="upload receipt">
+                                </div>
+                            </td>
+                            <td>
+                                <button type="submit" class="btn btn-sm btn-primary mb-1">Update</button>
+                                </form>
 
 
-                            </select>
-                            @if ($application->status == -1)
-                                <span class="text-danger" style="text-decoration: underline; cursor: pointer;"
-                                    data-reason="{{ $application->reason }}" data-toggle="modal"
-                                    data-target="#reasonModal{{ $application->id }}">Reason</span>
+                            </td>
+                            <td>
+                                <form action="{{ route('applications.destroy', $application->id) }}" method="POST"
+                                    onsubmit="return confirm('Are you sure you want to delete this application?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
 
-                                <!-- Modal -->
-                                <div class="modal fade" id="reasonModal{{ $application->id }}" tabindex="-1"
-                                    role="dialog" aria-labelledby="reasonModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="reasonModalLabel">Reason</h5>
-                                                <button type="button" class="close" data-dismiss="modal"
-                                                    aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                {{ $application->reason }}
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-dismiss="modal">Close</button>
-                                            </div>
+                            </td>
+
+
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="agentModal{{ $application->id }}" tabindex="-1" role="dialog"
+                                aria-labelledby="agentModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="agentModalLabel">
+                                                Application Details - {{ $application->customer_name }}
+                                            </h5>
                                         </div>
-                                    </div>
-                                </div>
-                            @endif
-                        </td>
-                        <td>{{ $application->service_name }}</td>
-                        <td>
-                            <span style="cursor: pointer" class="material-icons" data-toggle="modal"
-                                data-target="#agentModal{{ $application->id }}">
-                                preview
-                            </span>
-                        </td>
-                        <td>{{ $application->staffName }}</td>
-                        <td class="text-success"> &#8377;{{ $application->price }}</td>
-                        <td>
-                            @if ($application->delivery_date && $application->delivery)
-                                <!-- If delivery date exists, display a link to open the document in another tab -->
-                                <div class="form-group">
-                                    Uploaded Document:<a href="{{ asset($application->delivery) }}" target="_blank"
-                                        style="color: blue;">View Document</a>
-                                </div>
-                            @endif
-                            <div class="form-group">
-                                <input type="file" class="form-control-sm" id="document" name="document"
-                                    placeholder="upload Document">
-                            </div>
-                        </td>
-                        <td>
-                            @if ($application->receipt)
-                                <div class="form-group">
-                                    Uploaded Reciept:<a href="{{ asset($application->receipt) }}" target="_blank"
-                                        style="color: blue;">View Receipt</a>
-                                </div>
-                            @endif
-                            <div class="form-group">
-                                <input type="file" class="form-control-sm" id="receipt" name="receipt"
-                                    placeholder="upload receipt">
-                            </div>
-                        </td>
-                        <td>
-                            <button type="submit" class="btn btn-sm btn-primary mb-1">Update</button>
-                            </form>
+                                        <div class="modal-body">
+                                            <p><strong>Mobile Number:</strong> {{ $application->customer_mobile }}</p>
+                                            @php
+                                                $formData = json_decode($application->form_data, true);
+                                                $i = 1;
+                                            @endphp
+                                            @foreach ($formData as $category => $fields)
+                                                                @if (strtolower($category) !== 'service_id' && strtolower($category) !== 'filepaths')
+                                                                                    @foreach ($fields as $key => $value)
+                                                                                                        @php
+                                                                                                            if ($i == 1) {
+                                                                                                                $i++;
+                                                                                                                continue;
+                                                                                                            }
+                                                                                                        @endphp
+                                                                                                        @if (!empty($value))
+                                                                                                            @if (is_array($value))
+                                                                                                                <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong>
+                                                                                                                    {{ implode(', ', $value) }}</p>
+                                                                                                            @else
+                                                                                                                <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong>
+                                                                                                                    {{ $value }}</p>
+                                                                                                            @endif
+                                                                                                        @endif
+                                                                                    @endforeach
+                                                                @endif
+                                            @endforeach
 
-
-                        </td>
-                        <td>
-                            <form action="{{ route('applications.destroy', $application->id) }}" method="POST"
-                                onsubmit="return confirm('Are you sure you want to delete this application?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
-
-                        </td>
-
-
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="agentModal{{ $application->id }}" tabindex="-1" role="dialog"
-                            aria-labelledby="agentModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="agentModalLabel">
-                                            Application Details - {{ $application->customer_name }}
-                                        </h5>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p><strong>Mobile Number:</strong> {{ $application->customer_mobile }}</p>
-                                        @php
-                                            $formData = json_decode($application->form_data, true);
-                                            $i = 1;
-                                        @endphp
-                                        @foreach ($formData as $category => $fields)
-                                            @if (strtolower($category) !== 'service_id' && strtolower($category) !== 'filepaths')
-                                                @foreach ($fields as $key => $value)
-                                                    @php
-                                                        if ($i == 1) {
-                                                            $i++;
-                                                            continue;
-                                                        }
-                                                    @endphp
-                                                    @if (!empty($value))
-                                                        @if (is_array($value))
-                                                            <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong>
-                                                                {{ implode(', ', $value) }}</p>
-                                                        @else
-                                                            <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong>
-                                                                {{ $value }}</p>
-                                                        @endif
-                                                    @endif
-                                                @endforeach
-                                            @endif
-                                        @endforeach
-
-                                        @foreach ($formData['filePaths'] as $key => $value)
-                                            <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong> <a
-                                                    href="{{ asset($value) }}" target="_blank"
-                                                    style="color: blue;">View {{ $key }}</a></p>
-                                        @endforeach
-                                    </div>
-                                    <div class="modal-footer">
+                                            @foreach ($formData['filePaths'] as $key => $value)
+                                                <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong> <a
+                                                        href="{{ asset($value) }}" target="_blank" style="color: blue;">View
+                                                        {{ $key }}</a></p>
+                                            @endforeach
+                                        </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-dismiss="modal">Close</button>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-        <div>
-            {{ $applications->links('pagination::bootstrap-5') }}
-        </div>
+                        </tr>
+            @endforeach
+        </tbody>
+    </table>
+    <div>
+        {{ $applications->links('pagination::bootstrap-5') }}
+    </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
-    </script>
+        </script>
     <script src="{{ asset('js/adminDashboard.js') }}"></script>
     <script>
         document.querySelectorAll('.statuses-menu').forEach((e) => {
@@ -545,15 +514,13 @@
                         <div class="col-6">
                             <div class="form-group">
                                 <label for="exampleInputEmail"><strong>Email:</strong></label>
-                                <input type="email" class="form-control" name="email"
-                                    placeholder="Enter Email id" />
+                                <input type="email" class="form-control" name="email" placeholder="Enter Email id" />
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="form-group">
                                 <label for="exampleInputAddress"><strong>Address:</strong></label>
-                                <input type="text" class="form-control" name="address"
-                                    placeholder="Enter Address" />
+                                <input type="text" class="form-control" name="address" placeholder="Enter Address" />
                             </div>
                         </div>
                     </div>
@@ -626,8 +593,7 @@
                         <div class="col-6">
                             <div class="form-group">
                                 <label for="exampleInputUsername"><strong>Username:</strong></label>
-                                <input type="text" class="form-control" name="username"
-                                    placeholder="Enter Username" />
+                                <input type="text" class="form-control" name="username" placeholder="Enter Username" />
                             </div>
                         </div>
                         <div class="col-6">
