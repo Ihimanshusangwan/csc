@@ -16,6 +16,7 @@ class AdminLoginController extends Controller
     {
         $plans = DB::table('plans')->where("is_active", 1)->get();
         $locations = DB::table('locations')->get();
+        $applicantName = $request->input('applicantName');
 
         $query = DB::table('applications')
             ->join('customers', 'applications.customer_id', '=', 'customers.id')
@@ -34,6 +35,9 @@ class AdminLoginController extends Controller
                 DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color , ":" , ask_reason)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
             )
             ->orderBy("applications.id", "desc");
+            if ($applicantName) {
+                $query->where('customers.name', 'like', '%' . $applicantName . '%');
+            }
 
         // Fetch paginated applications
         $applications = $query->paginate(15);
