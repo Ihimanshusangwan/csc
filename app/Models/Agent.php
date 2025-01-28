@@ -132,7 +132,7 @@ class Agent extends Model
                 $query->whereDate("a.apply_date", "=", today()->toDateString());
                 break;
             case "completed":
-                $query->Where('applications.status', '==', 2);
+                $query->Where('applications.status', '=', 2);
                 break;
             case "pending":
                 $query->Where('applications.status', '!=', 2);
@@ -167,7 +167,7 @@ class Agent extends Model
 
         // Get completed applications count which have delivery date less than today
         $completedApplicationsCount = DB::table('applications')
-            ->where('applications.agent_id', $agent_id)->Where('applications.status', '==', 2)
+            ->where('applications.agent_id', $agent_id)->Where('applications.status', '=', 2)
             ->where('applications.is_approved', '=', 1)
             ->count();
         // Calculate pending applications count
