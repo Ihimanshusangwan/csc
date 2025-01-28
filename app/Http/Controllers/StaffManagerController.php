@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
 class StaffManagerController extends Controller
 {
     public function dashboard(Request $request)
     {
-        // Fetch applications and their assigned staff
-        $applications = DB::table('applications')
+        // Initialize the query
+        $query = DB::table('applications')
             ->leftJoin('staff', 'applications.staff_id', '=', 'staff.id')
             ->leftJoin('customers', 'applications.customer_id', '=', 'customers.id')
             ->leftJoin('services', 'applications.service_id', '=', 'services.id')
@@ -27,9 +28,19 @@ class StaffManagerController extends Controller
                 'staff.name as staff_name',
                 'staff.id as staff_id',
                 DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color , ":" , ask_reason)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
-            )
-            ->orderBy('applications.id', 'desc')
-            ->paginate(15);
+            );
+
+        // Apply filters if provided
+        if ($request->filled('customer_name')) {
+            $query->where('customers.name', 'like', '%' . $request->customer_name . '%');
+        }
+
+        if ($request->filled('date')) {
+            $query->whereDate('applications.created_at', $request->date);
+        }
+
+        // Fetch applications and their assigned staff
+        $applications = $query->orderBy('applications.id', 'desc')->paginate(15);
 
         // Fetch all staff members for the dropdown
         $staff = DB::table('staff')->select('id', 'name')->get();

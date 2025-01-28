@@ -9,6 +9,25 @@
 
     <div class="bg-white shadow-md rounded p-6">
         <h2 class="text-2xl font-bold mb-6">Applications</h2>
+
+      <!-- Search Form -->
+<form method="GET" action="{{ route('staff_manager.dashboard') }}" class="mb-6">
+    <div class="flex items-center space-x-4">
+        <div class="w-1/3">
+            <label for="customer_name" class="block text-sm font-medium text-gray-700">Customer Name</label>
+            <input type="text" name="customer_name" id="customer_name" value="{{ request('customer_name') }}" placeholder="Enter customer name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-lg">
+        </div>
+        <div class="w-1/3">
+            <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
+            <input type="date" name="date" id="date" value="{{ request('date') }}" placeholder="Select date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-lg">
+        </div>
+        <div class="w-1/3 flex items-end">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Search</button>
+        </div>
+    </div>
+</form>
+
+
         <table class="min-w-full bg-white">
             <thead>
                 <tr>
