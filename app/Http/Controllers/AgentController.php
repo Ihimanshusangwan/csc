@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
 
 class AgentController extends Controller
 {
@@ -53,7 +56,7 @@ class AgentController extends Controller
         $paidAmount = ($type == 'Register') ? $request->input('paid_amount') : null;
         $unpaidAmount = ($type == 'Register') ? $request->input('unpaid_amount') : null;
 
-        $existingUsername = DB::table('agents')->where('username', $username)->exists();
+        $existingUsername = DB::table('users')->where('username', $username)->exists();
 
         // If the username already exists, return an error response
         if ($existingUsername) {
@@ -80,7 +83,17 @@ class AgentController extends Controller
         $shopLicensePath = $this->uploadFile($request->file('upload_shop_license'), 'shop_license');
         $ownerPhotoPath = $this->uploadFile($request->file('upload_owner_photo'), 'owner_photo');
         $uploadSupportingDocumentPath = $this->uploadFile($request->file('uploadSupportingDocument'), 'supporting_document');
+        $user = User::create([
+            'username' => $username,
+            'password' => Hash::make($password),
+            'name' => $fullName,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
+        $AgentRoleId = Role::where('name', 'agent')->value('id');
+        $user->roles()->attach($AgentRoleId);
+        $userId = $user->id;
 
         // Save the data to the database using query builder
         $agentId = DB::table('agents')->insertGetId([
@@ -107,6 +120,7 @@ class AgentController extends Controller
             'reg_date' => now(),
             'expiration_date' => $expirationDate,
             'referral_code' => $referral_code,
+            'user_id' => $userId,
         ]);
         return redirect()->back()->with(['success' => 'Registration successful']);
     }
@@ -290,18 +304,18 @@ class AgentController extends Controller
     }
 
 
-    //agent login handling
-    public function showLoginForm()
-    {
-        // Check if the custom cookie exists
-        if (Cookie::has('Agent_Session')) {
-            // The cookie exists, proceed to the admin dashboard
-            return redirect()->route('agent.dashboard');
-        } else {
+ //agent login handling
+ public function showLoginForm()
+ {
+     // Check if the custom cookie exists
+     if (Cookie::has('Agent_Session')) {
+         // The cookie exists, proceed to the admin dashboard
+         return redirect()->route('agent.dashboard');
+     } else {
 
-            return view('agent.login');
-        }
-    }
+         return view('agent.login');
+     }
+ }
     public function login(Request $request)
     {
         // Validate login data

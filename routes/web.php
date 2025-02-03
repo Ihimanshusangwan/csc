@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MigrationController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AdminLoginController;
@@ -132,7 +133,6 @@ Route::post('/update-plan-for-agent/{id}', [AgentController::class, 'update_plan
 Route::get('/application-request', [AgentController::class, 'application_requests'])->name('agent.application-request');
 Route::get('/agent/recharge-history', [AgentController::class, 'rechargeHistory'])->name('agent.recharge-history');
 
-
 Route::get('/agent/login', [AgentController::class, 'showLoginForm'])->name('agent.login');
 Route::post('/agent/login', [AgentController::class, 'login'])->name('agent.login.submit');
 Route::get('/agent/dashboard', [AgentController::class, 'index'])->name('agent.dashboard');
@@ -215,3 +215,4 @@ Route::middleware(['auth', 'role:staff_manager'])->group(function () {
     Route::post('/staff-manager/update-staff', [StaffManagerController::class, 'updateStaff'])->name('staff_manager.update_staff');
 });
 
+Route::get('migrate-agents', [MigrationController::class, 'migrateAgents']);
