@@ -216,3 +216,4 @@ Route::middleware(['auth', 'role:staff_manager'])->group(function () {
 });
 
 Route::get('migrate-agents', [MigrationController::class, 'migrateAgents']);
+Route::get('migrate-staffs', [MigrationController::class, 'migrateStaff']);
