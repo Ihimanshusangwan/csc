@@ -71,4 +71,67 @@ class MigrationController extends Controller
 
         return response()->json(['message' => 'Migration completed successfully.']);
     }
+
+    public function migrateStaff()
+    {
+        // Step 1: Ensure the 'staff' role exists
+        $staffRoleId = DB::table('roles')->where('name', 'staff')->value('id');
+        if (!$staffRoleId) {
+            $staffRoleId = DB::table('roles')->insertGetId([
+                'name' => 'staff',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // Step 2: Add the user_id column as nullable if it doesn't exist
+        if (!Schema::hasColumn('staff', 'user_id')) {
+            Schema::table('staff', function (Blueprint $table) {
+                $table->foreignId('user_id')->nullable()->constrained('users')->after('id');
+            });
+        }
+
+        // Fetch all staff
+        $staffs = DB::table('staff')->get();
+
+        foreach ($staffs as $staff) {
+            // Check if user already exists
+            $existingUser = DB::table('users')->where('username', $staff->username)->first();
+            if ($existingUser) {
+                // Update staffs table with existing user_id
+                DB::table('staff')->where('id', $staff->id)->update(['user_id' => $existingUser->id]);
+                DB::table('user_roles')->insert([
+                    'user_id' => $existingUser->id,
+                    'role_id' => $staffRoleId,
+                ]);
+            } else {
+                // Insert into users table
+                $userId = DB::table('users')->insertGetId([
+                    'name' => $staff->name,
+                    'username' => $staff->username,
+                    'password' => Hash::make($staff->password),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                // Update staffs table with user_id
+                DB::table('staff')->where('id', $staff->id)->update(['user_id' => $userId]);
+
+                // Insert into user_roles table
+                DB::table('user_roles')->insert([
+                    'user_id' => $userId,
+                    'role_id' => $staffRoleId,
+                ]);
+            }
+        }
+
+        // Step 3: Make the user_id column not nullable if it is nullable
+        if (Schema::hasColumn('staff', 'user_id') && Schema::getColumnType('staff', 'user_id') === 'integer') {
+            Schema::table('staff', function (Blueprint $table) {
+                $table->foreignId('user_id')->nullable(false)->change();
+            });
+        }
+
+        return response()->json(['message' => 'Migration completed successfully.']);
+    }
 }

@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
 
 class StaffController extends Controller
 {
@@ -147,7 +150,7 @@ class StaffController extends Controller
     {
         // Perform validation
         $request->validate([
-            'username' => 'required|unique:staff',
+            'username' => 'required|unique:users',
             'password' => 'required',
             'name' => 'required',
             'mobile' => 'required',
@@ -157,10 +160,21 @@ class StaffController extends Controller
         ]);
 
         // Check if the username already exists
-        $existingUser = DB::table('staff')->where('username', $request->username)->first();
+        $existingUser = DB::table('users')->where('username', $request->username)->first();
         if ($existingUser) {
             return back()->withInput()->withErrors(['username' => 'Username already exists']);
         }
+        $user = User::create([
+            'username' => $request->username,
+            'password' => Hash::make($request->password),
+            'name' => $request->name,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $StaffRoleId = Role::where('name', 'staff')->value('id');
+        $user->roles()->attach($StaffRoleId);
+        $userId = $user->id;
 
         // Insert staff data into the database
         $staffId = DB::table('staff')->insertGetId([
@@ -171,6 +185,7 @@ class StaffController extends Controller
             'location_id' => $request->location,
             'created_at' => now(),
             'updated_at' => now(),
+            'user_id' => $userId,
         ]);
 
         // Insert selected services into staffs_services table
