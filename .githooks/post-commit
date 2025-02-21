@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+echo "Deleting merged local branches"
+git for-each-ref --format='%(refname:short)' --merged=master refs/heads | while read -r curr_branch; do
+    if [ "$curr_branch" != "test" ] && [ "$curr_branch" != "master" ]; then
+        git branch -D "$curr_branch"
+    fi
+done
