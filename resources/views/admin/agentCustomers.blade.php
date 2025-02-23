@@ -298,6 +298,11 @@
                                                 <b>Requested Again with
                                                     Message: </b>{{ $formData['formData'][$key]['message'] }}
                                             </p>
+                                        @else
+                                            <p class="text-warning"><b>Re Submitted by Agent</b></p>
+                                            <a class="btn btn-sm btn-info" href="#"
+                                               onclick="requestAgainWithMessage('{{ $application->id }}', '{{ $key }}')">Request
+                                                Again with message</a>
 
                                         @endif
                                     @else
