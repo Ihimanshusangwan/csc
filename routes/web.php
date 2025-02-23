@@ -68,7 +68,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 });
 
 
-
 //service groups routes
 Route::get('/service-groups', [ServiceGroupController::class, 'index'])->name('service-groups.index');
 Route::post('/service-groups', [ServiceGroupController::class, 'store'])->name('service-groups.store');
@@ -202,7 +201,7 @@ Route::get('/login', function () {
         }
     }
     return app(LoginController::class)->showLoginForm();
-})->name('login');  
+})->name('login');
 
 Route::post('/login', [LoginController::class, 'login'])->name('login.manager');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -217,3 +216,8 @@ Route::middleware(['auth', 'role:staff_manager'])->group(function () {
 
 Route::get('migrate-agents', [MigrationController::class, 'migrateAgents']);
 Route::get('migrate-staffs', [MigrationController::class, 'migrateStaff']);
+
+use App\Http\Controllers\DocumentController;
+
+Route::get('/document/request', [DocumentController::class, 'requestDocument'])->name('document.request');
+Route::post('/document/re-submit-doc/{id}/{key}', [DocumentController::class, 'reSubmitDocument'])->name('document.re-submit-doc');
