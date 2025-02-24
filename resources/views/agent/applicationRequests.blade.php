@@ -2,12 +2,12 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Applicattions</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
     <style>
         body {
             height: 100%;
@@ -135,11 +135,11 @@
 
     <link rel="stylesheet" href="{{ asset('css/adminDashboard.css') }}">
 
-  <script src="{{asset('js/sweetAlert.js')}}"></script>
+    <script src="{{asset('js/sweetAlert.js')}}"></script>
 </head>
 
 <body>
-    @if(session('success'))
+@if(session('success'))
     <script>
         Swal.fire({
             icon: 'success',
@@ -160,136 +160,137 @@
         });
     </script>
 @endif
-    <div class="agent-data-page">
-        <div class="heading">
-            <div class="dashboard-content">
-                <span class="material-icons home-icon"> home </span>
-                <h3 class="dashboard">Dashboard</h3>
-            </div>
-            
+<div class="agent-data-page">
+    <div class="heading">
+        <div class="dashboard-content">
+            <span class="material-icons home-icon"> home </span>
+            <h3 class="dashboard">Dashboard</h3>
         </div>
 
-        <h3 class="mt-4 text-center">All Applications</h3>
-        <div class="sort-filter">
-            <div class="dropdown">
-                <a href="{{ route('agent.dashboard') }}" class="btn btn-secondary m-2">Home</a>
-            </div>
+    </div>
+
+    <h3 class="mt-4 text-center">All Applications</h3>
+    <div class="sort-filter">
+        <div class="dropdown">
+            <a href="{{ route('agent.dashboard') }}" class="btn btn-secondary m-2">Home</a>
         </div>
+    </div>
 
-        <table class="table table-striped mt-4">
-            <thead>
-                <tr class="table-dark text-center">
-                    <th scope="col">Sr.No</th>
-                    <th scope="col">Applicant Name</th>
-                    <th scope="col">Date of Application</th>
-                    <th scope="col">Applied For</th>
-                    <th scope="col">Preview</th>
-                    <th scope="col">Price type</th>
-                    <th scope="col">Reason(if rejecting)</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
+    <table class="table table-striped mt-4">
+        <thead>
+        <tr class="table-dark text-center">
+            <th scope="col">Sr.No</th>
+            <th scope="col">Applicant Name</th>
+            <th scope="col">Date of Application</th>
+            <th scope="col">Applied For</th>
+            <th scope="col">Preview</th>
+            <th scope="col">Price type</th>
+            <th scope="col">Reason(if rejecting)</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
 
-                @php
-                    $counter = 1;
-                @endphp
-                @foreach ($applications as $application)
+        @php
+            $counter = 1;
+        @endphp
+        @foreach ($applications as $application)
 
-                <form action="{{route('agent.update-application')}}" method="POST">
-                    <tr class="text-center">
-                        <th scope="row">{{ $counter++ }}</th>
-                        <td>{{ $application->customer_name }}</td>
-                        <td>{{ $application->apply_date }}</td>
-            
-                        <td>{{ $application->service_name }}</td>
-                        <td>
+            <form action="{{route('agent.update-application')}}" method="POST">
+                <tr class="text-center">
+                    <th scope="row">{{ $counter++ }}</th>
+                    <td>{{ $application->customer_name }}</td>
+                    <td>{{ $application->apply_date }}</td>
+
+                    <td>{{ $application->service_name }}</td>
+                    <td>
                             <span style="cursor: pointer" class="material-icons" data-toggle="modal"
-                                data-target="#agentModal{{ $application->id }}">
+                                  data-target="#agentModal{{ $application->id }}">
                                 preview
                             </span>
-                        </td>
-                            @csrf
-                            <input type="hidden" name="id" value="{{$application->id}}">
-                        <td>
-                           <select name="price_type" class="form-control" >
+                    </td>
+                    @csrf
+                    <input type="hidden" name="id" value="{{$application->id}}">
+                    <td>
+                        <select name="price_type" class="form-control">
                             <option value="default">Default</option>
                             <option value="tatkal">Tatkal</option>
-                           </select>
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" name="reason">
-                        </td>
-                        <td>
-                            <button class="btn btn-success mx-1" type="submit">Approve</button>
-                            <button class="btn btn-danger" type="submit">Reject</button>
-                        </td>
-                        <!-- Modal -->
-                        <div class="modal fade" id="agentModal{{ $application->id }}" tabindex="-1" role="dialog"
-                            aria-labelledby="agentModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="agentModalLabel">
-                                            Application Details - {{ $application->customer_name }}
-                                        </h5>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p><strong>Mobile Number:</strong> {{ $application->customer_mobile }}</p>
-                                        @php
-                                            $formData = json_decode($application->form_data, true);
-                                            $i = 1;
-                                        @endphp
-                                        @foreach ($formData as $category => $fields)
-                                            @if (strtolower($category) !== 'service_id' && strtolower($category) !== 'filepaths')
-                                                @foreach ($fields as $key => $value)
-                                                    @php
-                                                        if ($i == 1) {
-                                                            $i++;
-                                                            continue;
-                                                        }
-                                                    @endphp
-                                                    @if (!empty($value))
-                                                        @if (is_array($value))
-                                                            <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong>
-                                                                {{ implode(', ', $value) }}</p>
-                                                        @else
-                                                            <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong>
-                                                                {{ $value }}</p>
-                                                        @endif
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="reason">
+                    </td>
+                    <td>
+                        <button class="btn btn-success mx-1" type="submit">Approve</button>
+                        <button class="btn btn-danger" type="submit">Reject</button>
+                    </td>
+                    <!-- Modal -->
+                    <div class="modal fade" id="agentModal{{ $application->id }}" tabindex="-1" role="dialog"
+                         aria-labelledby="agentModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="agentModalLabel">
+                                        Application Details - {{ $application->customer_name }}
+                                    </h5>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Mobile Number:</strong> {{ $application->customer_mobile }}</p>
+                                    @php
+                                        $formData = json_decode($application->form_data, true);
+                                        $i = 1;
+                                    @endphp
+                                    @foreach ($formData as $category => $fields)
+                                        @if (strtolower($category) !== 'service_id' && strtolower($category) !== 'filepaths')
+                                            @foreach ($fields as $key => $value)
+                                                @php
+                                                    if ($i == 1) {
+                                                        $i++;
+                                                        continue;
+                                                    }
+                                                @endphp
+                                                @if (!empty($value))
+                                                    @if (is_array($value))
+                                                        <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong>
+                                                            {{ implode(', ', $value) }}</p>
+                                                    @else
+                                                        <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong>
+                                                            {{ $value }}</p>
                                                     @endif
-                                                @endforeach
-                                            @endif
-                                        @endforeach
+                                                @endif
+                                            @endforeach
+                                        @endif
+                                    @endforeach
 
-                                        @foreach ($formData['filePaths'] as $key => $value)
-                                            <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong> <a
-                                                    href="{{ asset($value) }}" target="_blank">View
-                                                    {{ $key }}</a></p>
-                                        @endforeach
-                                    </div>
+                                    @foreach ($formData['filePaths'] as $key => $value)
+                                        <p><strong>{{ ucfirst(str_replace('-', ' ', $key)) }}:</strong> <a
+                                                href="{{ asset($value) }}" target="_blank">View
+                                                {{ $key }}</a></p>
+                                    @endforeach
+                                </div>
+                                <div class="modal-footer">
                                     <div class="modal-footer">
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-dismiss="modal">Close</button>
-                                        </div>
+                                        <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Close
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        </div>
-                    </tr>
+                    </div>
+</div>
+</tr>
 
-                </form>
-                @endforeach
-            </tbody>
-        </table>
-        <div>
-            {{ $applications->links('pagination::bootstrap-5') }}
-        </div>
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</form>
+@endforeach
+</tbody>
+</table>
+<div>
+    {{ $applications->links('pagination::bootstrap-5') }}
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>
