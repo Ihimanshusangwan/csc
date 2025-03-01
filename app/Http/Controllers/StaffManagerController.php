@@ -40,7 +40,7 @@ class StaffManagerController extends Controller
         }
 
         // Fetch applications and their assigned staff
-        $applications = $query->orderBy('applications.id', 'desc')->paginate(15);
+        $applications = $query->orderBy('applications.id', 'desc')->paginate(50);
 
         // Fetch all staff members for the dropdown
         $staff = DB::table('staff')->select('id', 'name')->get();
