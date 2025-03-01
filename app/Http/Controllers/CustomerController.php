@@ -30,7 +30,7 @@ class CustomerController extends Controller
                     DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color , ":" , ask_reason)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
                 )
                 ->orderBy("applications.id", "desc");
-            $applications = $query->paginate(15);
+            $applications = $query->paginate(50);
             return view('customer.dashboard', compact('applications'));
         } else {
 

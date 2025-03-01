@@ -172,7 +172,7 @@ class AgentController extends Controller
 
 
         // Use paginate directly on the query builder
-        $agents = $query->paginate(15);
+        $agents = $query->paginate(50);
 
         // Fetch all plans separately
         $plans = DB::table('plans')
@@ -202,7 +202,7 @@ class AgentController extends Controller
         }
 
         // Use paginate directly on the query builder before calling get()
-        $agents = $query->paginate(15);
+        $agents = $query->paginate(50);
 
         $query2 = DB::table('hold_agents')
             ->join('agents', 'hold_agents.agent_id', '=', 'agents.id')
@@ -220,7 +220,7 @@ class AgentController extends Controller
         }
 
         // Use paginate directly on the query builder before calling get()
-        $holds = $query2->paginate(15);
+        $holds = $query2->paginate(50);
 
         $plans = DB::table('plans')
             ->where("is_active", '=', true)->get();
@@ -496,7 +496,7 @@ class AgentController extends Controller
             }
 
             // Fetch paginated applications
-            $applications = $query->paginate(15);
+            $applications = $query->paginate(50);
 
             // Get sum of all price column
             $sumOfPrices = $query->sum('price');
@@ -541,7 +541,7 @@ class AgentController extends Controller
         // Calculate the new balance after recharge
         $newBalance = $currentBalance + $amount;
 
-        // Inserting data into the 'recharges' table 
+        // Inserting data into the 'recharges' table
         DB::table('recharges')->insert([
             'agent_id' => $id,
             'amount' => $amount,
@@ -606,7 +606,7 @@ class AgentController extends Controller
                 ->orderBy("id", "desc");
 
             // Fetch paginated applications
-            $recharges = $query->paginate(15);
+            $recharges = $query->paginate(50);
 
             // Get sum of all spendings
             $spendings = DB::table('recharges')
@@ -655,7 +655,7 @@ class AgentController extends Controller
                     'customers.mobile as customer_mobile',
                 )
                 ->orderBy("applications.id", "desc");
-            $applications = $query->paginate(15);
+            $applications = $query->paginate(50);
 
             return view('agent.applicationRequests', compact('applications'));
         } else {

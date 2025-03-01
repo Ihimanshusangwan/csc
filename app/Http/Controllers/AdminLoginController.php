@@ -35,12 +35,12 @@ class AdminLoginController extends Controller
                 DB::raw('(SELECT GROUP_CONCAT(CONCAT(id, ":", status_name, ":" , color , ":" , ask_reason)) FROM service_statuses WHERE service_statuses.service_id = applications.service_id) as statuses')
             )
             ->orderBy("applications.id", "desc");
-            if ($applicantName) {
-                $query->where('customers.name', 'like', '%' . $applicantName . '%');
-            }
+        if ($applicantName) {
+            $query->where('customers.name', 'like', '%' . $applicantName . '%');
+        }
 
         // Fetch paginated applications
-        $applications = $query->paginate(15);
+        $applications = $query->paginate(50);
         // dd($applications);
         // Get sum of all price column
         $sumOfPrices = DB::table('applications')
@@ -70,6 +70,7 @@ class AdminLoginController extends Controller
         return view('admin.dashboard', compact('plans', 'locations', 'applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount'));
 
     }
+
     public function troubleshoot()
     {
         // Check if the custom cookie exists
@@ -79,6 +80,7 @@ class AdminLoginController extends Controller
         return view('admin.troubleshooter', compact('issues'));
 
     }
+
     public function customerData()
     {
         $plans = DB::table('plans')->where("is_active", 1)->get();
@@ -105,6 +107,7 @@ class AdminLoginController extends Controller
         $applications = $query->get();
         return $applications->toJson();
     }
+
     public function showFieldBoyDetails(Request $request)
     {
 
@@ -119,13 +122,14 @@ class AdminLoginController extends Controller
             )
             ->orderBy("fieldboys.id", "desc");
 
-        $fieldboys = $query->paginate(15);
+        $fieldboys = $query->paginate(50);
 
 
         // Pass data to the view using compact
         return view('admin.registeredFieldBoys', compact('fieldboys'));
 
     }
+
     public function showStaffDetails(Request $request)
     {
         $query = DB::table('staff')
@@ -144,7 +148,7 @@ class AdminLoginController extends Controller
             )
             ->groupBy('staff.id', 'staff.username', 'staff.name', 'staff.mobile', 'locations.district', 'staff.password', 'staff.created_at');
 
-        $staffs = $query->paginate(15);
+        $staffs = $query->paginate(50);
 
         return view('admin.registeredStaff', compact('staffs'));
 
@@ -158,6 +162,7 @@ class AdminLoginController extends Controller
         return redirect()->route('admin.dashboard');
 
     }
+
     public function agentView(Request $request, $id, $category)
     {
 
@@ -196,7 +201,7 @@ class AdminLoginController extends Controller
         }
 
         // Fetch paginated applications
-        $applications = $query->paginate(15);
+        $applications = $query->paginate(50);
 
         // Get sum of all price column
         $sumOfPrices = $query->sum('price');
@@ -226,6 +231,7 @@ class AdminLoginController extends Controller
         return view('admin.agentCustomers', compact('applications', 'sumOfPrices', 'countOfTodaysApplications', 'totalApplicationCount', 'completedApplicationsCount', 'pendingApplicationsCount', 'id', 'category'));
 
     }
+
     public function filter(Request $request)
     {
         $services = DB::table('services')->where("is_active", 1)->get();
@@ -302,10 +308,10 @@ class AdminLoginController extends Controller
             foreach ($collection as $item) {
                 if (is_object($item)) {
                     // Calculate totals
-                    $totalPrice += (float) ($item->price ?? 0);
-                    $totalGovtPrice += (float) ($item->govt_price ?? 0);
-                    $totalCommission += (float) ($item->commission ?? 0);
-                    $totalTax += (float) ($item->tax ?? 0);
+                    $totalPrice += (float)($item->price ?? 0);
+                    $totalGovtPrice += (float)($item->govt_price ?? 0);
+                    $totalCommission += (float)($item->commission ?? 0);
+                    $totalTax += (float)($item->tax ?? 0);
                 }
             }
 
@@ -337,7 +343,7 @@ class AdminLoginController extends Controller
         // Get sum of all price column
         $sumOfPrices = $query
             ->sum('price');
-        //total govt. price 
+        //total govt. price
         $sumOfGovtPrice = $query
             ->sum('govt_price');
         //total commission
@@ -349,6 +355,7 @@ class AdminLoginController extends Controller
         return view('admin.filter', compact('applications', 'sumOfPrices', 'services', 'agents', 'statuses', 'sumOfGovtPrice', 'sumOfCommission', 'sumOfTax', 'structuredData'));
 
     }
+
     public function rechargeHistory(Request $request)
     {
 
@@ -362,7 +369,7 @@ class AdminLoginController extends Controller
             ->orderBy("recharges.id", "desc");
 
         // Fetch paginated applications
-        $recharges = $query->paginate(15);
+        $recharges = $query->paginate(50);
 
         // Get sum of all earnings
         $earnings = DB::table('recharges')
@@ -370,6 +377,7 @@ class AdminLoginController extends Controller
 
         return view("admin.rechargeHistory", compact('recharges', 'earnings'));
     }
+
     public function appointments(Request $request)
     {
 
@@ -386,11 +394,12 @@ class AdminLoginController extends Controller
             ->orderby('appointments.selected_date', 'asc');
 
         // Fetch paginated applications
-        $appointments = $query->paginate(15);
+        $appointments = $query->paginate(50);
         // dd($appointments);
 
         return view("admin.appointments", compact('appointments'));
     }
+
     public function visitedAppointments(Request $request)
     {
 
@@ -408,10 +417,11 @@ class AdminLoginController extends Controller
             ->orderby('appointments.id', 'desc');
 
         // Fetch paginated applications
-        $appointments = $query->paginate(15);
+        $appointments = $query->paginate(50);
 
         return view("admin.visitedAppointments", compact('appointments'));
     }
+
     public function rejectedAppointments(Request $request)
     {
 
@@ -431,10 +441,11 @@ class AdminLoginController extends Controller
             ->orderby('appointments.id', 'desc');
 
         // Fetch paginated applications
-        $appointments = $query->paginate(15);
+        $appointments = $query->paginate(50);
 
         return view("admin.deletedAppointments", compact('appointments'));
     }
+
     public function deleteData(Request $request)
     {
         $password = $request->input('password');
@@ -506,7 +517,7 @@ class AdminLoginController extends Controller
                 break;
         }
         // Fetch paginated applications
-        $applications = $query->paginate(15);
+        $applications = $query->paginate(50);
 
         // Get sum of all price column
         $sumOfPrices = $query
@@ -586,6 +597,7 @@ class AdminLoginController extends Controller
         return redirect()->route('admin.dashboard')->with(['success' => 'Bill data has been stored successfully']);
 
     }
+
     public function billFilter(Request $request)
     {
 
@@ -603,8 +615,6 @@ class AdminLoginController extends Controller
                 'bills.*',
             )
             ->orderBy("bills.id", "desc");
-
-
 
 
         // Apply filters conditionally based on input values
@@ -635,6 +645,7 @@ class AdminLoginController extends Controller
         return view('admin.billFilter', compact('bills', 'sumOfPrices', 'sumOfCommission', 'sumOfTax'));
 
     }
+
     public function showStaffManagers()
     {
         $staffManagers = User::whereHas('roles', function ($query) {
@@ -643,6 +654,7 @@ class AdminLoginController extends Controller
 
         return view('admin.staff_managers', compact('staffManagers'));
     }
+
     public function resetPassword(Request $request, $id)
     {
         $request->validate([
@@ -671,6 +683,7 @@ class AdminLoginController extends Controller
             return response()->json(['error' => 'Failed to fetch items.'], 500);
         }
     }
+
     public function deploy()
     {
         function recursive_copy($source, $dest)

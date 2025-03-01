@@ -104,7 +104,7 @@ class StaffController extends Controller
             }
 
             // Fetch paginated applications
-            $applications = $query->paginate(15);
+            $applications = $query->paginate(50);
 
 
             // Get count of today's applications
