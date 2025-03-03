@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class ApplicationController extends Controller
@@ -18,7 +18,15 @@ class ApplicationController extends Controller
         $updateData = [];
 
         // Update the delivery date if provided
+
         if ($request->has('delivery_date')) {
+            $deliveryDate = Carbon::parse($request->input('delivery_date'));
+            $today = Carbon::today();
+
+            if ($deliveryDate->lt($today)) {
+                return redirect()->back()->with('error', 'Delivery date cannot be earlier than today.');
+            }
+
             $updateData['delivery_date'] = $request->input('delivery_date');
         }
         // Update the status if provided
@@ -67,6 +75,7 @@ class ApplicationController extends Controller
         // Redirect back or wherever you need after successful update
         return redirect()->back()->with('success', 'Application updated successfully');
     }
+
     public function changeDocApprovalStatus(Request $request, $application_id)
     {
         $isApproved = $request->input('isApproved');
@@ -79,6 +88,7 @@ class ApplicationController extends Controller
             'application' => $application
         ]);
     }
+
     public function destroy($id)
     {
         $application = DB::table('applications')->where('id', $id)->first();

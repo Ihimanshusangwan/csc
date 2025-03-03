@@ -29,17 +29,13 @@
 @if (session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
-@if ($errors->has('error'))
+
+@if (session('error'))
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ $errors->first('error') }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+        {{ session('error') }}
     </div>
 @endif
 <div class="agent-data-page">
@@ -143,6 +139,18 @@
                         <input type="hidden" name="application_id" value="{{ $application->id }}"/>
                         <input type="date" class="form-control" id="delivery_date" name="delivery_date"
                                value="{{ $application->delivery_date ? $application->delivery_date : '' }}">
+
+                        @if (($application->status !== -1 || $application->status !== 2) && $application->delivery_date)
+                            @php
+                                $deliveryDate = new DateTime($application->delivery_date);
+                                $today = new DateTime();
+                                $interval = $today->diff($deliveryDate);
+                                $daysLeft = $interval->days;
+                            @endphp
+                            @if ($daysLeft < 5)
+                                <b><span class="text-danger">({{ $daysLeft }} days left)</span></b>
+                    @endif
+                    @endif
                 </td>
 
                 <td>
